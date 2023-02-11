@@ -12,7 +12,7 @@
   },
   "author": "",
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "ace-builds": "^1.15.0"
   }
 }
