@@ -1,0 +1,18 @@
+{
+  "name": "armtee",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Alternative micro template",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ace-builds": "^1.15.0"
+  }
+}

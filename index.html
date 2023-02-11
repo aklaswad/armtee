@@ -1,0 +1,213 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ace-builds@1.15.0/css/ace.min.css">
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://unpkg.com/marx-css/css/marx.min.css">
+<style type="text/css" media="screen">
+  body {
+    color: #444;
+    background-color: #f0f0f0;
+  }
+  #wrapper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 16rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .editor-wrapper {
+    background-color: #333;
+    color: #aaa;
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  #json, #tmpl, #out {
+    font-size: 1.0rem;
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 2.4rem);
+    top: 1.1rem;
+    left: 0;
+  }
+
+  .editor-header, .editor-footer {
+    position: absolute;
+    width: 100%;
+    padding: 0 1rem;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  .editor-header {
+    top: 0;
+  }
+
+  .editor-footer {
+    bottom: 0;
+  }
+
+  #doc {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: calc( 100% - 16rem );
+    padding: 1rem;
+    overflow: scroll;
+  }
+
+  .convert.selected {
+    color: #eee;
+    background-color: #393;
+  }
+
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.6rem; }
+  h3 { font-size: 1.4rem; }
+  h4 { font-size: 1.2rem; }
+
+</style>
+</head>
+<body>
+  <div id="wrapper">
+    <div class="editor-wrapper">
+      <div id="json">{
+  "name": "ArmTee!",
+  "items": [
+    "Advanced",
+    "Resig",
+    "Micro",
+    "Template",
+    "Engine",
+    "End"
+  ]
+}</div>
+      <p class="editor-header">data</p>
+    </div>
+    <div class="editor-wrapper">
+      <p class="editor-header">template</p>
+      <div id="tmpl">//% TAG <% %>
+//% ROOT armtee
+Thi${is} "armtee\\" &lt;%armtee.name%&gt;
+Show `items`
+//! armtee.items.forEach( item => {
+//# comment: This shows list of items!!
+//% TAG {{ }}
+ - {{item}}
+//! })</div>
+      <p class="editor-footer">
+        <a href="#" class="convert" data-style="hashy" data-mode="logic">hashy-logic</a>
+      | <a href="#" class="convert" data-style="hashy" data-mode="template">hashy-template</a>
+      | <a href="#" class="convert" data-style="slashy" data-mode="logic">slashy-logic</a>
+      | <a href="#" class="convert selected" data-style="slashy" data-mode="template">slashy-template</a>
+      </p>
+    </div>
+    <div class="editor-wrapper">
+      <p class="editor-header">output</p>
+      <div id="out"></div>
+    </div>
+  </div>
+  <div id="doc">
+    <h1>armtee</h1>
+    Line oriented text template tool
+    <h2>Synopsis</h2>
+
+    <h2>Macro</h2>
+    <h2>TextFilter</h2>
+oifja<br />
+ijfe<br />
+jij<br />
+<br />
+d<br />
+d<br />
+d<br />
+d<br />
+<br />
+<br />
+d<br />
+<br />
+<ul>
+<li> list </li>
+<li> list </li>
+</ul>
+d<br />
+<br />
+<br />
+<br />
+d<br />
+<br />
+
+  </div>
+</body>
+</script>
+<script src="./node_modules/ace-builds/src-min/ace.js"></script>
+<script type="module">
+
+  const editor = ace.edit("tmpl");
+  const jsoneditor = ace.edit("json");
+  const outeditor = ace.edit("out");
+  const editors = [ editor, jsoneditor, outeditor ];
+  editors.forEach( editor => {
+    editor.setTheme("ace/theme/pastel_on_dark");
+    editor.session.setUseWrapMode(true);
+  })
+  outeditor.getSession().selection.on('changeSelection', function (e) {
+    outeditor.getSession().selection.clearSelection();
+  });
+  outeditor.setHighlightActiveLine(false);
+  editor.session.setMode("ace/mode/markdown");
+  jsoneditor.session.setMode("ace/mode/json");
+  outeditor.session.setMode("ace/mode/json");
+  outeditor.setReadOnly(true)
+
+  import Armtee from './lib/armtee.js'
+  Armtee.debug = 1
+  const out = document.getElementById('out')
+
+  function render() {
+    const tmpl = editor.getValue()
+    const json = jsoneditor.getValue()
+    let data
+    try {
+      data = JSON.parse(json)
+    }
+    catch (e) {
+      outeditor.setValue( 'Waiting for JSON format corrected' )
+      return
+    }
+    try {
+      const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
+      outeditor.setValue( armtee.render(data) )
+    }
+    catch (e) {
+      console.log(e)
+      outeditor.setValue(e.toString())
+    }
+    return
+  }
+  const converts = document.getElementsByClassName('convert')
+  for ( let i=0; i < converts.length; i++ ) {
+    const mode = converts[i].getAttribute('data-mode')
+    const style = converts[i].getAttribute('data-style')
+    console.log({ mode, style })
+    converts[i].addEventListener('click', (evt) => {
+      for ( let i=0; i < converts.length; i++ ) {
+        converts[i].classList.remove("selected")
+      }
+      const tmpl = editor.getValue()
+      const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
+      editor.setValue(armtee.convert(style,mode))
+      evt.target.classList.add("selected")
+    })
+  }
+  console.log(converts)
+  editor.session.on('change', render)
+  jsoneditor.session.on('change', render)
+  render()
+</script>
