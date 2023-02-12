@@ -8,6 +8,7 @@
     "lib": "lib"
   },
   "scripts": {
+    "try": "node test.js",
     "test": "node --test"
   },
   "author": "",
