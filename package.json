@@ -9,11 +9,15 @@
   },
   "scripts": {
     "try": "node test.js",
-    "test": "node --test"
+    "test": "node --test",
+    "site-dev": "vite",
+    "site-build": "vite build"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "ace-builds": "^1.15.0"
+    "ace-builds": "^1.15.0",
+    "marx-css": "^4.0.1",
+    "vite": "^4.1.2"
   }
 }

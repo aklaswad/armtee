@@ -1,0 +1,68 @@
+body {
+  color: #444;
+  background-color: #00f0f0;
+}
+
+#wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 16rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.editor-wrapper {
+  background-color: #333;
+  color: #aaa;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#json, #tmpl, #out {
+  font-size: 1.0rem;
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 2.4rem);
+  top: 1.1rem;
+  left: 0;
+}
+
+.editor-header, .editor-footer {
+  position: absolute;
+  width: 100%;
+  padding: 0 1rem;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.editor-header {
+  top: 0;
+}
+
+.editor-footer {
+  bottom: 0;
+}
+
+#doc {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: calc( 100% - 16rem );
+  padding: 1rem;
+  overflow: scroll;
+}
+
+.convert.selected {
+  color: #eee;
+  background-color: #393;
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.4rem; }
+h4 { font-size: 1.2rem; }
+
