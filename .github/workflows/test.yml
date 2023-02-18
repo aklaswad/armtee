@@ -1,0 +1,16 @@
+on: push
+name: Test
+
+jobs:
+  run-tests:
+    strategy:
+      matrix:
+        os: [ macos-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/setup-node@main
+      with:
+        node-version: 18
+    - run: npm ci
+    - run: npm test
