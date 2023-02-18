@@ -32,7 +32,7 @@ function render() {
   }
   try {
     const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
-    outeditor.setValue( armtee.render(data) )
+    outeditor.setValue( armtee.render(data, {mode: 'function'}) )
   }
   catch (e) {
     console.log(e)
