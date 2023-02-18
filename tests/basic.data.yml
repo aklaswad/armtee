@@ -1,0 +1,178 @@
+- name: Render Value
+  data:
+    name: test
+  tmpl: |
+    <% data.name %>
+  expect: |
+    test
+
+- name: Render letter in the middle of word
+  data:
+    interface: cli
+  tmpl: |
+    a<% data.interface %>i
+  expect: |
+    aclii
+
+- name: Render zero number
+  data:
+    age: 0
+  tmpl: |
+    age <% data.age %>
+  expect: |
+    age 0
+
+- name: Render single quotes
+  data:
+    age: 0
+  tmpl: |
+    age '<% data.age %>' ok
+  expect: |
+    age '0' ok
+
+- name: Render double quotes
+  data:
+    age: 0
+  tmpl: |
+    age "<% data.age %>" ok
+  expect: |
+    age "0" ok
+
+- name: Render shell style EOL escape
+  data:
+    pkg: bar
+  tmpl: |
+    apt install foo \
+      <% data.pkg %> \
+      buz
+  expect: |
+    apt install foo \
+      bar \
+      buz
+
+- name: Render word in the middle of sentence
+  data:
+    emotion: love
+  tmpl: |
+    I <% data.emotion %> tests
+  expect: |
+    I love tests
+
+- name: Render Loop
+  data:
+    nums: [ 1, 2, 3 ]
+  tmpl: |
+    //! const output = data.nums.join('')
+    <% output %>
+  expect: |
+    123
+
+- name: Loop using Line based templating
+  data:
+    letters:
+      - b
+      - c
+      - d
+  tmpl: |
+    a
+    ##! data.letters.forEach( l => {
+    :<% l %>
+    ##! })
+    e
+  expect: |
+    a
+    :b
+    :c
+    :d
+    e
+
+- name: Loop using Line based templating alternative syntax
+  data:
+    letters:
+      - b
+      - c
+      - d
+  tmpl: |
+    a
+    //! data.letters.forEach( l => {
+      :<% l %>
+    //! })
+    e
+  expect: |
+    a
+      :b
+      :c
+      :d
+    e
+
+- name: Throw rendering error, for example member access for undefined
+  error: Armtee render error
+  data:
+    foo: { bar: 42 }
+  tmpl: <% data.foo.bar.fizz.buzz %>
+
+- name: Throw compile error for bad javascript
+  error: Failed to compile template
+  todo: Wakaranai
+  data:
+    nums: [ 1, 2, 3 ]
+  debug: 12
+  tmpl: |
+    //! data.nums.forEach( n => {
+      <% n %> oooooooooooooooooooo
+    //! })
+    //! for (var i=0; i<2; i++) {
+    //!   // foo
+    //! )}}
+
+- name: Include hello
+  todo: true
+  data:
+    name: world
+  tmpl: |
+    Hello. Repeat after me?
+    ##!!INCLUDE hello.tmpl
+    thanks
+  expect: |
+    Hello. Repeat after me?
+    hello world
+    thanks
+
+- name: Nested Include
+  todo: true
+  data:
+    name: world
+  tmpl: |
+    Um
+    ##!!INCLUDE hello_wrapper.tmpl
+    thanks
+  expect: |
+    Um
+    say
+    hello world
+    to you
+    thanks
+
+- name: Nested Include alternative syntax
+  todo: true
+  data:
+    name: world
+  tmpl: |
+    Um
+    //!! INCLUDE hello_wrapper.tmpl
+    thanks
+  expect: |
+    Um
+    say
+    hello world
+    to you
+    thanks
+
+- name: Stop circular including
+  todo: true
+  error: Too deep include
+  data:
+    name: world
+  tmpl: |
+    //!! INCLUDE each1.tmpl
+
