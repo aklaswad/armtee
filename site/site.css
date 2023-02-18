@@ -3,54 +3,101 @@ body {
   background-color: #e8e4e0;
 }
 
-#wrapper {
+h1 {
+  text-align: center;
+  margin: 5rem 0;
+  padding: 0 0 5rem 0;
+  border-bottom: 1px solid #fff;
+}
+
+a, a:active { color: #aaf; }
+a:hover { color: #77f; }
+
+#editors-wrapper {
   position: absolute;
   left: 0;
   top: 0;
   width: 100%;
   height: 16rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
 }
 
 .editor-wrapper {
+  float: left;
   background-color: #333;
+  border-top: 1px solid #666;
   color: #aaa;
   position: relative;
-  width: 100%;
+  top: 0;
   height: 100%;
+  overflow: hidden;
 }
 
-#json, #tmpl, #out {
+
+.editor-wrapper.g4-4 { width: calc(100% / 4) }
+.editor-wrapper.g3-4 { width: calc((100% - 1.6rem) / 3) }
+.editor-wrapper.g2-4 { width: calc((100% - 3.2rem) / 2) }
+.editor-wrapper.g1-4 { width: calc(100% - 4.8rem) }
+.editor-wrapper.off  { width: 1.6rem; }
+
+.off .editor-main { display: none; }
+.editor-toggle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0;
+  margin: 0;
+  line-height: 1rem;
+  color: #fff;
+  background-color: #383;
+  border: 2px solid #888;
+  border-radius: 0.2rem;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.editor-toggle:hover {
+  color: #fff;
+  background-color: #6a6;
+}
+
+#json, #tmpl, #trans, #out {
   font-size: 1.0rem;
   position: absolute;
   width: 100%;
-  height: calc(100% - 2.4rem);
-  top: 1.1rem;
+  height: calc(100% - 1.6rem);
+  top: 1.6rem;
   left: 0;
 }
 
-.editor-header, .editor-footer {
+.editor-header {
   position: absolute;
   width: 100%;
-  padding: 0 1rem;
+  padding: 0 2rem;
   margin: 0;
-  font-size: 0.9rem;
+  color: #eee;
+  height: 1.6rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  background-color: #234;
 }
 
 .editor-header {
   top: 0;
 }
-
-.editor-footer {
-  bottom: 0;
+.off .editor-header {
+  width: 16rem;
+  background-color: #555;
+  transform-origin: top left;
+  transform: rotate(90deg) translateY(-1.2rem);
 }
 
 #doc {
+  color: #e8efe0;
+  background-color: #333;
   position: absolute;
-  left: 0;
   bottom: 0;
-  width: 100%;
+  width: 50rem;
+  left: calc( 50% - 25rem );
   height: calc( 100% - 16rem );
   padding: 1rem;
   font-size: 1.2em;

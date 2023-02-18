@@ -7,9 +7,9 @@
 </style>
 </head>
 <body>
-  <div id="wrapper">
-    <div class="editor-wrapper">
-      <div id="json">{
+  <div id="editors-wrapper">
+    <div id="json-editor-wrapper" class="editor-wrapper g4-4">
+      <div id="json" class="editor-main">{
   "name": "ArmTee!",
   "items": [
     "Advanced",
@@ -20,11 +20,19 @@
     "End"
   ]
 }</div>
-      <p class="editor-header">data</p>
+      <p class="editor-header">data
+        <a class="editor-toggle" href="#">+</a>
+      </p>
     </div>
-    <div class="editor-wrapper">
-      <p class="editor-header">template</p>
-      <div id="tmpl">//% TAG &lt;% %&gt;
+    <div id="tmpl-editor-wrapper" class="editor-wrapper g4-4">
+      <p class="editor-header">template
+        <a href="#" class="convert" data-style="hashy" data-mode="logic">hashy-logic</a>
+      | <a href="#" class="convert" data-style="hashy" data-mode="template">hashy-template</a>
+      | <a href="#" class="convert" data-style="slashy" data-mode="logic">slashy-logic</a>
+      | <a href="#" class="convert selected" data-style="slashy" data-mode="template">slashy-template</a>
+        <a class="editor-toggle" href="#">+</a>
+      </p>
+      <div id="tmpl" class="editor-main">//% TAG &lt;% %&gt;
 //% ROOT armtee
 Thi${is} "armtee\\" &lt;%armtee.name%&gt;
 Show `items`
@@ -33,18 +41,23 @@ Show `items`
 //% TAG {{ }}
  - {{item}}
 //! })</div>
-      <p class="editor-footer">
-        <a href="#" class="convert" data-style="hashy" data-mode="logic">hashy-logic</a>
-      | <a href="#" class="convert" data-style="hashy" data-mode="template">hashy-template</a>
-      | <a href="#" class="convert" data-style="slashy" data-mode="logic">slashy-logic</a>
-      | <a href="#" class="convert selected" data-style="slashy" data-mode="template">slashy-template</a>
-      </p>
     </div>
-    <div class="editor-wrapper">
-      <p class="editor-header">output</p>
-      <div id="out"></div>
+    <div id="trans-editor-wrapper" class="editor-wrapper g4-4">
+      <p class="editor-header">
+        <span>transpiled</span>
+        <a class="editor-toggle" href="#">+</a>
+      </p>
+      <div id="trans" class="editor-main"></div>
+    </div>
+    <div id="out-editor-wrapper" class="editor-wrapper g4-4">
+      <p class="editor-header">
+        <span>output</span>
+        <a class="editor-toggle" href="#">+</a>
+      </p>
+      <div id="out" class="editor-main"></div>
     </div>
   </div>
+
   <div id="doc">
     <h1>armtee</h1>
     Line oriented text template tool<br />
