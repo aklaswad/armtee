@@ -1,3 +1,9 @@
+import ace from 'brace'
+import 'brace/theme/pastel_on_dark'
+import 'brace/mode/json'
+import 'brace/mode/markdown'
+import 'brace/mode/javascript'
+
 const editor = ace.edit("tmpl");
 const jsoneditor = ace.edit("json");
 const outeditor = ace.edit("out");
@@ -55,7 +61,6 @@ for ( let i=0; i < converts.length; i++ ) {
     evt.target.classList.add("selected")
   })
 }
-console.log(converts)
 editor.session.on('change', render)
 jsoneditor.session.on('change', render)
 render()
