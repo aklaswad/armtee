@@ -11,7 +11,7 @@
     "try": "node test.js",
     "test": "node --test tests/",
     "site-dev": "vite",
-    "site-build": "vite build"
+    "site-build": "node site/build.js && vite build"
   },
   "author": "",
   "license": "MIT",
