@@ -93,21 +93,6 @@ editorIds.forEach( editorId => {
     evt.stopPropagation()
   })
 })
-/*
-editors['tmpl'].session.setMode("ace/mode/markdown");
-editors['json'].session.setMode("ace/mode/json");
-editors['trans'].session.setMode("ace/mode/javascript");
-
-['out','trans'].forEach( editorId => {
-  const editor = editors[editorId]
-  editor.getSession().selection.on('changeSelection', function (e) {
-    editor.getSession().selection.clearSelection();
-  });
-  editor.setHighlightActiveLine(false);
-  editor.session.setMode("ace/mode/json");
-  editor.setReadOnly(true)
-})
-*/
 
 import Armtee from '../lib/armtee.js'
 Armtee.debug = 1
@@ -161,19 +146,28 @@ function render() {
   return
 }
 
+const convertFlip = {
+  style: { hashy: 'slashy', slashy: 'hashy' },
+  mode:  { template: 'logic', logic: 'template' }
+}
+const currentStyle = {
+  style: 'hashy',
+  mode: 'template'
+}
+
 const converts = document.getElementsByClassName('convert')
 for ( let i=0; i < converts.length; i++ ) {
-  const mode = converts[i].getAttribute('data-mode')
+  const mode = converts[i].getAttribute('data-type')
+
   const style = converts[i].getAttribute('data-style')
-  console.log({ mode, style })
   converts[i].addEventListener('click', (evt) => {
-    for ( let i=0; i < converts.length; i++ ) {
-      converts[i].classList.remove("selected")
-    }
-    const tmpl = editors['tmpl'].getValue()
+    const type = evt.target.getAttribute('data-type')
+    const newOne
+      = currentStyle[type] = convertFlip[type][currentStyle[type]]
+    const tmpl = editors['tmpl'].state.doc.toString();
     const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
-    editors['tmpl'].setValue(armtee.convert(style,mode))
-    evt.target.classList.add("selected")
+    replace('tmpl',armtee.convert(currentStyle.style, currentStyle.mode))
+    evt.target.text = newOne
   })
 }
 

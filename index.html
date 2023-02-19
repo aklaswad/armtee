@@ -28,17 +28,16 @@
     <div id="tmpl-editor-wrapper" class="editor-wrapper g4-4">
       <p class="editor-header">template
         <a class="editor-toggle" href="#">&nbsp;</a>
-        <a href="#" class="convert" data-style="hashy" data-mode="logic">hashy-logic</a>
-      | <a href="#" class="convert" data-style="hashy" data-mode="template">hashy-template</a>
-      | <a href="#" class="convert" data-style="slashy" data-mode="logic">slashy-logic</a>
-      | <a href="#" class="convert selected" data-style="slashy" data-mode="template">slashy-template</a>
+        <a href="#" class="convert" data-type="style">hashy</a>
+        |
+        <a href="#" class="convert" data-type="mode">template</a>
       </p>
       <div id="tmpl" class="editor-main">//% TAG &lt;% %&gt;
 //% ROOT armtee
 Thi${is} "armtee\\" &lt;%armtee.name%&gt;
 Show `items`
 //! armtee.items.forEach( item => {
-//# comment: This shows list of items!!
+//- comment: This shows list of items!!
 //% TAG {{ }}
  - {{item}}
 //! })</div>
