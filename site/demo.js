@@ -58,12 +58,14 @@ editorIds.forEach( editorId => {
   editorWrappers.push(wrapper)
 
   const toggle = wrapper.getElementsByClassName('editor-toggle')
+
   toggle[0].addEventListener('click', (evt) => {
     if ( wrapper.classList.contains('off') ) {
       const len = editorWrappers.length
       const prev = `g${len - closedFilters}-${len}`
       editorWrappers.forEach( w => w.classList.remove(prev) )
       closedFilters--
+      document.body.classList.remove('no-editor')
       const next = `g${len - closedFilters}-${len}`
       wrapper.classList.remove('off')
       editorWrappers.forEach( w => {
@@ -76,6 +78,9 @@ editorIds.forEach( editorId => {
       const prev = `g${len - closedFilters}-${len}`
       editorWrappers.forEach( w => w.classList.remove(prev) )
       closedFilters++
+      if ( closedFilters === len ) {
+        document.body.classList.add('no-editor')
+      }
       const next = `g${len - closedFilters}-${len}`
       wrapper.classList.add('off')
       editorWrappers.forEach( w => {
