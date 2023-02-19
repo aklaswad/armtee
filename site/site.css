@@ -19,11 +19,12 @@ a:hover { color: #77f; }
   top: 0;
   width: 100%;
   height: 16rem;
+  background-color: #282c34;
 }
 
 .editor-wrapper {
   float: left;
-  background-color: #333;
+  background-color: #282c34;
   border-top: 1px solid #666;
   color: #aaa;
   position: relative;
@@ -32,12 +33,18 @@ a:hover { color: #77f; }
   overflow: hidden;
 }
 
-
 .editor-wrapper.g4-4 { width: calc(100% / 4) }
 .editor-wrapper.g3-4 { width: calc((100% - 1.6rem) / 3) }
 .editor-wrapper.g2-4 { width: calc((100% - 3.2rem) / 2) }
 .editor-wrapper.g1-4 { width: calc(100% - 4.8rem) }
 .editor-wrapper.off  { width: 1.6rem; }
+
+.editor-main {
+  position: absolute;
+  height: calc( 100% - 1.6rem );
+  top: 1.6rem;
+  overflow: scroll;
+}
 
 .off .editor-main { display: none; }
 .editor-toggle {
@@ -83,6 +90,7 @@ a:hover { color: #77f; }
 
 .editor-header {
   top: 0;
+  overflow: hidden;
 }
 .off .editor-header {
   width: 16rem;
@@ -95,7 +103,7 @@ a:hover { color: #77f; }
 #doc {
   color: #e8efe0;
   background-color: #333;
-  background-color: #353030;
+  background-color: #282c34;
   position: absolute;
   bottom: 0;
   width: 50rem;

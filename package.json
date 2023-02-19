@@ -16,7 +16,14 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@codemirror/gutter": "^0.19.9",
+    "@codemirror/lang-javascript": "^6.1.4",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-markdown": "^6.1.0",
+    "@codemirror/theme-one-dark": "^6.1.1",
+    "@codemirror/view": "^6.9.1",
     "brace": "^0.11.1",
+    "codemirror": "^6.0.1",
     "marx-css": "^4.0.1",
     "vite": "^4.1.2",
     "yaml": "^2.2.1"

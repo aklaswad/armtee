@@ -1,19 +1,57 @@
-import ace from 'brace'
-import 'brace/theme/pastel_on_dark'
-import 'brace/mode/json'
-import 'brace/mode/markdown'
-import 'brace/mode/javascript'
+import { minimalSetup, EditorView } from 'codemirror'
+import { EditorState, Compartment, StateField } from "@codemirror/state"
+import { lineNumbers } from '@codemirror/view'
+import { javascript } from "@codemirror/lang-javascript"
+import { json } from "@codemirror/lang-json"
+import { markdown } from '@codemirror/lang-markdown'
+import { oneDark } from '@codemirror/theme-one-dark'
 
 let closedFilters = 0
 const editorIds = [ 'tmpl', 'json', 'trans', 'out' ]
+const editorDefaults = {
+  json: { lang: json() },
+  tmpl: { lang: javascript() },
+  trans: { lang: javascript(), readOnly: true },
+  out:  { lang: markdown(), readOnly: true }
+}
 const editorWrappers = []
 const editors = {}
 editorIds.forEach( editorId => {
-  const editor = ace.edit(editorId)
-  editor.setTheme("ace/theme/pastel_on_dark");
-  editor.session.setUseWrapMode(false);
-  editor.getSession().setUseWorker(false);
-  editors[editorId] = editor
+  const element = document.getElementById(editorId)
+  const text = element.textContent
+  element.innerText = ''
+  const defaults = editorDefaults[editorId]
+  const stateConfig = {
+    doc: text,
+    extensions: [ minimalSetup, lineNumbers(), oneDark, defaults.lang ],
+  }
+  let length = 0
+  if ( editorId === 'tmpl' || editorId === 'json' ) {
+    stateConfig.extensions.push(
+      StateField.define({
+        create() { return 0 },
+        update(value, tr) {
+          if ( tr._doc.length !== length ) {
+            //XXX: ugly...
+            setTimeout(() => { render() }, 1)
+          }
+          length = tr._doc.length
+        }
+      })
+    )
+  }
+  if ( defaults.readOnly ) {
+    stateConfig.extensions.push(
+      EditorState.readOnly.of(true)
+    )
+  }
+  const state = EditorState.create(stateConfig)
+  const view = new EditorView({
+    state,
+    parent: element
+  })
+  console.log(view)
+  editors[editorId] = view
 
   const wrapper = document.getElementById(editorId + '-editor-wrapper')
   editorWrappers.push(wrapper)
@@ -48,7 +86,7 @@ editorIds.forEach( editorId => {
     }
   })
 })
-
+/*
 editors['tmpl'].session.setMode("ace/mode/markdown");
 editors['json'].session.setMode("ace/mode/json");
 editors['trans'].session.setMode("ace/mode/javascript");
@@ -62,32 +100,43 @@ editors['trans'].session.setMode("ace/mode/javascript");
   editor.session.setMode("ace/mode/json");
   editor.setReadOnly(true)
 })
+*/
 
 import Armtee from '../lib/armtee.js'
 Armtee.debug = 1
 const out = document.getElementById('out')
 
+function replace(editorId, txt) {
+  editors[editorId].dispatch({
+    changes: {
+      from: 0,
+      to: editors[editorId].state.doc.length,
+      insert: txt
+    }
+  })
+}
+
 function render() {
-  const tmpl = editors['tmpl'].getValue()
-  const json = editors['json'].getValue()
+  const tmpl = editors['tmpl'].state.doc.toString();
+  const json = editors['json'].state.doc.toString();
   let data
   try {
     data = JSON.parse(json)
   }
   catch (e) {
-    editors['out'].setValue( 'Waiting for JSON format corrected' )
+    editors['out'].setValue( 'Waiting for JSON format corrected')
     return
   }
   try {
     const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
     Armtee.debug = 0
-    editors['trans'].setValue( armtee.translate({mode:'function'}) )
+    replace('trans', armtee.translate({mode:'function'}))
     Armtee.debug = 1
-    editors['out'].setValue( armtee.render(data, {mode: 'function'}) )
+    replace('out', armtee.render(data, {mode: 'function'}))
   }
   catch (e) {
-    console.log(e)
-    editors['out'].setValue(e.toString())
+    //console.log(e)
+    editors['out'].state.doc = e.toString()
   }
   return
 }
@@ -107,8 +156,4 @@ for ( let i=0; i < converts.length; i++ ) {
     evt.target.classList.add("selected")
   })
 }
-
-editors['tmpl'].session.on('change', render)
-editors['tmpl'].session.on('change', render)
-
 render()
