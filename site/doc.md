@@ -1,4 +1,6 @@
-
+TOCBEGIN
+[[toc]]
+TOCEND
 
 # Why armtee?
 

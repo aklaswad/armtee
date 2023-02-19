@@ -1,7 +1,6 @@
 body {
   color: #333;
   background-color: #e8e4e0;
-  overflow: scroll;
 }
 
 h1.hero {
@@ -180,6 +179,12 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   padding: 1.3rem;
 }
 
+/* hack for inline jump to fixed content */
+#doc h1, #doc h2, #doc h3, #doc h4, #doc h5, #doc h6 {
+  padding-top: 16rem;
+  margin-top: -16rem;
+}
+
 #doc-overlay {
   position: sticky;
   top: 16rem;
@@ -196,6 +201,23 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 .convert.selected {
   color: #eee;
   background-color: #393;
+}
+
+#toc {
+  color: #000;
+  padding-top: 16rem;
+  position: fixed;
+  width: calc((100% - 40rem)/2);
+  left: 0;
+  overflow-x: hidden;
+}
+
+#toc a {
+  color: #888;
+}
+
+#toc a:hover, #toc a:focus, #toc a:active {
+  color: #333;
 }
 
 #content-right {
