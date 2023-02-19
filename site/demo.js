@@ -14,6 +14,7 @@ const editorDefaults = {
   trans: { lang: javascript(), readOnly: true },
   out:  { lang: markdown(), readOnly: true }
 }
+
 const editorWrappers = []
 const editors = {}
 editorIds.forEach( editorId => {
@@ -58,8 +59,6 @@ editorIds.forEach( editorId => {
 
   const toggle = wrapper.getElementsByClassName('editor-toggle')
   toggle[0].addEventListener('click', (evt) => {
-    evt.preventDefault()
-    evt.stopImmediatePropagation()
     if ( wrapper.classList.contains('off') ) {
       const len = editorWrappers.length
       const prev = `g${len - closedFilters}-${len}`
@@ -84,6 +83,9 @@ editorIds.forEach( editorId => {
           w.classList.add(next)
       })
     }
+    evt.target.blur()
+    evt.preventDefault()
+    evt.stopPropagation()
   })
 })
 /*

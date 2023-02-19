@@ -22,16 +22,16 @@
   ]
 }</div>
       <p class="editor-header">data
-        <a class="editor-toggle" href="#">+</a>
+        <a class="editor-toggle" href="#">&nbsp;</a>
       </p>
     </div>
     <div id="tmpl-editor-wrapper" class="editor-wrapper g4-4">
       <p class="editor-header">template
+        <a class="editor-toggle" href="#">&nbsp;</a>
         <a href="#" class="convert" data-style="hashy" data-mode="logic">hashy-logic</a>
       | <a href="#" class="convert" data-style="hashy" data-mode="template">hashy-template</a>
       | <a href="#" class="convert" data-style="slashy" data-mode="logic">slashy-logic</a>
       | <a href="#" class="convert selected" data-style="slashy" data-mode="template">slashy-template</a>
-        <a class="editor-toggle" href="#">+</a>
       </p>
       <div id="tmpl" class="editor-main">//% TAG &lt;% %&gt;
 //% ROOT armtee
@@ -45,16 +45,16 @@ Show `items`
     </div>
     <div id="trans-editor-wrapper" class="editor-wrapper g4-4">
       <p class="editor-header">
+        <a class="editor-toggle" href="#">&nbsp;</a>
         <span>transpiled</span>
-        <a class="editor-toggle" href="#">+</a>
       </p>
       <div id="trans" class="editor-main"></div>
     </div>
 
     <div id="out-editor-wrapper" class="editor-wrapper g4-4">
       <p class="editor-header">
+        <a class="editor-toggle" href="#">&nbsp;</a>
         <span>output</span>
-        <a class="editor-toggle" href="#">+</a>
       </p>
       <div id="out" class="editor-main"></div>
     </div>
@@ -62,17 +62,28 @@ Show `items`
 
   <div id="content-wrapper">
     <div id="toc"></div>
-    <div id="doc">
-      <h1>armtee</h1>
-      Line oriented text template tool<br />
-      <p>
-        This project has started for my another project, from modifying <a href="https://johnresig.com/blog/javascript-micro-templating/">Resig's Micro Templating</a> for generic text template. Replaced string concatenation with ECMAScript's Template Literal and ddd line oriented macros for include function.
-      </p>
-      <h2>Synopsis</h2>
-      <h2>Macro</h2>
-      <h2>TextFilter</h2>
+    <div id="doc-wrapper">
+      <div id="doc-overlay"></div>
+      <div id="doc">
+        <h1>armtee</h1>
+        Line oriented text template tool<br />
+        <p>
+          This project has started for my another project, from modifying <a href="https://johnresig.com/blog/javascript-micro-templating/">Resig's Micro Templating</a> for generic text template. Replaced string concatenation with ECMAScript's Template Literal and ddd line oriented macros for include function.
+        </p>
+        <h2>Synopsis</h2>
+        <h2>Macro</h2>
+        <h2>TextFilter</h2>
+      </div>
     </div>
     <div id="content-right">
+      <footer id="content-footer">
+        <a href="https://github.com/aklaswad/armtee">
+          <img
+            class="link-logo"
+            src="./site/images/github-mark.svg"
+            alt="View repository on github.com"
+          /></a>
+      </footer>
     </div>
   </div>
 </body>

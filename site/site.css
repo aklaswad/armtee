@@ -11,7 +11,7 @@ h1 {
 }
 
 a, a:active { color: #aaf; }
-a:hover { color: #77f; }
+a:hover, a:focus { color: #77f; }
 
 #editors-wrapper {
   position: absolute;
@@ -24,13 +24,16 @@ a:hover { color: #77f; }
 
 .editor-wrapper {
   float: left;
+  border-left: 1px solid #042;
+  border-right: 1px solid #223;
+
   background-color: #282c34;
-  border-top: 1px solid #666;
   color: #aaa;
   position: relative;
   top: 0;
   height: 100%;
   overflow: hidden;
+  transition: width 0.3s;
 }
 
 .editor-wrapper.g4-4 { width: calc(100% / 4) }
@@ -46,26 +49,42 @@ a:hover { color: #77f; }
   overflow: scroll;
 }
 
+.editor-main .cm-scroller {
+  font-family: 'Roboto Mono','Courier', "Courier New", Consolas, monospace !important;
+}
+
 .off .editor-main { display: none; }
 .editor-toggle {
   position: absolute;
+  text-decoration: none;
   top: 0;
   left: 0;
   padding: 0;
-  margin: 0;
+  margin: 0.3rem;
   line-height: 1rem;
   color: #fff;
-  background-color: #383;
+  background-color: #363;
   border: 2px solid #888;
-  border-radius: 0.2rem;
-  width: 1.2rem;
-  height: 1.2rem;
+  border-radius: 0.3rem;
+  width: 1.0rem;
+  height: 1.0rem;
 }
 
-.editor-toggle:hover {
-  color: #fff;
-  background-color: #6a6;
+.off .editor-toggle {
+  background-color: #111;
 }
+
+a.editor-toggle:hover, a.editor-toggle:focus {
+  text-decoration: none;
+  background-color: #666;
+}
+
+.off a.editor-toggle:hover, .off a.editor-toggle:focus {
+  color: #fff;
+  text-decoration: none;
+  background-color: #6d6;
+}
+
 
 #json, #tmpl, #trans, #out {
   font-size: 1.0rem;
@@ -81,23 +100,28 @@ a:hover { color: #77f; }
   width: 100%;
   padding: 0 2rem;
   margin: 0;
-  color: #eee;
+  color: #aaa;
   height: 1.6rem;
   font-size: 1.1rem;
   font-weight: bold;
-  background-color: #234;
-}
-
-.editor-header {
+  vertical-align: center;
+  line-height: 1.6rem;
+  white-space: nowrap;
+  background-color: #253028;
   top: 0;
   overflow: hidden;
+  border-bottom: 1px solid #141;
 }
+
 .off .editor-header {
   width: 16rem;
   background-color: #555;
   border: 1px solid #000;
   transform-origin: top left;
-  transform: rotate(90deg) translateY(-1.2rem);
+  transition: transform 0.3s;
+  transform: rotate(90deg) translateY(-1.6rem);
+  background-color: #354;
+
 }
 
 #error-display {
@@ -135,15 +159,55 @@ a:hover { color: #77f; }
   height: 100%;
 }
 
+#doc-wrapper {
+  position: relative;
+  color: #e8efe0;
+  background-color: #282c34;
+  font-size: 1.2em;
+  overflow: hidden;;
+}
+
 #doc {
+  position: absolute;
+  top: 0;
+  left: 0;
   color: #e8efe0;
   background-color: #333;
   background-color: #282c34;
   font-size: 1.2em;
   overflow: scroll;
+  height: 100%;
+}
+
+#doc-overlay {
+  position: absolute;
+  top: 0;
+  height: 3em;
+  width: 100%;
+  z-index: 40;
+  background: linear-gradient(#282c34, rgba(0,0,0,0.0));
 }
 
 .convert.selected {
   color: #eee;
   background-color: #393;
+}
+
+#content-right {
+  position: relative;
+}
+
+#content-footer {
+  border: 0;
+  padding: 0.4rem;
+  text-align: left;
+  margin: 0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.link-logo {
+  width: 1.8rem;
+  height: 1.8rem;
 }
