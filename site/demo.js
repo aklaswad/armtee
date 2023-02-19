@@ -116,6 +116,17 @@ function replace(editorId, txt) {
   })
 }
 
+const errorBlock = document.getElementById('error-display')
+function setError (error) {
+  if (error) {
+    errorBlock.classList.add('error')
+    errorBlock.innerText = error
+  }
+  else {
+    errorBlock.classList.remove('error')
+  }
+}
+
 function render() {
   const tmpl = editors['tmpl'].state.doc.toString();
   const json = editors['json'].state.doc.toString();
@@ -124,7 +135,7 @@ function render() {
     data = JSON.parse(json)
   }
   catch (e) {
-    editors['out'].setValue( 'Waiting for JSON format corrected')
+    setError( 'Waiting for JSON format corrected')
     return
   }
   try {
@@ -136,8 +147,10 @@ function render() {
   }
   catch (e) {
     //console.log(e)
-    editors['out'].state.doc = e.toString()
+    setError( e.toString() )
+    return
   }
+  setError()
   return
 }
 
@@ -156,4 +169,5 @@ for ( let i=0; i < converts.length; i++ ) {
     evt.target.classList.add("selected")
   })
 }
+
 render()
