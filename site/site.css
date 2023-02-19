@@ -181,6 +181,7 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 
 /* hack for inline jump to fixed content */
 #doc h1, #doc h2, #doc h3, #doc h4, #doc h5, #doc h6 {
+  max-width: 40rem;
   padding-top: 16rem;
   margin-top: -16rem;
 }
