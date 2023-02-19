@@ -9,22 +9,23 @@
 <body>
   <div id="error-display">error faaaa</div>
   <div id="editors-wrapper">
-    <div id="json-editor-wrapper" class="editor-wrapper g4-4">
-      <div id="json" class="editor-main">{
-  "name": "ArmTee!",
-  "items": [
-    "Advanced",
-    "Resig",
-    "Micro",
-    "Template",
-    "Engine",
-    "End"
-  ]
-}</div>
-      <p class="editor-header">data
+
+    <div id="out-editor-wrapper" class="editor-wrapper g4-4">
+      <p class="editor-header">
         <a class="editor-toggle" href="#">&nbsp;</a>
+        <span>output</span>
       </p>
+      <div id="out" class="editor-main"></div>
     </div>
+
+    <div id="trans-editor-wrapper" class="editor-wrapper g4-4">
+      <p class="editor-header">
+        <a class="editor-toggle" href="#">&nbsp;</a>
+        <span>transpiled</span>
+      </p>
+      <div id="trans" class="editor-main"></div>
+    </div>
+
     <div id="tmpl-editor-wrapper" class="editor-wrapper g4-4">
       <p class="editor-header">template
         <a class="editor-toggle" href="#">&nbsp;</a>
@@ -42,20 +43,22 @@ Show `items`
  - {{item}}
 //! })</div>
     </div>
-    <div id="trans-editor-wrapper" class="editor-wrapper g4-4">
-      <p class="editor-header">
-        <a class="editor-toggle" href="#">&nbsp;</a>
-        <span>transpiled</span>
-      </p>
-      <div id="trans" class="editor-main"></div>
-    </div>
 
-    <div id="out-editor-wrapper" class="editor-wrapper g4-4">
-      <p class="editor-header">
+    <div id="json-editor-wrapper" class="editor-wrapper g4-4">
+      <div id="json" class="editor-main">{
+  "name": "ArmTee!",
+  "items": [
+    "Advanced",
+    "Resig",
+    "Micro",
+    "Template",
+    "Engine",
+    "End"
+  ]
+}</div>
+      <p class="editor-header">data
         <a class="editor-toggle" href="#">&nbsp;</a>
-        <span>output</span>
       </p>
-      <div id="out" class="editor-main"></div>
     </div>
   </div>
 
