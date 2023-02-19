@@ -87,6 +87,7 @@ a:hover { color: #77f; }
 .off .editor-header {
   width: 16rem;
   background-color: #555;
+  border: 1px solid #000;
   transform-origin: top left;
   transform: rotate(90deg) translateY(-1.2rem);
 }
@@ -94,6 +95,7 @@ a:hover { color: #77f; }
 #doc {
   color: #e8efe0;
   background-color: #333;
+  background-color: #353030;
   position: absolute;
   bottom: 0;
   width: 50rem;
