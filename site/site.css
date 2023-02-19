@@ -32,7 +32,7 @@ a:hover, a:active, a:focus { color: #aed; }
 }
 
 .editor-wrapper {
-  float: left;
+  float: right;
   border-left: 1px solid #042;
   border-right: 1px solid #223;
 
@@ -178,18 +178,31 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   font-size: 1.2rem;
   padding: 1.3rem;
 }
+#doc * {
+  max-width: 38rem;
+}
 
-/* hack for inline jump to fixed content */
+#doc h1 a, #doc h2 a, #doc h3 a, #doc h4 a, #doc h5 a, #doc h6 a {
+  color: #eee;
+  text-decoration: none;
+}
+
 #doc h1, #doc h2, #doc h3, #doc h4, #doc h5, #doc h6 {
-  max-width: 40rem;
-  padding-top: 16rem;
-  margin-top: -16rem;
+/* hack for inline jump to fixed content */
+  padding-top: 19rem;
+  margin-top: -18rem;
+
+}
+
+#doc p {
+  margin: 1rem;
+
 }
 
 #doc-overlay {
   position: sticky;
   top: 16rem;
-  height: 3em;
+  height: 2em;
   width: 100%;
   z-index: 40;
   background: linear-gradient(#282c34, rgba(0,0,0,0.0));
@@ -211,14 +224,22 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   width: calc((100% - 40rem)/2);
   left: 0;
   overflow-x: hidden;
+  font-weight: bold;
 }
 
+#toc ul {
+  list-style: none;
+}
+
+#toc li { font-size: 1.2rem; text-decoration: underline; }
+#toc li li { font-size: 1.1rem; text-decoration: none; }
 #toc a {
-  color: #888;
+  color: #555;
+  text-decoration: none;
 }
 
 #toc a:hover, #toc a:focus, #toc a:active {
-  color: #333;
+  color: #111;
 }
 
 #content-right {
@@ -243,4 +264,30 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   width: 1.8rem;
   height: 1.8rem;
 
+}
+
+#doc pre {
+  margin-left: 3rem;
+  width: 34rem;
+  overflow-x: auto;
+  overflow-block: scroll;
+  white-space: pre;
+}
+
+pre, code {
+  color: #fee;
+  border: 1px solid #fff;
+  background-color: #000;
+  padding: 0.2rem;
+  font-family: 'Roboto Mono','Courier', "Courier New", Consolas, monospace !important;
+}
+
+pre code {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+code {
+  margin: 0.3rem;
 }

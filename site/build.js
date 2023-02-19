@@ -2,8 +2,10 @@ import MD from 'markdown-it'
 import toc from "markdown-it-table-of-contents"
 import anchor from "markdown-it-anchor"
 const md = new MD()
+md.use(anchor, {
+  permalink: anchor.permalink.headerLink()
+})
 md.use(toc)
-md.use(anchor)
 import fs from 'fs'
 const doc = fs.readFileSync('./site/doc.md', 'utf-8')
 let tocHtml
