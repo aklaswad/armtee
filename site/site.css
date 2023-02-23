@@ -1,10 +1,10 @@
 html {
+  background-color: #282c34;
   scroll-padding-top: 18rem;
 }
 
 body {
   color: #333;
-  background-color: #e8e4e0;
 }
 
 h1.hero {
@@ -191,7 +191,12 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   max-width: 38rem;
 }
 
-#doc h1 a, #doc h2 a, #doc h3 a, #doc h4 a, #doc h5 a, #doc h6 a {
+#doc h1 a,
+#doc h2 a,
+#doc h3 a,
+#doc h4 a,
+#doc h5 a,
+#doc h6 a {
   display: none;
 }
 
@@ -208,7 +213,6 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 
 #doc p {
   margin: 1rem;
-
 }
 
 #doc-overlay {
@@ -230,6 +234,7 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 }
 
 #toc {
+  background-color: #e8e4e0;
   color: #000;
   padding-top: 16rem;
   position: fixed;
@@ -237,6 +242,7 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   left: 0;
   overflow-x: hidden;
   font-weight: bold;
+  height: 100%;
 }
 
 #toc ul {
@@ -255,6 +261,7 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 }
 
 #content-right {
+  background-color: #e8e4e0;
   height: 100%;
   overflow: hidden;
   position: fixed;
@@ -275,7 +282,6 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 .link-logo {
   width: 1.8rem;
   height: 1.8rem;
-
 }
 
 #doc pre {
