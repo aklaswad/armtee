@@ -240,4 +240,10 @@ for ( let i=0; i < converts.length; i++ ) {
   })
 }
 
+if (location.hash) {
+  openTocFor(location.hash)
+  closeAllEditor()
+  evt.target.text = 'open editors'
+
+}
 render()
