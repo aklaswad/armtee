@@ -58,7 +58,6 @@ editorIds.forEach( editorId => {
   editorWrappers.push(wrapper)
 
   const toggle = wrapper.getElementsByClassName('editor-toggle')
-
   toggle[0].addEventListener('click', (evt) => {
     if ( wrapper.classList.contains('off') ) {
       const len = editorWrappers.length

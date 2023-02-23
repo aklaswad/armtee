@@ -136,7 +136,7 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 }
 
 #error-display {
-  position: absolute;
+  position: fixed;
   top: 16rem;
   min-width: 30rem;
   right: 0;
@@ -147,8 +147,12 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   background-color: rgba(40,0,0,0.9);
   padding: 1rem;
   display: none;
+  transition: right 0.3s;
 }
 
+.no-editor #error-display {
+  right: -100%;
+}
 #error-display.error {
   display: block;
 }
