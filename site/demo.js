@@ -95,7 +95,6 @@ editorIds.forEach( editorId => {
 })
 
 import Armtee from '../lib/armtee.js'
-Armtee.debug = 1
 const out = document.getElementById('out')
 
 function replace(editorId, txt) {
@@ -132,9 +131,7 @@ function render() {
   }
   try {
     const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
-    Armtee.debug = 0
     replace('trans', armtee.translate({mode:'function'}))
-    Armtee.debug = 1
     replace('out', armtee.render(data, {mode: 'function'}))
   }
   catch (e) {
