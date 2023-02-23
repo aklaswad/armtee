@@ -254,6 +254,12 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   overflow-x: hidden;
   font-weight: bold;
   height: 100%;
+  transition: padding-top 0.3s;
+}
+
+.no-editor #toc {
+  padding-top: 2rem;
+  z-index: 10;
 }
 
 #toc ul {
@@ -284,7 +290,7 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   color: #888;
   border: 0;
   padding: 0.4rem;
-  text-align: left;
+  text-align: right;
   position: absolute;
   left: 0;
   top: 19rem;
