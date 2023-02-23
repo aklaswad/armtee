@@ -2,7 +2,8 @@ TOCBEGIN
 [[toc]]
 TOCEND
 
-# Why armtee?
+# Overview
+## Why armtee?
 
 This project has started for my another project, from modifying [Resig's Micro Templating](https://johnresig.com/blog/javascript-micro-templating/) for generic text template.
 
@@ -244,7 +245,8 @@ nodejs環境でのみ利用可能です。
 
 ## Filter
 
-# API
+# Reference Manual
+## API
 
 ### Armtee.render
 

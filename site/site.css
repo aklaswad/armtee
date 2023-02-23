@@ -264,13 +264,35 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 
 #toc ul {
   list-style: none;
+  padding: 0;
+  margin-left: 1rem;
 }
 
-#toc li { font-size: 1.2rem; text-decoration: underline; }
-#toc li li { font-size: 1.1rem; text-decoration: none; }
+#toc > ul > li { display: block }
+#toc li ul {
+  text-align: left;
+  display: none;
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+.no-editor #toc li ul {
+  display: block;
+}
+
+#toc li ul.show {
+  display: block;
+}
+
 #toc a {
   color: #555;
   text-decoration: none;
+  padding: 0 4rem 0 0;
+}
+
+#toc a.selected {
+  color: #000;
+  background-color: #aaa;
 }
 
 #toc a:hover, #toc a:focus, #toc a:active {

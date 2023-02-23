@@ -12,7 +12,9 @@ md.use(anchor, {
     placement: 'after'
   })
 })
-md.use(toc)
+md.use(toc, {
+  includeLevel: [1,2,3],
+})
 const doc = fs.readFileSync('./site/doc.md', 'utf-8')
 let tocHtml
 const rendered = md.render(doc).replace( /<p>TOCBEGIN(.*)TOCEND<\/p>/s, (match, p1) => {

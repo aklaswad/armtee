@@ -181,10 +181,48 @@ const convertFlip = {
   style: { hashy: 'slashy', slashy: 'hashy' },
   mode:  { template: 'logic', logic: 'template' }
 }
+
 const currentStyle = {
   style: 'hashy',
   mode: 'template'
 }
+
+
+const toggles = document.querySelectorAll('#toc a')
+const tocSubLists = document.querySelectorAll('#toc ul ul')
+for ( let i=0; i < toggles.length; i++ ) {
+  toggles[i].addEventListener('click', function(evt) {
+    const href = evt.target.getAttribute('href')
+    const child = evt.target.parentElement.querySelector(':scope > ul')
+    if ( child ) {
+      child.classList.add('show')
+    }
+  })
+}
+
+function openTocFor(href) {
+  for ( let i=0; i < tocSubLists.length; i++ ) {
+    tocSubLists[i].classList.remove('show')
+  }
+  for ( let i=0; i < toggles.length; i++ ) {
+    toggles[i].classList.remove('selected')
+  }
+
+  let target = document.querySelector("a[href='" + href + "']")
+  const child = target.parentElement.querySelector(':scope > ul')
+  if ( child ) {
+    child.classList.add('show')
+  }
+  target.classList.add('selected')
+  while (target.tagName !== 'DIV' ) {
+    target.classList.add('show')
+    target = target.parentElement
+  }
+}
+
+window.addEventListener('hashchange', () => {
+  openTocFor(location.hash)
+});
 
 const converts = document.getElementsByClassName('convert')
 for ( let i=0; i < converts.length; i++ ) {
