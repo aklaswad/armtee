@@ -190,6 +190,10 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   padding: 16rem 0 0 0;
 }
 
+.no-editor #doc-wrapper {
+  z-index: 10;
+}
+
 #doc {
   color: #e8efe0;
   background-color: #333;
@@ -233,11 +237,12 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 #doc-overlay {
   position: sticky;
   top: 16rem;
-  height: 2em;
+  height: 1.2em;
   width: 100%;
   z-index: 40;
   background: linear-gradient(#282c34, rgba(0,0,0,0.0));
 }
+
 
 .no-editor #doc-overlay {
   top: 0;
