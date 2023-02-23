@@ -1,3 +1,7 @@
+html {
+  scroll-padding-top: 18rem;
+}
+
 body {
   color: #333;
   background-color: #e8e4e0;
@@ -182,20 +186,24 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   font-size: 1.2rem;
   padding: 1.3rem;
 }
+
 #doc * {
   max-width: 38rem;
 }
 
 #doc h1 a, #doc h2 a, #doc h3 a, #doc h4 a, #doc h5 a, #doc h6 a {
-  color: #eee;
-  text-decoration: none;
+  display: none;
 }
 
-#doc h1, #doc h2, #doc h3, #doc h4, #doc h5, #doc h6 {
-/* hack for inline jump to fixed content */
-  padding-top: 19rem;
-  margin-top: -18rem;
-
+#doc h1:hover a,
+#doc h2:hover a,
+#doc h3:hover a,
+#doc h4:hover a,
+#doc h5:hover a,
+#doc h6:hover a {
+  color: #eee;
+  display: inline;
+  text-decoration: none;
 }
 
 #doc p {

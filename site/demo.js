@@ -51,7 +51,6 @@ editorIds.forEach( editorId => {
     state,
     parent: element
   })
-  console.log(view)
   editors[editorId] = view
 
   const wrapper = document.getElementById(editorId + '-editor-wrapper')

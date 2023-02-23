@@ -5,8 +5,12 @@ import fs from 'fs'
 
 const md = new MD()
 md.use(anchor, {
-  slugify: (s) => 'doc-' + encodeURIComponent(String(s).trim().toLowerCase().replace(/\s+/g, '-')),
-  permalink: anchor.permalink.headerLink()
+  permalink: anchor.permalink.linkInsideHeader({
+    symbol: `
+      <span class="anchor-link">#</span>
+    `,
+    placement: 'after'
+  })
 })
 md.use(toc)
 const doc = fs.readFileSync('./site/doc.md', 'utf-8')
