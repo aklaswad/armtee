@@ -6,7 +6,7 @@ import { json } from "@codemirror/lang-json"
 import { markdown } from '@codemirror/lang-markdown'
 import { oneDark } from '@codemirror/theme-one-dark'
 
-let closedFilters = 0
+let closedEditors = 0
 const editorIds = [ 'tmpl', 'json', 'trans', 'out' ]
 const editorDefaults = {
   json: { lang: json() },
@@ -60,11 +60,11 @@ editorIds.forEach( editorId => {
   toggle[0].addEventListener('click', (evt) => {
     if ( wrapper.classList.contains('off') ) {
       const len = editorWrappers.length
-      const prev = `g${len - closedFilters}-${len}`
+      const prev = `g${len - closedEditors}-${len}`
       editorWrappers.forEach( w => w.classList.remove(prev) )
-      closedFilters--
+      closedEditors--
       document.body.classList.remove('no-editor')
-      const next = `g${len - closedFilters}-${len}`
+      const next = `g${len - closedEditors}-${len}`
       wrapper.classList.remove('off')
       editorWrappers.forEach( w => {
         if ( !w.classList.contains('off') )
@@ -73,13 +73,13 @@ editorIds.forEach( editorId => {
     }
     else {
       const len = editorWrappers.length
-      const prev = `g${len - closedFilters}-${len}`
+      const prev = `g${len - closedEditors}-${len}`
       editorWrappers.forEach( w => w.classList.remove(prev) )
-      closedFilters++
-      if ( closedFilters === len ) {
+      closedEditors++
+      if ( closedEditors === len ) {
         document.body.classList.add('no-editor')
       }
-      const next = `g${len - closedFilters}-${len}`
+      const next = `g${len - closedEditors}-${len}`
       wrapper.classList.add('off')
       editorWrappers.forEach( w => {
         if ( ! w.classList.contains('off') )
@@ -91,6 +91,42 @@ editorIds.forEach( editorId => {
     evt.stopPropagation()
   })
 })
+
+document.getElementById('editor-toggle').addEventListener( 'click', function (evt) {
+  if ( document.body.classList.contains('no-editor') ) {
+    openAllEditor()
+    evt.target.text = 'close editors'
+  }
+  else {
+    closeAllEditor()
+    evt.target.text = 'open editors'
+  }
+  evt.target.blur()
+  evt.preventDefault()
+  evt.stopPropagation()
+})
+
+function openAllEditor () {
+  const len = editorWrappers.length
+  editorWrappers.forEach( w => {
+    w.classList.remove('off')
+    w.classList.add(`g${len}-${len}`)
+    document.body.classList.remove('no-editor')
+  })
+  closedEditors = 0
+}
+
+function closeAllEditor () {
+  const len = editorWrappers.length
+  const prev = `g${len - closedEditors}-${len}`
+  console.log(prev)
+  editorWrappers.forEach( w => {
+    w.classList.add('off')
+    w.classList.remove(prev)
+    document.body.classList.add('no-editor')
+  })
+  closedEditors = len
+}
 
 import Armtee from '../lib/armtee.js'
 const out = document.getElementById('out')

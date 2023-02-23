@@ -21,8 +21,19 @@ h2.hero {
   border-bottom: 1px solid #fff;
 }
 
-a { color: #9cb; text-decoration: underline; }
-a:hover, a:active, a:focus { color: #aed; }
+.light-contents a { color: #333; text-decoration: underline; }
+.light-contents a:hover,
+.light-contents a:active,
+.light-contents a:focus {
+  color: #555;
+}
+
+.dark-contents a { color: #9cb; text-decoration: underline; }
+.dark-contents a:hover,
+.dark-contents a:active,
+.dark-contents a:focus {
+  color: #aed;
+}
 
 #editors-wrapper {
   position: fixed;
@@ -269,7 +280,17 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   right: 0;
 }
 
-#content-footer {
+#content-right > header {
+  color: #888;
+  border: 0;
+  padding: 0.4rem;
+  text-align: left;
+  position: absolute;
+  left: 0;
+  top: 19rem;
+}
+
+#content-right > footer {
   color: #888;
   border: 0;
   padding: 0.4rem;
