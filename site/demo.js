@@ -95,11 +95,9 @@ editorIds.forEach( editorId => {
 document.getElementById('editor-toggle').addEventListener( 'click', function (evt) {
   if ( document.body.classList.contains('no-editor') ) {
     openAllEditor()
-    evt.target.text = 'close editors'
   }
   else {
     closeAllEditor()
-    evt.target.text = 'open editors'
   }
   evt.target.blur()
   evt.preventDefault()

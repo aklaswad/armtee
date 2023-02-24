@@ -95,6 +95,13 @@ h2.hero {
   transition: background-color 0.3s;
 }
 
+.no-editor .editor-toggle-text-placeholder::after {
+  content: '<< open editors'
+}
+.editor-toggle-text-placeholder::after {
+  content: 'close editors >>'
+}
+
 .off .editor-toggle {
   background-color: #111;
   border-color: #777;
