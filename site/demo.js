@@ -185,6 +185,22 @@ const currentStyle = {
   mode: 'template'
 }
 
+const converts = document.getElementsByClassName('convert')
+for ( let i=0; i < converts.length; i++ ) {
+  const mode = converts[i].getAttribute('data-type')
+
+  const style = converts[i].getAttribute('data-style')
+  converts[i].addEventListener('click', (evt) => {
+    const type = evt.target.getAttribute('data-type')
+    const newOne
+      = currentStyle[type] = convertFlip[type][currentStyle[type]]
+    const tmpl = editors['tmpl'].state.doc.toString();
+    const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
+    replace('tmpl',armtee.convert(currentStyle.style, currentStyle.mode))
+    evt.target.text = newOne
+  })
+}
+
 
 const toggles = document.querySelectorAll('#toc a')
 const tocSubLists = document.querySelectorAll('#toc ul ul')
@@ -222,26 +238,10 @@ window.addEventListener('hashchange', () => {
   openTocFor(location.hash)
 });
 
-const converts = document.getElementsByClassName('convert')
-for ( let i=0; i < converts.length; i++ ) {
-  const mode = converts[i].getAttribute('data-type')
-
-  const style = converts[i].getAttribute('data-style')
-  converts[i].addEventListener('click', (evt) => {
-    const type = evt.target.getAttribute('data-type')
-    const newOne
-      = currentStyle[type] = convertFlip[type][currentStyle[type]]
-    const tmpl = editors['tmpl'].state.doc.toString();
-    const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
-    replace('tmpl',armtee.convert(currentStyle.style, currentStyle.mode))
-    evt.target.text = newOne
-  })
-}
-
 if (location.hash) {
   openTocFor(location.hash)
   closeAllEditor()
   evt.target.text = 'open editors'
-
 }
+
 render()
