@@ -183,22 +183,27 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 #content-wrapper {
   position: absolute;
   width: 100%;
-  height: 100%;
+  height: calc(100vh - 16rem);
   padding: 0 0 0 0;
   margin: 0;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr 40rem 1fr;
+  overflow: scroll;
+}
+
+.no-editor #content-wrapper {
+  height: 100vh;
 }
 
 #doc-wrapper {
-  position: absolute;
   color: #e8efe0;
   background-color: #282c34;
   font-size: 1.2em;
-  left: calc( 50% - 20rem );
-  width: 40rem;
-  padding: 16rem 0 0 0;
 }
 
 .no-editor #doc-wrapper {
+  padding-top: 16rem;
   z-index: 10;
 }
 
@@ -261,21 +266,27 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   background-color: #393;
 }
 
-#toc {
+#toc-wrapper {
   background-color: #e8e4e0;
   color: #000;
-  padding-top: 16rem;
   padding-right: 1rem;
-  position: fixed;
-  width: calc((100% - 40rem)/2);
   left: 0;
-  overflow-x: hidden;
+  position: relative;
   font-weight: bold;
   height: 100%;
   transition: padding-top 0.3s;
 }
 
+#toc {
+  top: 16rem;
+  height: calc( 100vh - 16rem );
+  position: sticky;
+  overflow: scroll;
+}
+
 .no-editor #toc {
+  top: 0;
+  height: 100vh;
   padding-top: 2rem;
   z-index: 10;
 }
@@ -317,13 +328,20 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   color: #111;
 }
 
-#content-right {
+#content-right-wrapper {
   background-color: #e8e4e0;
-  height: 100%;
-  overflow: hidden;
-  position: fixed;
-  width: calc((100% - 40rem)/2);
+  color: #000;
+  padding-right: 1rem;
   right: 0;
+  position: relative;
+  height: 100%;
+  transition: padding-top 0.3s;
+}
+
+#content-right {
+  top: 16rem;
+  height: calc( 100vh - 16rem );
+  position: sticky;
 }
 
 #content-right > header {
@@ -333,7 +351,6 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   text-align: right;
   position: absolute;
   left: 0;
-  top: 19rem;
 }
 
 #content-right > footer {

@@ -237,15 +237,33 @@ function setUpDoc () {
     }
   }
 
+  const observeOptions = {
+    root: document.querySelector('#content-wrapper'),
+    rootMargin: '0px 0px -50% 0px',
+    threshold: 1.0
+  }
+  console.log({ observeOptions })
+  const observer = new IntersectionObserver(
+    (evts) => {
+      const id = evts.filter(evt => evt.isIntersecting).map( e => e.target.id)[0]
+      if ( id ) {
+        openTocFor('#' + id)
+      }
+
+    }, observeOptions
+  )
+  document.querySelectorAll('#doc h1, #doc h2, #doc h3')
+    .forEach( section => observer.observe(section) )
 
   window.addEventListener('hashchange', () => {
     openTocFor(location.hash)
   });
 
   if (location.hash) {
-    openTocFor(location.hash)
+    const hash = '#' + CSS.escape(location.hash.slice(1))
+    openTocFor(hash)
     closeAllEditor()
-    document.querySelector(location.hash).scrollIntoView()
+    document.querySelector(hash).scrollIntoView()
   }
 }
 
@@ -257,7 +275,6 @@ async function loadContent (configAry) {
         const html = await fetched.text()
         const dom = new DOMParser()
           .parseFromString(html, 'text/html')
-          console.log(dom)
         document.querySelector(conf.to)
           .append(...dom.body.childNodes)
       })()
