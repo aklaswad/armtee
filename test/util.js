@@ -1,5 +1,3 @@
-import Armtee from '../lib/armtee.js'
-
 import fs from 'fs/promises'
 import YAML from 'yaml'
 import path from 'path'
@@ -9,7 +7,7 @@ const here = path.dirname(
   url.fileURLToPath(import.meta.url)
 )
 
-export async function testFromYaml( file ) {
+export async function testFromYaml( file, Armtee) {
   const dataPath = path.resolve(here, file)
   const dataText = await fs.readFile(dataPath, 'utf-8')
   const data = YAML.parse(dataText)

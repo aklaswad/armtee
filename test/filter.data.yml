@@ -1,0 +1,45 @@
+- name: Use upper filter inline
+  debug: 2
+  data:
+    name: Test
+  tmpl: |-
+    <% data.name.$upper() %>
+  expected: |-
+    TEST
+- name: Use lower filter inline
+  debug: 2
+  data:
+    name: Test
+  tmpl: |-
+    <% data.name.$lower() %>
+  expected: |-
+    test
+- name: Method chain also work
+  debug: 2
+  data:
+    name: Test
+  tmpl: |-
+    <% data.name.$lower().$upper() %>
+  expected: |-
+    TEST
+- name: Use lower filter from macro
+  debug: 2
+  data:
+    name: Test
+  tmpl: |-
+    //% filter lower
+    <% data.name %>
+  expected: |-
+    test
+- name: Can reset filter from macro
+  debug: 2
+  data:
+    name: Test
+  tmpl: |-
+    //% filter lower
+    <% data.name %>
+    //% filter none
+    <% data.name %>
+  expected: |-
+    test
+    Test
