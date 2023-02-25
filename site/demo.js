@@ -284,6 +284,6 @@ async function loadContent (configAry) {
 }
 
 loadContent([
-  { url: '/doc.html', to: '#doc-content' },
-  { url: '/toc.html', to: '#toc' }
+  { url: 'doc.html', to: '#doc-content' },
+  { url: 'toc.html', to: '#toc' }
 ]) 
