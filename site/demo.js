@@ -127,6 +127,7 @@ function closeAllEditor () {
 }
 
 import Armtee from '../lib/armtee.js'
+Armtee.addFilter( 'upperCase', str => str.toUpperCase() )
 const out = document.getElementById('out')
 
 function replace(editorId, txt) {
@@ -164,7 +165,10 @@ function render() {
   try {
     const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
     replace('trans', armtee.translate({mode:'function'}))
-    replace('out', armtee.render(data, {mode: 'function'}))
+    replace('out', armtee.render(data, {
+      includeFilters: true,
+      mode: 'function'
+    }))
   }
   catch (e) {
     //console.log(e)
