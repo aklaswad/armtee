@@ -9,7 +9,7 @@
   },
   "scripts": {
     "try": "node test.js",
-    "test": "node --test tests/",
+    "test": "npx vitest run --globals",
     "site-dev": "vite",
     "site-build": "node site/build.js && vite build"
   },
@@ -30,6 +30,7 @@
     "markdown-it-table-of-contents": "^0.6.0",
     "marx-css": "^4.0.1",
     "vite": "^4.1.2",
+    "vitest": "^0.29.1",
     "yaml": "^2.2.1"
   }
 }
