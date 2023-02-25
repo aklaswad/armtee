@@ -242,7 +242,6 @@ function setUpDoc () {
     rootMargin: '0px 0px -50% 0px',
     threshold: 1.0
   }
-  console.log({ observeOptions })
   const observer = new IntersectionObserver(
     (evts) => {
       const id = evts.filter(evt => evt.isIntersecting).map( e => e.target.id)[0]

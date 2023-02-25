@@ -193,6 +193,7 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 }
 
 .no-editor #content-wrapper {
+  top: 0;
   height: 100vh;
 }
 
@@ -249,16 +250,11 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 
 #doc-overlay {
   position: sticky;
-  top: 16rem;
+  top: 0;
   height: 1.2em;
   width: 100%;
   z-index: 40;
   background: linear-gradient(#282c34, rgba(0,0,0,0.0));
-}
-
-
-.no-editor #doc-overlay {
-  top: 0;
 }
 
 .convert.selected {
@@ -278,16 +274,15 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 }
 
 #toc {
-  top: 16rem;
   height: calc( 100vh - 16rem );
   position: sticky;
   overflow: scroll;
+  padding-top: 2rem;
+  top: 0;
 }
 
 .no-editor #toc {
-  top: 0;
   height: 100vh;
-  padding-top: 2rem;
   z-index: 10;
 }
 
@@ -339,9 +334,13 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 }
 
 #content-right {
-  top: 16rem;
   height: calc( 100vh - 16rem );
   position: sticky;
+  top: 0;
+}
+
+.no-editor #content-right {
+  top: 16rem;
 }
 
 #content-right > header {
