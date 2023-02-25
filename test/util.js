@@ -16,6 +16,7 @@ export async function testFromYaml( file, Armtee) {
   /*
       data,
       tmpl,
+      file,
       expected,
       error,
       skip,

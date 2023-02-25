@@ -22,7 +22,6 @@
     "@codemirror/lang-markdown": "^6.1.0",
     "@codemirror/theme-one-dark": "^6.1.1",
     "@codemirror/view": "^6.9.1",
-    "brace": "^0.11.1",
     "codemirror": "^6.0.1",
     "markdown-it": "^13.0.1",
     "markdown-it-anchor": "^8.6.7",
