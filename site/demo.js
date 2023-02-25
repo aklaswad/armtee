@@ -230,6 +230,9 @@ function setUpDoc () {
     }
 
     let target = document.querySelector("a[href='" + href + "']")
+    const container = document.querySelector("#toc")
+    container.scrollTop = target.offsetTop - ( container.clientHeight / 2 )
+
     const child = target.parentElement.querySelector(':scope > ul')
     if ( child ) {
       child.classList.add('show')
