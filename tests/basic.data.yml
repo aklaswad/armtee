@@ -1,51 +1,51 @@
 - name: Render Value
   data:
     name: test
-  tmpl: |
+  tmpl: |-
     <% data.name %>
-  expect: |
+  expect: |-
     test
 
 - name: Render letter in the middle of word
   data:
     interface: cli
-  tmpl: |
+  tmpl: |-
     a<% data.interface %>i
-  expect: |
+  expect: |-
     aclii
 
 - name: Render zero number
   data:
     age: 0
-  tmpl: |
+  tmpl: |-
     age <% data.age %>
-  expect: |
+  expect: |-
     age 0
 
 - name: Render single quotes
   data:
     age: 0
-  tmpl: |
+  tmpl: |-
     age '<% data.age %>' ok
-  expect: |
+  expect: |-
     age '0' ok
 
 - name: Render double quotes
   data:
     age: 0
-  tmpl: |
+  tmpl: |-
     age "<% data.age %>" ok
-  expect: |
+  expect: |-
     age "0" ok
 
 - name: Render shell style EOL escape
   data:
     pkg: bar
-  tmpl: |
+  tmpl: |-
     apt install foo \
       <% data.pkg %> \
       buz
-  expect: |
+  expect: |-
     apt install foo \
       bar \
       buz
@@ -53,18 +53,18 @@
 - name: Render word in the middle of sentence
   data:
     emotion: love
-  tmpl: |
+  tmpl: |-
     I <% data.emotion %> tests
-  expect: |
+  expect: |-
     I love tests
 
 - name: Render Loop
   data:
     nums: [ 1, 2, 3 ]
-  tmpl: |
+  tmpl: |-
     //! const output = data.nums.join('')
     <% output %>
-  expect: |
+  expect: |-
     123
 
 - name: Loop using Line based templating
@@ -73,13 +73,13 @@
       - b
       - c
       - d
-  tmpl: |
+  tmpl: |-
     a
     ##! data.letters.forEach( l => {
     :<% l %>
     ##! })
     e
-  expect: |
+  expect: |-
     a
     :b
     :c
@@ -92,13 +92,13 @@
       - b
       - c
       - d
-  tmpl: |
+  tmpl: |-
     a
     //! data.letters.forEach( l => {
       :<% l %>
     //! })
     e
-  expect: |
+  expect: |-
     a
       :b
       :c
@@ -109,7 +109,8 @@
   error: Armtee render error
   data:
     foo: { bar: 42 }
-  tmpl: <% data.foo.bar.fizz.buzz %>
+  tmpl: |-
+    <% data.foo.bar.fizz.buzz %>
 
 - name: Throw compile error for bad javascript
   error: Failed to compile template
@@ -129,11 +130,11 @@
   todo: true
   data:
     name: world
-  tmpl: |
+  tmpl: |-
     Hello. Repeat after me?
-    ##!!INCLUDE hello.tmpl
+    ##% INCLUDE ./hello.tmpl
     thanks
-  expect: |
+  expect: |-
     Hello. Repeat after me?
     hello world
     thanks

@@ -14,10 +14,6 @@ const dataPath = path.resolve(here, 'basic.data.yml')
 const dataText = fs.readFileSync(dataPath, 'utf-8')
 const data = YAML.parse(dataText)
 
-function compressSpaces (text) {
-  return text
-}
-
 data.forEach( (testItem) => {
   if ( testItem.skip ) {
     test(testItem.name, (t) => {
@@ -56,14 +52,14 @@ data.forEach( (testItem) => {
       )
       if ( testItem.fail ) {
         assert.notEqual(
-          compressSpaces(result),
-          compressSpaces(testItem.expect)
+          result,
+          testItem.expect
         )
       }
       else {
         assert.strictEqual(
-          compressSpaces(result),
-          compressSpaces(testItem.expect)
+          result,
+          testItem.expect
         )
       }
     })
