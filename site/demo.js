@@ -201,47 +201,73 @@ for ( let i=0; i < converts.length; i++ ) {
   })
 }
 
+render()
 
-const toggles = document.querySelectorAll('#toc a')
-const tocSubLists = document.querySelectorAll('#toc ul ul')
-for ( let i=0; i < toggles.length; i++ ) {
-  toggles[i].addEventListener('click', function(evt) {
-    const href = evt.target.getAttribute('href')
-    const child = evt.target.parentElement.querySelector(':scope > ul')
+
+function setUpDoc () {
+  const toggles = document.querySelectorAll('#toc a')
+  const tocSubLists = document.querySelectorAll('#toc ul ul')
+  for ( let i=0; i < toggles.length; i++ ) {
+    toggles[i].addEventListener('click', function(evt) {
+      const href = evt.target.getAttribute('href')
+      const child = evt.target.parentElement.querySelector(':scope > ul')
+      if ( child ) {
+        child.classList.add('show')
+      }
+    })
+  }
+
+  function openTocFor(href) {
+    for ( let i=0; i < tocSubLists.length; i++ ) {
+      tocSubLists[i].classList.remove('show')
+    }
+    for ( let i=0; i < toggles.length; i++ ) {
+      toggles[i].classList.remove('selected')
+    }
+
+    let target = document.querySelector("a[href='" + href + "']")
+    const child = target.parentElement.querySelector(':scope > ul')
     if ( child ) {
       child.classList.add('show')
     }
-  })
-}
-
-function openTocFor(href) {
-  for ( let i=0; i < tocSubLists.length; i++ ) {
-    tocSubLists[i].classList.remove('show')
-  }
-  for ( let i=0; i < toggles.length; i++ ) {
-    toggles[i].classList.remove('selected')
+    target.classList.add('selected')
+    while (target.tagName !== 'DIV' ) {
+      target.classList.add('show')
+      target = target.parentElement
+    }
   }
 
-  let target = document.querySelector("a[href='" + href + "']")
-  const child = target.parentElement.querySelector(':scope > ul')
-  if ( child ) {
-    child.classList.add('show')
-  }
-  target.classList.add('selected')
-  while (target.tagName !== 'DIV' ) {
-    target.classList.add('show')
-    target = target.parentElement
+
+  window.addEventListener('hashchange', () => {
+    openTocFor(location.hash)
+  });
+
+  if (location.hash) {
+    openTocFor(location.hash)
+    closeAllEditor()
+    document.querySelector(location.hash).scrollIntoView()
   }
 }
 
-window.addEventListener('hashchange', () => {
-  openTocFor(location.hash)
-});
+async function loadContent (configAry) {
+  await Promise.all(
+    configAry.map( conf => {
+      return (async () => {
+        const fetched = await fetch(conf.url)
+        const html = await fetched.text()
+        const dom = new DOMParser()
+          .parseFromString(html, 'text/html')
+          console.log(dom)
+        document.querySelector(conf.to)
+          .append(...dom.body.childNodes)
+      })()
+    })
+  )
 
-if (location.hash) {
-  openTocFor(location.hash)
-  closeAllEditor()
-  evt.target.text = 'open editors'
+  setTimeout(setUpDoc, 1)
 }
 
-render()
+loadContent([
+  { url: '/doc.html', to: '#doc-content' },
+  { url: '/toc.html', to: '#toc' }
+]) 

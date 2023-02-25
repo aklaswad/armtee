@@ -9,6 +9,32 @@
 </style>
 </head>
 <body>
+  <div id="content-wrapper">
+    <div id="toc" class="light-contents"></div>
+    <div id="doc-wrapper" class="dark-contents">
+      <div id="doc-overlay"></div>
+      <div id="doc">
+        <h1 class="hero">armtee</h1>
+        <h2 class="hero">Line oriented text template tool</h2>
+        <div id="doc-content"></div>
+      </div>
+    </div>
+    <div id="content-right" class="light-contents">
+      <header>
+        <a href="#" id="editor-toggle"><span class="editor-toggle-text-placeholder"></span></a>
+      </header>
+      <footer id="content-footer">
+        <a href="/armtee/">armtee</a><br />
+        by aklaswad<br />
+        <a href="https://github.com/aklaswad/armtee">
+          <img
+            class="link-logo"
+            src="./site/images/github-mark.svg"
+            alt="View repository on github.com"
+          /></a>
+      </footer>
+    </div>
+  </div>
   <div id="error-display">error faaaa</div>
   <div id="editors-wrapper">
 
@@ -64,32 +90,6 @@ Show `items`
     </div>
   </div>
 
-  <div id="content-wrapper">
-    <div id="toc" class="light-contents"><!--TOC_PLACEHOLDER--></div>
-    <div id="doc-wrapper" class="dark-contents">
-      <div id="doc-overlay"></div>
-      <div id="doc">
-        <h1 class="hero">armtee</h1>
-        <h2 class="hero">Line oriented text template tool</h2>
-        <!--CONTENT_PLACEHOLDER-->
-      </div>
-    </div>
-    <div id="content-right" class="light-contents">
-      <header>
-        <a href="#" id="editor-toggle"><span class="editor-toggle-text-placeholder"></span></a>
-      </header>
-      <footer id="content-footer">
-        <a href="/armtee/">armtee</a><br />
-        by aklaswad<br />
-        <a href="https://github.com/aklaswad/armtee">
-          <img
-            class="link-logo"
-            src="./site/images/github-mark.svg"
-            alt="View repository on github.com"
-          /></a>
-      </footer>
-    </div>
-  </div>
 </body>
 </script>
 <script type="module" src="./site/demo.js"></script>
