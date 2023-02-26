@@ -222,7 +222,8 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 
 #doc h1 { margin: 7rem 0 3rem 0; font-weight: bold; }
 #doc h2 { margin: 4rem 0 2rem 0; }
-#doc h3 { margin: 3rem 0 1.7rem 0; }
+#doc h3 { margin: 3rem 0 1.7rem 0.5rem; }
+#doc h4 { margin: 3rem 0 1.7rem 1.2rem; }
 
 #doc h1 a,
 #doc h2 a,
