@@ -1,5 +1,4 @@
 - name: Use upper filter inline
-  debug: 2
   data:
     name: Test
   tmpl: |-
@@ -7,7 +6,6 @@
   expected: |-
     TEST
 - name: Use lower filter inline
-  debug: 2
   data:
     name: Test
   tmpl: |-
@@ -15,7 +13,6 @@
   expected: |-
     test
 - name: Method chain also work
-  debug: 2
   data:
     name: Test
   tmpl: |-
@@ -23,7 +20,6 @@
   expected: |-
     TEST
 - name: Use lower filter from macro
-  debug: 2
   data:
     name: Test
   tmpl: |-
@@ -32,7 +28,6 @@
   expected: |-
     test
 - name: Can reset filter from macro
-  debug: 2
   data:
     name: Test
   tmpl: |-

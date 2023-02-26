@@ -117,7 +117,6 @@
   skip: Wakaranai
   data:
     nums: [ 1, 2, 3 ]
-  debug: 0
   tmpl: |
     //! data.nums.forEach( n => {
       <% n %> oooooooooooooooooooo
@@ -127,12 +126,12 @@
     //! )}}
 
 - name: Include hello
-  todo: true
+  tmpfile: true
   data:
     name: world
   tmpl: |-
     Hello. Repeat after me?
-    ##% INCLUDE ./hello.tmpl
+    ##% INCLUDE ./hello.tmpl data
     thanks
   expected: |-
     Hello. Repeat after me?
@@ -140,14 +139,14 @@
     thanks
 
 - name: Nested Include
-  todo: true
+  tmpfile: true
   data:
     name: world
-  tmpl: |
+  tmpl: |-
     Um
-    ##!!INCLUDE hello_wrapper.tmpl
+    ##% INCLUDE hello_wrapper.tmpl data
     thanks
-  expected: |
+  expected: |-
     Um
     say
     hello world
@@ -155,14 +154,14 @@
     thanks
 
 - name: Nested Include alternative syntax
-  todo: true
+  tmpfile: true
   data:
     name: world
-  tmpl: |
+  tmpl: |-
     Um
-    //!! INCLUDE hello_wrapper.tmpl
+    //% INCLUDE hello_wrapper.tmpl data
     thanks
-  expected: |
+  expected: |-
     Um
     say
     hello world
@@ -170,10 +169,10 @@
     thanks
 
 - name: Stop circular including
-  todo: true
+  tmpfile: true
   error: Too deep include
   data:
     name: world
-  tmpl: |
-    //!! INCLUDE each1.tmpl
+  tmpl: |-
+    //% INCLUDE each1.tmpl data
 
