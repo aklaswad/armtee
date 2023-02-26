@@ -4,6 +4,9 @@
   "version": "0.0.1",
   "description": "Alternative micro template",
   "main": "index.js",
+  "bin": {
+    "armtee": "./bin/cli.js"
+  },
   "directories": {
     "lib": "lib"
   },
@@ -32,5 +35,8 @@
     "vite": "^4.1.2",
     "vitest": "^0.29.1",
     "yaml": "^2.2.1"
+  },
+  "dependencies": {
+    "yargs": "^17.7.1"
   }
 }
