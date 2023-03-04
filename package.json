@@ -15,7 +15,7 @@
     "try": "node test.js",
     "test": "npx vitest run --globals",
     "site-dev": "vite",
-    "site-build": "node site/build.js && vite build"
+    "site-build": "node site/build.js && npm run build && vite build"
   },
   "author": "",
   "license": "MIT",
