@@ -1,3 +1,7 @@
+import monaco from 'rollup-plugin-monaco-editor';
 export default {
-  base: '/armtee/'
+  base: '/armtee/',
+  plugins: [
+    monaco({ languages: ['javascript'] }),
+  ],
 }
