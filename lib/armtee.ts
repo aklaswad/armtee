@@ -12,15 +12,7 @@ type ArmteeMacro = {
 type ArmteeFilter = (str: string) => string
 
 type ArmteeBlockMetaInfo = { file?: string, line?: number, type?: string }
-
 type ArmteeTranspileOptions = Record<string, any>
-/*
-interface ArmteeBlockInterface {
-  precompile: (armtee: Armtee, txt: string) => ArmteeBlock[] | undefined | void
-  compile: (armtee: Armtee, txt: string) => string[] | undefined | void
-}
-*/
-
 type ArmteePrinterContext = {f: ArmteeFilter, fa: ArmteeFilter }
 
 interface ArmteePrinter extends Function {
@@ -81,7 +73,7 @@ const RE = {
 /**
  * Base class for pre-transpile line/block
  */
-class ArmteeBlock {
+export class ArmteeBlock {
   type (): ArmteeLineType { return 'never' }
   txt: string
   src: ArmteeBlockMetaInfo
@@ -109,6 +101,7 @@ class ArmteeBlock {
   _compile (armtee: Armtee, txt: string) {
     const ret = this.compile(armtee, txt)
     this.compiled = ret ? ret : []
+    return this.compiled
   }
 
   compiledLineCount () {
@@ -138,7 +131,7 @@ class ArmteeBlock {
   }
 }
 
-class ArmteeScriptBlock extends ArmteeBlock {
+export class ArmteeScriptBlock extends ArmteeBlock {
   type ():ArmteeLineType { return 'script' }
 
   compile (armtee:Armtee, txt:string) {
@@ -154,7 +147,7 @@ class ArmteeScriptBlock extends ArmteeBlock {
 /**
  * @extends ArmteeBlock
  */
-class ArmteeMacroBlock extends ArmteeBlock {
+export class ArmteeMacroBlock extends ArmteeBlock {
   type ():ArmteeLineType { return 'macro' }
 
   handler: ArmteeMacro | undefined
@@ -194,7 +187,7 @@ class ArmteeMacroBlock extends ArmteeBlock {
   }
 }
 
-class ArmteeTemplateBlock extends ArmteeBlock {
+export class ArmteeTemplateBlock extends ArmteeBlock {
   type ():ArmteeLineType { return 'template' }
 
   compile (armtee: Armtee, txt: string) {
@@ -261,12 +254,12 @@ ${ e instanceof Error ? e.toString() : e }
   }
 }
 
-class ArmteeCommentBlock extends ArmteeBlock {
+export class ArmteeCommentBlock extends ArmteeBlock {
   type ():ArmteeLineType { return 'comment' }
   precompile () { return [] }
 }
 
-class ArmteeLineParser {
+export class ArmteeLineParser {
   buf: { txt: string; meta: ArmteeBlockMetaInfo; }[]
   out: ArmteeBlock[]
   cur: ArmteeLineType
@@ -345,11 +338,8 @@ const __filters:Record <string, ArmteeFilter> = {}
 /**
  * Class represents parsed template
  */
-class Armtee {
+export class Armtee {
   static debug = 0
-
-
-
 
   static fromText (txt: string, meta: ArmteeBlockMetaInfo={}) {
     const mode = Armtee.modeFromText(txt)
@@ -577,7 +567,6 @@ ERROR: ${orig}
 
     // This could have a side effect... :thinking:
     let blocks = this.prepare()
-
     if ( options.inject ) {
       blocks = blocks.flatMap( (block,idx) => {
         if ( options.injectLine === idx ) {
@@ -762,4 +751,3 @@ Armtee.addMacro('INCLUDE', {
 })
 
 Armtee.addFilter( 'none', str => str )
-export default Armtee

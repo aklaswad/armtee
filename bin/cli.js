@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import Armtee from '../lib/armtee.js'
+import Armtee from '../dist/armtee.js'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import fs from 'fs/promises'

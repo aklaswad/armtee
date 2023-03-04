@@ -126,7 +126,7 @@ function closeAllEditor () {
   closedEditors = len
 }
 
-import Armtee from '../lib/armtee.js'
+import {Armtee} from '../dist/armtee.js'
 Armtee.addFilter( 'upperCase', str => str.toUpperCase() )
 const out = document.getElementById('out')
 
@@ -293,4 +293,4 @@ async function loadContent (configAry) {
 loadContent([
   { url: 'doc.html', to: '#doc-content' },
   { url: 'toc.html', to: '#toc' }
-]) 
+])
