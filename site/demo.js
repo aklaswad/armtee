@@ -17,12 +17,6 @@ self.MonacoEnvironment = {
     if (label === 'json') {
       return new jsonWorker()
     }
-    if (label === 'css' || label === 'scss' || label === 'less') {
-      return new cssWorker()
-    }
-    if (label === 'html' || label === 'handlebars' || label === 'razor') {
-      return new htmlWorker()
-    }
     if (label === 'typescript' || label === 'javascript') {
       return new tsWorker()
     }
@@ -256,6 +250,7 @@ render()
 
 
 function setUpDoc () {
+  let observeStop = false
   const toggles = document.querySelectorAll('#toc a')
   const tocSubLists = document.querySelectorAll('#toc ul ul')
   for ( let i=0; i < toggles.length; i++ ) {
@@ -268,7 +263,7 @@ function setUpDoc () {
     })
   }
 
-  function openTocFor(href) {
+  function openTocFor(href, noScroll) {
     for ( let i=0; i < tocSubLists.length; i++ ) {
       tocSubLists[i].classList.remove('show')
     }
@@ -278,8 +273,9 @@ function setUpDoc () {
 
     let target = document.querySelector("a[href='" + href + "']")
     const container = document.querySelector("#toc")
-    container.scrollTop = target.offsetTop - ( container.clientHeight / 2 )
-
+    if ( !noScroll ) {
+      container.scrollTop = target.offsetTop - ( container.clientHeight / 2 )
+    }
     const child = target.parentElement.querySelector(':scope > ul')
     if ( child ) {
       child.classList.add('show')
@@ -293,11 +289,13 @@ function setUpDoc () {
 
   const observeOptions = {
     root: document.querySelector('#content-wrapper'),
-    rootMargin: '0px 0px -50% 0px',
+    rootMargin: '0px 0px -40% 0px',
     threshold: 1.0
   }
+
   const observer = new IntersectionObserver(
     (evts) => {
+      if ( observeStop ) return
       const id = evts.filter(evt => evt.isIntersecting).map( e => e.target.id)[0]
       if ( id ) {
         openTocFor('#' + id)
@@ -312,11 +310,25 @@ function setUpDoc () {
     openTocFor(location.hash)
   });
 
+  document.querySelectorAll('#toc a')
+    .forEach( elem => elem.addEventListener('click', (evt) => {
+      observeStop = true
+      setTimeout(() => observeStop = false, 100)
+      const hash = elem.getAttribute('href')
+      openTocFor(hash, true)
+      document.getElementById(hash.slice(1)).scrollIntoView({block: 'top'})
+      evt.target.blur()
+      evt.preventDefault()
+      evt.stopPropagation()
+    }))
+
   if (location.hash) {
     const hash = '#' + CSS.escape(location.hash.slice(1))
+    observeStop = true
+    setTimeout(() => observeStop = false, 100)
     openTocFor(hash)
     closeAllEditor()
-    document.querySelector(hash).scrollIntoView()
+    document.querySelector(hash).scrollIntoView({block: 'top'})
   }
 }
 
