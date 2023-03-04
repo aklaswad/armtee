@@ -1,18 +1,51 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-const Sigs = {
+type ArmteeLineSignature = "hashy" | "slashy"
+type ArmteeTemplateMode = "template" | "logic" | "something"
+type ArmteeLineType = "macro" | "script" | "template" | "comment" | "never"
+
+type ArmteeMacro = {
+  precompile?: (armtee: Armtee, args: string[], block: ArmteeMacroBlock ) => void | undefined | ArmteeBlock | ArmteeBlock[]
+  compile?: (armtee: Armtee, args: string[], block: ArmteeMacroBlock ) => void | undefined | string | string[]
+}
+type ArmteeFilter = (str: string) => string
+
+type ArmteeBlockMetaInfo = { file?: string, line?: number, type?: string }
+
+type ArmteeTranspileOptions = Record<string, any>
+/*
+interface ArmteeBlockInterface {
+  precompile: (armtee: Armtee, txt: string) => ArmteeBlock[] | undefined | void
+  compile: (armtee: Armtee, txt: string) => string[] | undefined | void
+}
+*/
+
+type ArmteePrinterContext = {f: ArmteeFilter, fa: ArmteeFilter }
+
+interface ArmteePrinter extends Function {
+  _: ArmteePrinterContext[]
+  $: ArmteePrinterContext
+  _trace: Function
+  __filters: Record<string, ArmteeFilter>
+  push: Function
+  pop: Function
+}
+
+const Sigs :Record<ArmteeLineSignature, Record<ArmteeLineType,string>> = {
   hashy: {
     macro: '##% ',
     script: '##! ',
     template: '##> ',
     comment: '##- ',
+    never: ''
   },
   slashy: {
     macro: '//% ',
     script: '//! ',
     template: '//> ',
     comment: '//- ',
+    never: ''
   }
 }
 
@@ -45,24 +78,37 @@ const RE = {
   }
 }
 
+/**
+ * Base class for pre-transpile line/block
+ */
 class ArmteeBlock {
-  constructor (txt, src) {
+  type (): ArmteeLineType { return 'never' }
+  txt: string
+  src: ArmteeBlockMetaInfo
+  dst: ArmteeBlockMetaInfo
+  colmap: [number,number][]
+  compiled: string[]
+
+  constructor (txt: string, src: ArmteeBlockMetaInfo) {
     this.txt = txt
     this.src = src
     this.dst = {}
     this.colmap = [[1,1]] // src, dst
+    this.compiled = []
   }
 
-  parseError (error) {
+  parseError (error:string) {
     throw `Armtee template error: ${error} at ${ this.src.file } line ${ this.src.line }`
   }
 
-  precompile () { return this }
-  compile () {}
+
+  precompile (armtee: Armtee, txt: string): ArmteeBlock[] { return [this] }
+  compile (armtee: Armtee, txt: string): string[] { return [] }
   postcompile () {}
 
-  _compile (...args) {
-    return this.compiled = this.compile(...args)
+  _compile (armtee: Armtee, txt: string) {
+    const ret = this.compile(armtee, txt)
+    this.compiled = ret ? ret : []
   }
 
   compiledLineCount () {
@@ -72,7 +118,7 @@ class ArmteeBlock {
     }, 0 )
   }
 
-  static create ( type, txt, src ) {
+  static create ( type: ArmteeLineType, txt: string, src: ArmteeBlockMetaInfo ) {
     switch (type) {
       case 'macro' :
         return new ArmteeMacroBlock(txt, src)
@@ -93,9 +139,9 @@ class ArmteeBlock {
 }
 
 class ArmteeScriptBlock extends ArmteeBlock {
-  static type = 'script'
+  type ():ArmteeLineType { return 'script' }
 
-  compile (armtee, txt) {
+  compile (armtee:Armtee, txt:string) {
     const ret = []
     if ( Armtee.debug ) {
       //ret.push( '_trace(' + JSON.stringify(this) + ')' )
@@ -105,15 +151,21 @@ class ArmteeScriptBlock extends ArmteeBlock {
   }
 }
 
+/**
+ * @extends ArmteeBlock
+ */
 class ArmteeMacroBlock extends ArmteeBlock {
-  static type = 'macro'
+  type ():ArmteeLineType { return 'macro' }
 
-  precompile (armtee, txt) {
+  handler: ArmteeMacro | undefined
+  args: string[] | undefined
+
+  precompile (armtee :Armtee, txt :string): ArmteeBlock[] {
     const [ command, ...args ] = txt.trim().split(/\s+/)
     if ( !command )
       this.parseError( 'Macro line needs at least 1 words' )
 
-    const handler = Armtee.__macros[ command.toUpperCase() ]
+    const handler = __macros[ command.toUpperCase() ]
     if ( !handler ) {
       this.parseError( 'Unknown macro command: ' + command )
     }
@@ -121,32 +173,31 @@ class ArmteeMacroBlock extends ArmteeBlock {
     this.args = args
     if ( handler.precompile ) {
       const ret = handler.precompile(armtee, args, this)
-      if ( ret ) {
-        ret.forEach( block => block.src = this.src )
-        return ret
-      }
-      return []
+      if ( !ret ) return []
+      const blocks = Array.isArray(ret) ? ret : [ret]
+      blocks.forEach( block => block.src = this.src )
+      return blocks
     }
-    return this
+    return [this]
   }
 
-  compile (armtee, txt) {
+  compile (armtee: Armtee, txt: string): string[] {
+    if ( !this.handler ) return []
     if ( this.handler.compile ) {
-      const res = this.handler.compile(armtee, this.args, this)
-      if ( 'undefined' === typeof res ) {
-        return
+      const res = this.handler.compile(armtee, this.args || [], this)
+      if ( ! res ) {
+        return []
       }
-      return res
-
+      return Array.isArray(res) ? res : [res]
     }
-    return
+    return []
   }
 }
 
 class ArmteeTemplateBlock extends ArmteeBlock {
-  static type = 'template'
+  type ():ArmteeLineType { return 'template' }
 
-  compile (armtee, txt) {
+  compile (armtee: Armtee, txt: string) {
     const ret = []
     const parts = txt.split(armtee.runtimeSymbols.tagSeparator[0])
       .flatMap( p => p.split(armtee.runtimeSymbols.tagSeparator[1]))
@@ -161,7 +212,7 @@ class ArmteeTemplateBlock extends ArmteeBlock {
     let isText = true
     parts.forEach( str => {
       if ( isText ) {
-        const txt = str.replaceAll(new RegExp('([`$])', 'g'), '${"$1"}')
+        const txt = str.replace(new RegExp('([`$])', 'g'), '${"$1"}')
         offset += str.length + lenL
         buf += txt
       }
@@ -174,7 +225,7 @@ class ArmteeTemplateBlock extends ArmteeBlock {
 -------------
 ${ str }
 -------------
-${ e.toString() }
+${ e instanceof Error ? e.toString() : e }
 -------------
           `)
         }
@@ -198,7 +249,7 @@ ${ e.toString() }
 -------------
 ${ script }
 -------------
-${ e.toString() }
+${ e instanceof Error ? e.toString() : e }
 -------------
       `)
     }
@@ -211,24 +262,21 @@ ${ e.toString() }
 }
 
 class ArmteeCommentBlock extends ArmteeBlock {
-  static type = 'comment'
-  precompile () {
-    return []
-  }
+  type ():ArmteeLineType { return 'comment' }
+  precompile () { return [] }
 }
 
 class ArmteeLineParser {
+  buf: { txt: string; meta: ArmteeBlockMetaInfo; }[]
+  out: ArmteeBlock[]
+  cur: ArmteeLineType
   constructor () {
-    this.init()
-  }
-
-  init () {
     this.buf = []
     this.out = []
-    this.cur = ''
+    this.cur = 'never'
   }
 
-  _addLine (type, txt, meta) {
+  _addLine (type: ArmteeLineType, txt: string, meta: ArmteeBlockMetaInfo) {
     if ( this.cur === type ) {
       this.buf.push({ txt, meta })
     }
@@ -252,7 +300,15 @@ class ArmteeLineParser {
     }
   }
 
-  parse (txt, meta, mode='hashy', filemode='template') {
+  /**
+   *
+   * @param {*} txt
+   * @param {*} meta
+   * @param {LineSignature} mode
+   * @param {*} filemode
+   * @returns {?} output
+   */
+  parse (txt: string, meta: ArmteeBlockMetaInfo, mode:ArmteeLineSignature='hashy', filemode:ArmteeTemplateMode='template') {
     const re = RE[mode].line
     txt.split("\n").forEach( (line, idx) => {
       const _meta = Object.assign( {}, meta, { line: idx + 1, colOffset: 4 } )
@@ -271,45 +327,90 @@ class ArmteeLineParser {
           line,
           _meta_wo_prefix)
     })
-    this._addLine('') // Flush last buffer
+    this._addLine('never', '', {}) // Flush last buffer
     return this.out
   }
 }
 
+
+
+/**
+ * Transpile and Rendering options
+ * @typedef {object} TranspileOptions
+ */
+
+
+const __macros:Record <string, ArmteeMacro> = {}
+const __filters:Record <string, ArmteeFilter> = {}
+/**
+ * Class represents parsed template
+ */
 class Armtee {
   static debug = 0
-  static __macros = {}
-  static __filters = {}
 
-  // meta should looks like `{ file: filepath }`
-  static fromText (txt, meta={}) {
+
+
+
+  static fromText (txt: string, meta: ArmteeBlockMetaInfo={}) {
     const mode = Armtee.modeFromText(txt)
     return new Armtee(txt.replace(/\n$/,''), mode[0], mode[1], meta)
   }
 
-  static fromFile(filename, options={}) {
+  /**
+   * Load template from file
+   * @param {string} filename - filename to be loaded
+   * @param {{depth: number}} options - Internal use
+   * @returns {Armtee} new Armtee instance
+   */
+  static fromFile(filename:string, options:ArmteeTranspileOptions={}) {
     const txt = fs.readFileSync(filename, 'utf-8')
     const armtee = Armtee.fromText(txt, { file: filename, type: 'file' })
     armtee.__depth = options.__depth || 0
     return armtee
   }
 
-  static render (tmpl, data, options) {
+  /**
+   * Render outputs from template string and data
+   * @param {string} tmpl - template
+   * @param {any} data - data to be passed to template
+   * @param {TranspileOptions} options - option
+   * @returns {string} Rendered output
+   */
+  static render (tmpl:string, data:any, options:ArmteeTranspileOptions) {
     const armtee = this.fromText(tmpl)
     return armtee.render(data, options)
   }
 
-  static renderFile(filename, data, options) {
+  /**
+   * Render outputs from template file and data
+   * @param {string} filename - Filename to be loaded
+   * @param {any} data - data to be passed to template
+   * @param {TranspileOptions} options
+   * @returns {string} Rendered output
+   */
+  static renderFile(filename:string, data:any, options: ArmteeTranspileOptions) {
     const armtee = this.fromFile(filename)
     return armtee.render(data, options)
   }
 
-  constructor ( txt, signature, filemode, meta={} ) {
+
+  blocks: ArmteeBlock[]
+  signature: ArmteeLineSignature
+  filemode: ArmteeTemplateMode
+  runtimeSymbols: Record<string, string | string[]>
+  executable: Function | undefined
+  rawScript: string
+  offset: number
+  __depth: number
+  constructor ( txt: string, signature: ArmteeLineSignature, filemode: ArmteeTemplateMode, meta={} ) {
     const parser = new ArmteeLineParser()
     const blocks = parser.parse(txt, meta, signature, filemode)
+    this.offset = 0
+    this.__depth = 0
     this.blocks = blocks
     this.signature = signature
     this.filemode = filemode
+    this.rawScript = ''
     this.runtimeSymbols = {
       printer:  '_$',
       root: 'data',
@@ -318,7 +419,7 @@ class Armtee {
     }
   }
 
-  static modeFromText (txt) {
+  static modeFromText (txt:string): [ArmteeLineSignature, ArmteeTemplateMode] {
     const hashySomething  = RE.hashy.file.something.test(txt)
     const hashyLogic      = RE.hashy.file.logic.test(txt)
     const hashyTemplate   = RE.hashy.file.template.test(txt)
@@ -332,24 +433,19 @@ class Armtee {
     }
     if ( hashySomething ) {
       return hashyLogic    ? [ 'hashy', 'logic' ]
-           : hashyTemplate ? [ 'hashy', 'template' ]
-           :                 [ 'hashy' ]
-    }
-    else if ( slashySomething ) {
-      return slashyLogic    ? [ 'slashy', 'logic' ]
-           : slashyTemplate ? [ 'slashy', 'template' ]
-           :                  [ 'slashy' ]
+                           : [ 'hashy', 'template' ]
     }
     else {
-      return []
+      return slashyLogic    ? [ 'slashy', 'logic' ]
+                            : [ 'slashy', 'template' ]
     }
   }
 
-  setTagSeparator ( begin, end ) {
+  setTagSeparator ( begin:string, end:string ) {
     this.runtimeSymbols.tagSeparator = [ begin, end ]
   }
 
-  compile (options) {
+  compile (options: ArmteeTranspileOptions) {
     //if ( this.executable ) {
     //  return this.executable
     //}
@@ -374,7 +470,7 @@ class Armtee {
       // But they all doesn't have enough compatibility for
       // browsers, at least on my setup...
 
-      const orig = e.message
+      const orig = e instanceof Error ? e.message : e
 
       // At first, inject various type of script snipet which could
       // possibly raise another error at begin of script, and
@@ -394,10 +490,15 @@ class Armtee {
           new Function(js)
         }
         catch (e) {
-          if ( orig !== e.message) {
-            raiserError = e.message
-            raiser = injectBlock
-            break FIND
+          if ( e instanceof Error ) {
+            if ( orig !== e.message) {
+              raiserError = e.message
+              raiser = injectBlock
+              break FIND
+            }
+          }
+          else {
+            throw "Armtee: Panic at finding cause of compile error :" + orig
           }
         }
       }
@@ -413,6 +514,9 @@ class Armtee {
           new Function(js)
         }
         catch(e) {
+          if ( !(e instanceof Error) ) {
+            throw "Armtee: Panic at finding cause of compile error :" + orig
+          }
           got = e.message
         }
 
@@ -442,15 +546,15 @@ ERROR: ${orig}
     }
   }
 
-  wrap (txt, options={}) {
+  wrap (txt: string, options: ArmteeTranspileOptions = {} ) {
     let filterInjection = ''
     if ( options.includeFilters ) {
-      filterInjection = Object.keys(this.constructor.__filters)
-        .map( f => `String.prototype.$${f} = function () {return (${Armtee.__filters[f].toString()})(this)}`)
+      filterInjection = Object.keys(__filters)
+        .map( f => `String.prototype.$${f} = function () {return (${__filters[f].toString()})(this)}`)
         .join('\n')
     }
     else {
-      filterInjection = Object.keys(this.constructor.__filters)
+      filterInjection = Object.keys(__filters)
         .map( f => `String.prototype.$${f} = function () {return printer.__filters.${f}(this)}`)
         .join('\n')
     }
@@ -460,13 +564,13 @@ ERROR: ${orig}
     return [ header, '/*___ARMTEE___*/', txt, footer ].join('\n')
   }
 
-  prepare (options={}) {
+  prepare (options:ArmteeTranspileOptions={}) {
     return this.blocks.flatMap( (block, idx) => {
       return block.precompile(this, block.txt)
     })
   }
 
-  translate (options={}) {
+  translate (options:ArmteeTranspileOptions={}) {
     //if ( this.rawScript ) {
     //  return this.rawScript
     //}
@@ -494,41 +598,44 @@ ERROR: ${orig}
     return this.rawScript = compiledLines.join('\n')
   }
 
-  resolvePos (dstLine,dstCol) {
+  resolvePos (dstLine:number,dstCol:number) {
     const idx = this.blocks.findIndex( b => b.dst.line && b.dst.line > dstLine - this.offset )
     if ( idx === -1 ) return
     console.error(this.blocks[idx-1])
     return this.blocks[idx-1].src
   }
 
-  _render_core (js, data, printer) {
+  _render_core (js: Function, data: any, printer: Function) {
     js( data, printer )
   }
 
-  setUpPrinter (buf,trace) {
-    const printer = function (...args) {
-      const raw = String.raw(...args)
+
+  setUpPrinter (buf: string[],trace: any[]) {
+    const printer:ArmteePrinter = function (literals: TemplateStringsArray, ...placeholders: string[]) {
+      const raw = String.raw(literals, ...placeholders)
       buf.push(printer.$.fa ? printer.$.fa(raw) : raw)
     }
-    printer['_trace'] = function (block) { trace.push(block) }
-    printer.__filters = Armtee.__filters
+    printer['_trace'] = function (block: ArmteeBlock) { trace.push(block) }
+    printer.__filters = __filters
     printer._ = [] // context stack
-    printer.$ = {f: Armtee.__filters.none } // context
+    printer.$ = {f: __filters.none, fa: __filters.none } // context
     printer.push = function printerPush () {
       const newContext = Object.assign({}, printer.$)
       printer._.push(printer.$)
       printer.$ = newContext
     }
     printer.pop = function printerPop () {
-      printer.$ = printer._.pop()
+      const $ = printer._.pop()
+      if ( !$ ) throw 'Invalid context'
+      printer.$ = $
     }
     return printer
   }
 
-  render (data, options={}) {
+  render (data:any, options:ArmteeTranspileOptions={}) {
     const js = this.compile(options)
-    const buf = []
-    const trace = []
+    const buf: string[] = []
+    const trace: any[] = []
     const printer = this.setUpPrinter(buf, trace)
     try {
       js(data,printer)
@@ -540,14 +647,17 @@ ERROR: ${orig}
 -------------
 ${ errorBlock.txt }
 -------------
-ERROR: ${ e.toString()}
+ERROR: ${ e instanceof Error ? e.toString() : e}
 -------------`)
       }
       else {
-        console.log(e)
+        if ( !(e instanceof Error) ) {
+          throw e
+        }
         if ( e.stack ) {
-          if ( e.stack.match(/(\d+):(\d+)\)?\n/m) ) {
-            const pos = this.resolvePos( RegExp.$1, RegExp.$2 )
+          let matches
+          if ( matches = e.stack.match(/(\d+):(\d+)\)?\n/m) ) {
+            const pos = this.resolvePos( parseInt(matches[1]), parseInt(matches[2]) )
             if ( pos ) {
               throw( `Armtee render error: Got JS runtime error "${e}" at file ${pos.file} line ${pos.line}` )
             }
@@ -562,31 +672,35 @@ ERROR: ${ e.toString()}
     return buf.join('\n')
   }
 
-  convert (style, mode) {
-    const buf = []
+  convert (style: ArmteeLineSignature, mode: ArmteeTemplateMode) {
+    const buf:string[] = []
     const sigs = Sigs[style]
     this.blocks.forEach( b => {
-      const sig = mode === 'logic' && b.constructor.type === 'script'      ? ''
-                : mode === 'template' && b.constructor.type === 'template' ? ''
-                : sigs[b.constructor.type]
+      const sig = mode === 'logic' && b instanceof ArmteeScriptBlock      ? ''
+                : mode === 'template' && b instanceof ArmteeTemplateBlock ? ''
+                : sigs[b.type()]
       buf.push( b.txt.replace(/^/m, sig) )
 
     })
     return buf.join('\n')
   }
-
-  static addMacro( command, fn ) {
-    Armtee.__macros[command] = fn
+  /**
+   *
+   * @param {string} command
+   * @param {ArmteeMacro} macro
+   */
+  static addMacro( command:string, macro:ArmteeMacro ) {
+    __macros[command] = macro
   }
 
-  static addFilter ( name, fn ) {
-    Armtee.__filters[name] = fn
+  static addFilter ( name:string, fn: (str:string) => string ) {
+    __filters[name] = fn
   }
 }
 
 Armtee.addMacro('TAG', {
   compile: (armtee, args) => {
-    armtee.setTagSeparator( ...args )
+    armtee.setTagSeparator( args[0], args[1] )
   }
 })
 
@@ -599,7 +713,7 @@ Armtee.addMacro('ROOT', {
 Armtee.addMacro('FILTER', {
   compile: (armtee, args) => {
     const [ filterName ] = args
-    if ( ! Armtee.__filters[filterName] ) {
+    if ( ! __filters[filterName] ) {
       throw 'Unknown filter ' + filterName
     }
     const _$ = armtee.runtimeSymbols.printer
@@ -610,7 +724,7 @@ Armtee.addMacro('FILTER', {
 Armtee.addMacro('FILTERALL', {
   compile: (armtee, args) => {
     const [ filterName ] = args
-    if ( ! Armtee.__filters[filterName] ) {
+    if ( ! __filters[filterName] ) {
       throw 'Unknown filter ' + filterName
     }
     return [`${armtee.runtimeSymbols.printer}.$.fa = ${armtee.runtimeSymbols.printer}.__filters.${filterName}`]
@@ -623,7 +737,10 @@ Armtee.addMacro('INCLUDE', {
       throw 'Too deep include'
     }
     if ( block.src.type !== 'file' ) {
-      block.parseError('INCLUDE macro cannot be invoked from non-file template.')
+      return block.parseError('INCLUDE macro cannot be invoked from non-file template.')
+    }
+    if ( ! block.src?.file ) {
+      return block.parseError('INCLUDE macro cannot be invoked from non-file template.')
     }
     const rootPath = path.dirname(block.src.file)
     const [ filename, context ] = args

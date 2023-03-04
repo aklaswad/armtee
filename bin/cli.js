@@ -40,6 +40,8 @@ parser.command('render <file>', 'Load template from file, and render input', yar
 })
 
 
+parser.completion('completion')
+
 const Commands = {
   "convert": async (options) => {
     const bk = options.file + '.bk'
