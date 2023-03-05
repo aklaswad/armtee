@@ -147,10 +147,20 @@ async function loadEditor () {
   })
   monaco.editor.setTheme("my-dark")
 
+  const editorValues = {}
+  editorValues.json = document.getElementById('json').textContent
+  editorValues.tmpl = document.getElementById('tmpl').textContent
+  let rendered
+  try {
+    rendered = renderCore(editorValues.tmpl, editorValues.json)
+  }
+  catch (e) { /* ignore. don't stop rendering entire page */}
+  editorValues.trans = rendered[0] || ''
+  editorValues.out = rendered[1] || ''
 
   editorIds.forEach( editorId => {
     const element = document.getElementById(editorId)
-    const text = element.textContent
+    const text = editorValues[editorId]
     element.innerText = ''
     const defaults = editorDefaults[editorId]
 
@@ -228,8 +238,6 @@ async function loadContent (configAry) {
       })()
     })
   )
-
-  setTimeout(setUpDoc, 1)
 }
 
 
@@ -310,33 +318,39 @@ function setError (error) {
   }
 }
 
-function render() {
-  rendering = true
-  const tmpl = editors['tmpl'].getValue()
-  const json = editors['json'].getValue()
-  let data
+function renderCore (tmpl, json) {
+  let data, compiled, rendered
   try {
     data = JSON.parse(json)
   }
   catch (e) {
-    setError( 'Waiting for JSON format corrected')
-    rendering = false
-    return
+    throw( 'Waiting for JSON format corrected' )
   }
+  const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
+  compiled = armtee.translate({mode:'function'})
+  rendered = armtee.render(data, {
+    includeFilters: true,
+    mode: 'function'
+  })
+
+  return [compiled, rendered]
+}
+
+function render() {
+  rendering = true
+  const tmpl = editors['tmpl'].getValue()
+  const json = editors['json'].getValue()
+  let res
   try {
-    const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
-    replace('trans', armtee.translate({mode:'function'}))
-    replace('out', armtee.render(data, {
-      includeFilters: true,
-      mode: 'function'
-    }))
+    res = renderCore(tmpl,json)
   }
   catch (e) {
-    //console.log(e)
+    setError(e)
     rendering = false
-    setError( e.toString() )
     return
   }
+  replace('trans', res[0])
+  replace('out', res[1])
   setError()
   rendering = false
   return
@@ -348,8 +362,10 @@ Promise.all([
     { url: 'doc.html', to: '#doc-content' },
     { url: 'toc.html', to: '#toc' }
   ])
-]).then( () => {
+]).then( setTimeout(() => {
   setUpPage()
-  render()
-})
+  //render()
+  // TODO: Invoke initial render() from editor's loaded callback,
+  // Or set as initial value...
+}, 20))
 
