@@ -3,7 +3,7 @@
   "compilerOptions": {
     "useUnknownInCatchVariables": true,
     "target": "ES2020",
-    "module": "esnext",
+    "module": "UMD",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,

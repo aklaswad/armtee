@@ -8,7 +8,7 @@ import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 
-import {Armtee} from '../dist/armtee.js'
+import {Armtee} from '../dist/index.js'
 
 let rendering = false
 

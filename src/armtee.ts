@@ -26,7 +26,7 @@ export const __filters:Record <string, ArmteeFilter> = {}
 /**
  * Class represents parsed template
  */
-export class Armtee implements IArmteeTranspiler {
+export class ArmteeTranspiler implements IArmteeTranspiler {
   debug: number
 
   static fromText (txt: string, meta: ArmteeBlockMetaInfo={}) {
@@ -157,19 +157,19 @@ export class Armtee implements IArmteeTranspiler {
   }
 }
 
-Armtee.addMacro('TAG', {
+ArmteeTranspiler.addMacro('TAG', {
   compile: (armtee, args) => {
     armtee.setTagSeparator( args[0], args[1] )
   }
 })
 
-Armtee.addMacro('ROOT', {
+ArmteeTranspiler.addMacro('ROOT', {
   precompile: (armtee, args, block) => {
     armtee.runtimeSymbols.root = args[0]
   }
 })
 
-Armtee.addMacro('FILTER', {
+ArmteeTranspiler.addMacro('FILTER', {
   compile: (armtee, args) => {
     const [ filterName ] = args
     if ( ! __filters[filterName] ) {
@@ -180,7 +180,7 @@ Armtee.addMacro('FILTER', {
   }
 })
 
-Armtee.addMacro('FILTERALL', {
+ArmteeTranspiler.addMacro('FILTERALL', {
   compile: (armtee, args) => {
     const [ filterName ] = args
     if ( ! __filters[filterName] ) {
@@ -190,7 +190,7 @@ Armtee.addMacro('FILTERALL', {
   }
 })
 
-Armtee.addMacro('INCLUDE', {
+ArmteeTranspiler.addMacro('INCLUDE', {
   precompile: (armtee, args, block) => {
     if ( armtee.__depth > 10 ) {
       throw 'Too deep include'
@@ -203,7 +203,7 @@ Armtee.addMacro('INCLUDE', {
     }
     const rootPath = path.dirname(block.src.file)
     const [ filename, context ] = args
-    const included = Armtee.fromFile(path.resolve(rootPath, filename), {__depth: armtee.__depth + 1})
+    const included = ArmteeTranspiler.fromFile(path.resolve(rootPath, filename), {__depth: armtee.__depth + 1})
     const blocks = included.prepare()
     // Semi-colon is required.
     // Without this ';', got error "_(...) is not a function."
@@ -220,4 +220,4 @@ Armtee.addMacro('INCLUDE', {
   }
 })
 
-Armtee.addFilter( 'none', str => str )
+ArmteeTranspiler.addFilter( 'none', str => str )

@@ -2,13 +2,22 @@
   "name": "armtee",
   "type": "module",
   "version": "0.0.1",
-  "description": "Alternative micro template",
-  "main": "index.js",
+  "description": "Line oriented micro templating tool",
+  "keywords": ["template", "microtemplate"],
+  "homepage": "https://aklaswad.github.io/armtee/",
+  "bugs": "https://github.com/aklaswad/armtee/issues",
+  "repository": "github:aklaswad/armtee",
   "bin": {
     "armtee": "./bin/cli.js"
   },
-  "directories": {
-    "lib": "lib"
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "umd": "./dist/index.js"
+    },
+    "./package.json": "./package.json",
+    "./dist": "./dist",
+    "./bin": "./bin"
   },
   "scripts": {
     "build": "npx tsc --outDir dist",
@@ -17,7 +26,7 @@
     "site-dev": "vite",
     "site-build": "node site/build.js && npm run build && vite build"
   },
-  "author": "",
+  "author": "Akira Sawada",
   "license": "MIT",
   "devDependencies": {
     "markdown-it": "^13.0.1",
