@@ -6,27 +6,32 @@ import {
   ArmteeFilter,
   ArmteeBlockMetaInfo,
   ArmteeTranspileOptions,
-} from './types'
+  IArmteeMacro,
+  IArmteeBlock,
+  IArmteeTranspiler
+} from './types.js'
 
 import {
+  __macros,
   ArmteeBlock,
   ArmteeScriptBlock,
   ArmteeTemplateBlock,
-  ArmteeMacro,
-  __macros
-} from './block'
-import { ArmteeLineParser, Sigs, modeFromText } from './line-parser'
+} from './block.js'
+
+//export const __macros:Record <string, IArmteeMacro> = {};
+
+import { ArmteeLineParser, Sigs, modeFromText } from './line-parser.js'
 
 export const __filters:Record <string, ArmteeFilter> = {}
 /**
  * Class represents parsed template
  */
-export class Armtee {
-  static debug = 0
+export class Armtee implements IArmteeTranspiler {
+  debug: number
 
   static fromText (txt: string, meta: ArmteeBlockMetaInfo={}) {
     const mode = modeFromText(txt)
-    return new Armtee(txt.replace(/\n$/,''), mode[0], mode[1], meta)
+    return new this(txt.replace(/\n$/,''), mode[0], mode[1], meta)
   }
 
   /**
@@ -37,13 +42,12 @@ export class Armtee {
    */
   static fromFile(filename:string, options:ArmteeTranspileOptions={}) {
     const txt = fs.readFileSync(filename, 'utf-8')
-    const armtee = Armtee.fromText(txt, { file: filename, type: 'file' })
+    const armtee = this.fromText(txt, { file: filename, type: 'file' })
     armtee.__depth = options.__depth || 0
     return armtee
   }
 
-
-  blocks: ArmteeBlock[]
+  blocks: IArmteeBlock[]
   signature: ArmteeLineSignature
   filemode: ArmteeTemplateMode
   runtimeSymbols: Record<string, string | string[]>
@@ -56,6 +60,7 @@ export class Armtee {
     const blocks = parser.parse(txt, meta, signature, filemode)
     this.offset = 0
     this.__depth = 0
+    this.debug = 0
     this.blocks = blocks
     this.signature = signature
     this.filemode = filemode
@@ -142,12 +147,8 @@ export class Armtee {
     })
     return buf.join('\n')
   }
-  /**
-   *
-   * @param {string} command
-   * @param {ArmteeMacro} macro
-   */
-  static addMacro( command:string, macro:ArmteeMacro ) {
+
+  static addMacro( command:string, macro:IArmteeMacro ) {
     __macros[command] = macro
   }
 

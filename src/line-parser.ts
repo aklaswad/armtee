@@ -1,11 +1,12 @@
 import {
   ArmteeLineSignature,
   ArmteeTemplateMode,
-    ArmteeLineType,
-    ArmteeBlockMetaInfo,
-} from './types'
+  ArmteeLineType,
+  ArmteeBlockMetaInfo,
+  IArmteeBlock
+} from './types.js'
 
-import { ArmteeBlock } from './block'
+import { ArmteeBlock } from './block.js'
 
 export const Sigs :Record<ArmteeLineSignature, Record<ArmteeLineType,string>> = {
 
@@ -56,7 +57,7 @@ export const RE = {
 
 export class ArmteeLineParser {
   buf: { txt: string; meta: ArmteeBlockMetaInfo; }[]
-  out: ArmteeBlock[]
+  out: IArmteeBlock[]
   cur: ArmteeLineType
   constructor () {
     this.buf = []

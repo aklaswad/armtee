@@ -1,3 +1,3 @@
-import { Armtee } from '../dist/armtee.js'
+import { ArmteeRunner } from '../dist/runner.js'
 import { testFromYaml } from './util.js'
-await testFromYaml('basic.data.yml', Armtee)
+await testFromYaml('basic.data.yml', ArmteeRunner)

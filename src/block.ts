@@ -1,18 +1,18 @@
 import {
   ArmteeLineType,
   ArmteeBlockMetaInfo,
-} from './types'
-import {Armtee} from './armtee'
-export const __macros:Record <string, ArmteeMacro> = {}
-export type ArmteeMacro = {
-  precompile?: (armtee: Armtee, args: string[], block: ArmteeMacroBlock ) => void | undefined | ArmteeBlock | ArmteeBlock[]
-  compile?: (armtee: Armtee, args: string[], block: ArmteeMacroBlock ) => void | undefined | string | string[]
-}
+  IArmteeBlock,
+  IArmteeMacro,
+  IArmteeTranspiler
+} from './types.js'
+
+export const __macros:Record <string, IArmteeMacro> = {}
+
 
 /**
  * Base class for pre-transpile line/block
  */
-export class ArmteeBlock {
+export class ArmteeBlock implements IArmteeBlock {
   type (): ArmteeLineType { return 'never' }
   txt: string
   src: ArmteeBlockMetaInfo
@@ -32,12 +32,11 @@ export class ArmteeBlock {
     throw `Armtee template error: ${error} at ${ this.src.file } line ${ this.src.line }`
   }
 
-
-  precompile (armtee: Armtee, txt: string): ArmteeBlock[] { return [this] }
-  compile (armtee: Armtee, txt: string): string[] { return [] }
+  precompile (armtee: IArmteeTranspiler, txt: string): IArmteeBlock[] { return [this] }
+  compile (armtee: IArmteeTranspiler, txt: string): string[] { return [] }
   postcompile () {}
 
-  _compile (armtee: Armtee, txt: string) {
+  _compile (armtee: IArmteeTranspiler, txt: string) {
     const ret = this.compile(armtee, txt)
     this.compiled = ret ? ret : []
     return this.compiled
@@ -73,9 +72,9 @@ export class ArmteeBlock {
 export class ArmteeScriptBlock extends ArmteeBlock {
   type ():ArmteeLineType { return 'script' }
 
-  compile (armtee:Armtee, txt:string) {
+  compile (armtee:IArmteeTranspiler, txt:string) {
     const ret = []
-    if ( Armtee.debug ) {
+    if ( armtee.debug ) {
       //ret.push( '_trace(' + JSON.stringify(this) + ')' )
     }
     ret.push(this.txt)
@@ -89,10 +88,10 @@ export class ArmteeScriptBlock extends ArmteeBlock {
 export class ArmteeMacroBlock extends ArmteeBlock {
   type ():ArmteeLineType { return 'macro' }
 
-  handler: ArmteeMacro | undefined
+  handler: IArmteeMacro | undefined
   args: string[] | undefined
 
-  precompile (armtee :Armtee, txt :string): ArmteeBlock[] {
+  precompile (armtee :IArmteeTranspiler, txt :string): IArmteeBlock[] {
     const [ command, ...args ] = txt.trim().split(/\s+/)
     if ( !command )
       this.parseError( 'Macro line needs at least 1 words' )
@@ -113,7 +112,7 @@ export class ArmteeMacroBlock extends ArmteeBlock {
     return [this]
   }
 
-  compile (armtee: Armtee, txt: string): string[] {
+  compile (armtee: IArmteeTranspiler, txt: string): string[] {
     if ( !this.handler ) return []
     if ( this.handler.compile ) {
       const res = this.handler.compile(armtee, this.args || [], this)
@@ -129,7 +128,7 @@ export class ArmteeMacroBlock extends ArmteeBlock {
 export class ArmteeTemplateBlock extends ArmteeBlock {
   type ():ArmteeLineType { return 'template' }
 
-  compile (armtee: Armtee, txt: string) {
+  compile (armtee: IArmteeTranspiler, txt: string) {
     const ret = []
     const parts = txt.split(armtee.runtimeSymbols.tagSeparator[0])
       .flatMap( p => p.split(armtee.runtimeSymbols.tagSeparator[1]))
@@ -183,7 +182,7 @@ ${ script }
 ${ e instanceof Error ? e.toString() : e }
 -------------`)
     }
-    if ( Armtee.debug ) {
+    if ( armtee.debug ) {
       ret.push( armtee.runtimeSymbols.printer + '._trace(' + JSON.stringify(this) + ')' )
     }
     ret.push( armtee.runtimeSymbols.printer + script )
