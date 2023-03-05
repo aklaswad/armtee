@@ -6,18 +6,18 @@ import {
   ArmteeFilter,
   ArmteeBlockMetaInfo,
   ArmteeTranspileOptions,
-  ArmteePrinter
 } from './types'
 
-import {ArmteeBlock, ArmteeScriptBlock, ArmteeTemplateBlock, ArmteeMacro, __macros } from './block'
+import {
+  ArmteeBlock,
+  ArmteeScriptBlock,
+  ArmteeTemplateBlock,
+  ArmteeMacro,
+  __macros
+} from './block'
 import { ArmteeLineParser, Sigs, modeFromText } from './line-parser'
 
-/**
- * Transpile and Rendering options
- * @typedef {object} TranspileOptions
- */
-
-const __filters:Record <string, ArmteeFilter> = {}
+export const __filters:Record <string, ArmteeFilter> = {}
 /**
  * Class represents parsed template
  */
@@ -40,30 +40,6 @@ export class Armtee {
     const armtee = Armtee.fromText(txt, { file: filename, type: 'file' })
     armtee.__depth = options.__depth || 0
     return armtee
-  }
-
-  /**
-   * Render outputs from template string and data
-   * @param {string} tmpl - template
-   * @param {any} data - data to be passed to template
-   * @param {TranspileOptions} options - option
-   * @returns {string} Rendered output
-   */
-  static render (tmpl:string, data:any, options:ArmteeTranspileOptions) {
-    const armtee = this.fromText(tmpl)
-    return armtee.render(data, options)
-  }
-
-  /**
-   * Render outputs from template file and data
-   * @param {string} filename - Filename to be loaded
-   * @param {any} data - data to be passed to template
-   * @param {TranspileOptions} options
-   * @returns {string} Rendered output
-   */
-  static renderFile(filename:string, data:any, options: ArmteeTranspileOptions) {
-    const armtee = this.fromFile(filename)
-    return armtee.render(data, options)
   }
 
 
@@ -92,111 +68,8 @@ export class Armtee {
     }
   }
 
-
-
   setTagSeparator ( begin:string, end:string ) {
     this.runtimeSymbols.tagSeparator = [ begin, end ]
-  }
-
-  compile (options: ArmteeTranspileOptions) {
-    //if ( this.executable ) {
-    //  return this.executable
-    //}
-
-    const js = this.wrap( this.translate(options), options )
-    if ( Armtee.debug > 1 ) {
-      console.error( 'DEBUG: armtee gerenated render script')
-      console.error( '------------------------------------------')
-      console.error( js )
-    }
-
-    try {
-      this.executable = new Function('data', 'printer', js)
-      const sig = '/*___ARMTEE___*/'
-      this.offset = this.executable.toString().split(sig,2)[0].split('\n').length
-      return this.executable
-    }
-    catch (e) {
-      // Find error block by using binary search, since
-      // v8/browsers doesn't return error line in `new Function()` ... *sigh*
-      // Also tried acorn/esprima/espree to catch error line
-      // But they all doesn't have enough compatibility for
-      // browsers, at least on my setup...
-
-      const orig = e instanceof Error ? e.message : e
-
-      // At first, inject various type of script snipet which could
-      // possibly raise another error at begin of script, and
-      // choose one which could raise a error different from original error
-      // And then, use binary search for which line is the edge of
-      // original error to be shown or not, by injecting error snipet
-      const errorRaisers = [ 'for ""', '`${}`', '"']
-      let raiser
-      let raiserError
-      FIND: for ( const r of errorRaisers ) {
-        const injectBlock = ArmteeBlock.create('script',r, {})
-        try {
-          const js = this.translate({
-            injectLine: 0,
-            inject: injectBlock
-          })
-          new Function(js)
-        }
-        catch (e) {
-          if ( e instanceof Error ) {
-            if ( orig !== e.message) {
-              raiserError = e.message
-              raiser = injectBlock
-              break FIND
-            }
-          }
-          else {
-            throw "Armtee: Panic at finding cause of compile error :" + orig
-          }
-        }
-      }
-      if ( ! raiser )
-        throw "Armtee: Panic at finding cause of compile error :" + orig
-      // Binary search. using top(t) and bottom(b)
-      let nth, got, t = 0, b = this.blocks.length - 1
-      let isOrigError, lastOrig = 0, lastNew = 0
-      while ( true ) {
-        nth = t + Math.floor((b - t) / 2)
-        const js = this.translate({ injectLine: nth, inject: raiser })
-        try {
-          new Function(js)
-        }
-        catch(e) {
-          if ( !(e instanceof Error) ) {
-            throw "Armtee: Panic at finding cause of compile error :" + orig
-          }
-          got = e.message
-        }
-
-        isOrigError = got === orig
-        if ( isOrigError ) {
-          lastOrig = nth
-          b = nth
-        }
-        else {
-          lastNew = nth
-          t = nth
-        }
-        if ( t + 1 >= b ) break
-      }
-      // Insert error-ish snipet before this block will change the
-      // error message, so this block might have something wrong!
-      //  ( Sometimes this will point wrong line... )
-      const errorBlock = this.blocks[lastNew]
-
-      throw( `Armtee compile error: Got JS compile error around file ${ errorBlock.src.file } line ${ errorBlock.src.line }:
--------------
-${ errorBlock.txt }
--------------
-ERROR: ${orig}
--------------`)
-
-    }
   }
 
   wrap (txt: string, options: ArmteeTranspileOptions = {} ) {
@@ -255,73 +128,6 @@ ERROR: ${orig}
     if ( idx === -1 ) return
     console.error(this.blocks[idx-1])
     return this.blocks[idx-1].src
-  }
-
-  _render_core (js: Function, data: any, printer: Function) {
-    js( data, printer )
-  }
-
-
-  setUpPrinter (buf: string[],trace: any[]) {
-    const printer:ArmteePrinter = function (literals: TemplateStringsArray, ...placeholders: string[]) {
-      const raw = String.raw(literals, ...placeholders)
-      buf.push(printer.$.fa ? printer.$.fa(raw) : raw)
-    }
-    printer['_trace'] = function (block: ArmteeBlock) { trace.push(block) }
-    printer.__filters = __filters
-    printer._ = [] // context stack
-    printer.$ = {f: __filters.none, fa: __filters.none } // context
-    printer.push = function printerPush () {
-      const newContext = Object.assign({}, printer.$)
-      printer._.push(printer.$)
-      printer.$ = newContext
-    }
-    printer.pop = function printerPop () {
-      const $ = printer._.pop()
-      if ( !$ ) throw 'Invalid context'
-      printer.$ = $
-    }
-    return printer
-  }
-
-  render (data:any, options:ArmteeTranspileOptions={}) {
-    const js = this.compile(options)
-    const buf: string[] = []
-    const trace: any[] = []
-    const printer = this.setUpPrinter(buf, trace)
-    try {
-      js(data,printer)
-    }
-    catch (e) {
-      if (Armtee.debug > 0 ) {
-        const errorBlock = trace[ trace.length - 1 ]
-        throw( `Armtee render error: Got JS runtime error around file ${ errorBlock.src.file } line ${ errorBlock.src.line }:
--------------
-${ errorBlock.txt }
--------------
-ERROR: ${ e instanceof Error ? e.toString() : e}
--------------`)
-      }
-      else {
-        if ( !(e instanceof Error) ) {
-          throw e
-        }
-        if ( e.stack ) {
-          let matches
-          if ( matches = e.stack.match(/(\d+):(\d+)\)?\n/m) ) {
-            const pos = this.resolvePos( parseInt(matches[1]), parseInt(matches[2]) )
-            if ( pos ) {
-              throw( `Armtee render error: Got JS runtime error "${e}" at file ${pos.file} line ${pos.line}` )
-            }
-            else {
-              throw( `Armtee render error: Got JS runtime error "${e}"` )
-            }
-          }
-        }
-        e.toString()
-      }
-    }
-    return buf.join('\n')
   }
 
   convert (style: ArmteeLineSignature, mode: ArmteeTemplateMode) {
