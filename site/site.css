@@ -226,6 +226,7 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 #doc h1, #doc h2, #doc h3, #doc h4, #doc h5, #doc #h6 {
   scroll-margin: 2rem;
 }
+
 #doc h1 a,
 #doc h2 a,
 #doc h3 a,
