@@ -3,38 +3,41 @@
   "type": "module",
   "version": "0.0.1",
   "description": "Line oriented micro templating tool",
-  "keywords": ["template", "microtemplate"],
+  "keywords": [
+    "template",
+    "microtemplate"
+  ],
   "homepage": "https://aklaswad.github.io/armtee/",
   "bugs": "https://github.com/aklaswad/armtee/issues",
   "repository": "github:aklaswad/armtee",
   "bin": {
     "armtee": "./bin/cli.js"
   },
-  "main": "./dist/index.js",
-  "exports": {
-    ".": {
-      "umd": "./dist/index.js"
-    },
-    "./package.json": "./package.json",
-    "./dist": "./dist",
-    "./bin": "./bin"
-  },
+  "main": "./lib/index.js",
+  "module": "./esm/index.js",
+  "files": [
+    "lib",
+    "bin",
+    "esm",
+    "umd"
+  ],
   "scripts": {
     "build": "npx tsc --outDir dist",
     "try": "node test.js",
     "test": "npx vitest run --globals",
-    "site-dev": "vite",
-    "site-build": "node site/build.js && npm run build && vite build"
+    "site-dev": "vite -c vite.config.site.js",
+    "site-build": "node site/build.js && npm run build && vite build -c vite.config.site.js"
   },
   "author": "Akira Sawada",
   "license": "MIT",
   "devDependencies": {
+    "@monaco-editor/loader": "^1.3.2",
     "markdown-it": "^13.0.1",
     "markdown-it-anchor": "^8.6.7",
     "markdown-it-attrs": "^4.1.6",
     "markdown-it-table-of-contents": "^0.6.0",
     "marx-css": "^4.0.1",
-    "rollup-plugin-monaco-editor": "^0.2.1",
+    "monaco-editor": "^0.36.1",
     "tmp": "^0.2.1",
     "typedoc": "^0.23.26",
     "typescript": "^4.9.5",

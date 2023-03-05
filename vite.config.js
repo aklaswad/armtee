@@ -1,10 +1,13 @@
-import monaco from 'rollup-plugin-monaco-editor';
-export default {
-  base: '/armtee/',
+import { resolve } from 'path'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
   build: {
-    outDir: './site-dist'
-  },
-  plugins: [
-    monaco({ languages: ['javascript'] }),
-  ],
-}
+    lib: {
+      entry: resolve(__dirname, 'src/index.ts'),
+      name: 'armtee',
+      fileName: 'index',
+      formats: ['es', 'cjs', 'umd'],
+    },
+  }
+})
