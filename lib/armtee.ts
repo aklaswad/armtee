@@ -668,7 +668,7 @@ ERROR: ${ e instanceof Error ? e.toString() : e}
       const sig = mode === 'logic' && b instanceof ArmteeScriptBlock      ? ''
                 : mode === 'template' && b instanceof ArmteeTemplateBlock ? ''
                 : sigs[b.type()]
-      buf.push( b.txt.replace(/^/m, sig) )
+      buf.push( b.txt.replace(/^/mg, sig) )
 
     })
     return buf.join('\n')

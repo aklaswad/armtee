@@ -4,7 +4,7 @@ import * as monaco from 'monaco-editor'
 
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
-import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
+//import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
 import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 
@@ -12,12 +12,31 @@ import {Armtee} from '../dist/armtee.js'
 
 let rendering = false
 
+const commonEditorConfig = {
+  language: 'javascript',
+  minimap: {
+    enabled: false
+  },
+  automaticLayout: true,
+  scrollBeyondLastLine: false,
+  contextmenu: false,
+  quickSuggestions: false,
+  snippetSuggestions: false,
+  suggestOnTriggerCharacters: false,
+  tabCompletion: "off",
+  fontSize: 15,
+  autoClosingBrackets: "never",
+}
+
 self.MonacoEnvironment = {
   getWorker(_, label) {
     if (label === 'json') {
       return new jsonWorker()
     }
-    if (label === 'typescript' || label === 'javascript') {
+    if (label === 'html') {
+      return new htmlWorker()
+    }
+    if (label === 'javascript') {
       return new tsWorker()
     }
     return new editorWorker()
@@ -26,10 +45,10 @@ self.MonacoEnvironment = {
 let closedEditors = 0
 const editorIds = [ 'tmpl', 'json', 'trans', 'out' ]
 const editorDefaults = {
-  json: { lang: 'json' },
-  tmpl: { lang: 'javascript' },
-  trans: { lang: 'javascript', readOnly: true },
-  out:  { lang: 'markdown', readOnly: true }
+  json: { language: 'json' },
+  tmpl: { language: 'html' },
+  trans: { language: 'javascript', readOnly: true },
+  out:  { language: 'html', readOnly: true }
 }
 
 monaco.editor.defineTheme("my-dark", {
@@ -46,13 +65,11 @@ monaco.editor.setTheme("my-dark")
 const editorWrappers = []
 const editors = {}
 editorIds.forEach( editorId => {
-  console.log('here1')
   const element = document.getElementById(editorId)
   const text = element.textContent
   element.innerText = ''
   const defaults = editorDefaults[editorId]
-  const commonConfig = {
-  }
+
   let length = 0
   if ( editorId === 'tmpl' || editorId === 'json' ) {
     //set up editable config
@@ -61,29 +78,14 @@ editorIds.forEach( editorId => {
   if ( defaults.readOnly ) {
     // set up readonly
   }
-  console.log('baz')
 
 //  editors[editorId] = view
-  const editor = monaco.editor.create(element, {
-	  value: text,
-	  language: 'javascript',
-    minimap: {
-      enabled: false
-    },
-    automaticLayout: true,
-    scrollBeyondLastLine: false,
-    contextmenu: false,
-    quickSuggestions: false,
-    snippetSuggestions: false,
-    suggestOnTriggerCharacters: false,
-    tabCompletion: "off",
-    fontSize: 15,
-    autoClosingBrackets: "never",
-  });
+  const config = Object.assign({},commonEditorConfig, defaults)
+  config.value = text
+  const editor = monaco.editor.create(element, config)
 
   if ( !defaults.readOnly ) {
     editor.onDidChangeModelContent((e) => {
-      console.log('hey')
       if ( !rendering ) {
         render()
       }
@@ -168,13 +170,6 @@ const out = document.getElementById('out')
 
 function replace(editorId, txt) {
   editors[editorId].setValue(txt)
-/*  dispatch({
-    changes: {
-      from: 0,
-      to: editors[editorId].state.doc.length,
-      insert: txt
-    }
-  })*/
 }
 
 const errorBlock = document.getElementById('error-display')
@@ -239,10 +234,17 @@ for ( let i=0; i < converts.length; i++ ) {
     const type = evt.target.getAttribute('data-type')
     const newOne
       = currentStyle[type] = convertFlip[type][currentStyle[type]]
-    const tmpl = editors['tmpl'].getValue();
+    const editor = editors['tmpl']
+    const tmpl = editor.getValue();
     const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
-    replace('tmpl',armtee.convert(currentStyle.style, currentStyle.mode))
+    replace('tmpl', armtee.convert(currentStyle.style, currentStyle.mode))
+    const lang = currentStyle.mode === 'logic' ? 'javascript' : 'html'
+    monaco.editor.setModelLanguage(editor.getModel(),lang)
     evt.target.text = newOne
+    evt.target.blur()
+    evt.preventDefault()
+    evt.stopPropagation()
+
   })
 }
 

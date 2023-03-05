@@ -11,7 +11,7 @@
 <body>
   <div id="content-wrapper">
     <div id="toc-wrapper">
-      <header><h1><a class="sub-hero-link" href="/">armtee</a></h1></header>
+      <header id="toc-header"><h1><a class="sub-hero-link" href="/">armtee</a></h1></header>
       <div id="toc" class="light-contents">
       </div>
     </div>
@@ -70,13 +70,15 @@
       </p>
       <div id="tmpl" class="editor-main">//% TAG &lt;% %&gt;
 //% ROOT armtee
-Thi${is} "armtee\\" &lt;%armtee.name%&gt;
-Show `items`
-//! armtee.items.forEach( item => {
+&lt;h1&gt;&lt;%armtee.name%&gt;&lt;/h1&gt;
+&lt;ul&gt;
+//! const className = "item-class"
+//! armtee.items.forEach( item =&gt; {
 //- comment: This shows list of items!!
 //% TAG {{ }}
- - {{item}}
-//! })</div>
+  &lt;li class="{{className}}"&gt;{{item}}&lt;/li&gt;
+//! })
+&lt;/ul&gt;</div>
     </div>
 
     <div id="json-editor-wrapper" class="editor-wrapper g4-4">
