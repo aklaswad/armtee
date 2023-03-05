@@ -1,6 +1,5 @@
 html {
   background-color: #282c34;
-  scroll-padding-top: 18rem;
 }
 
 body {
@@ -224,6 +223,9 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 #doc h2 { margin: 4rem 0 2rem 0; }
 #doc h3 { margin: 3rem 0 1.7rem 0.5rem; }
 #doc h4 { margin: 3rem 0 1.7rem 1.2rem; }
+#doc h1, #doc h2, #doc h3, #doc h4, #doc h5, #doc #h6 {
+  scroll-margin: 2rem;
+}
 
 #doc h1 a,
 #doc h2 a,
@@ -252,10 +254,15 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 #doc-overlay {
   position: sticky;
   top: 0;
-  height: 1.2em;
+  height: 0.6em;
   width: 100%;
   z-index: 40;
   background: linear-gradient(#282c34, rgba(0,0,0,0.0));
+}
+
+#doc-ending {
+  text-align: center;
+  padding: 5rem;
 }
 
 .convert.selected {
@@ -274,11 +281,34 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   transition: padding-top 0.3s;
 }
 
+#toc-wrapper header {
+  position: sticky;
+  top: 0;
+  z-index: 11;
+  padding-bottom: 0;
+  height: 0rem;
+  margin: 0;
+}
+
+#toc-wrapper header h1 {
+  font-size: 2rem;
+  margin: 0;
+  height: 0;
+  text-align: right;
+}
+
+.sub-hero-link, .sub-hero-link:hover, .sub-hero-link:active, .sub-hero-link:focus {
+  color: rgba(10,18,12,0.3);
+  padding-right: 3rem;
+  text-decoration: none;
+}
+
 #toc {
   height: calc( 100vh - 16rem );
   position: sticky;
   overflow: scroll;
-  padding-top: 2rem;
+  padding-top: 4rem;
+  padding-bottom: 5rem;
   top: 0;
 }
 
@@ -310,14 +340,16 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 }
 
 #toc a {
-  color: #555;
+  color: #666;
   text-decoration: none;
-  padding: 0 4rem 0 0;
+  padding: 0.1rem 4rem 0.1rem 0.2rem;
+  border-radius: 0.2rem;
 }
 
 #toc a.selected {
   color: #000;
-  background-color: #aaa;
+  background-color: #c4c2c0;
+  border-radius: 0.2rem;
 }
 
 #toc a:hover, #toc a:focus, #toc a:active {
@@ -393,3 +425,4 @@ pre code {
 code {
   margin: 0.3rem;
 }
+

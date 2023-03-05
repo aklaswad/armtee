@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import Armtee from '../lib/armtee.js'
+import Armtee from '../dist/armtee.js'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 import fs from 'fs/promises'
@@ -39,6 +39,8 @@ parser.command('render <file>', 'Load template from file, and render input', yar
     .example('gh api repos/aklaswad/armtee/issues | $0 render daily-report.tmpl', 'Read data from STDIN and render with daily-report.tmpl')
 })
 
+
+parser.completion('completion')
 
 const Commands = {
   "convert": async (options) => {
