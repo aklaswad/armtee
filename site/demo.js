@@ -11,6 +11,12 @@ let rendering = false
 let closedEditors = 0
 let out
 const editorWrappers = []
+const editorIds = [ 'tmpl', 'json', 'trans', 'out' ]
+
+editorIds.forEach( editorId => {
+  const wrapper = document.getElementById(editorId + '-editor-wrapper')
+  editorWrappers.push(wrapper)
+})
 const editors = {}
 
 const convertFlip = {
@@ -108,27 +114,32 @@ function setUpDoc () {
       setTimeout(() => observeStop = false, 100)
       const hash = elem.getAttribute('href')
       openTocFor(hash, true)
-      document.getElementById(hash.slice(1)).scrollIntoView({block: 'top'})
+      document.getElementById(hash.slice(1)).scrollIntoView({block: 'start'})
       evt.target.blur()
       evt.preventDefault()
       evt.stopPropagation()
     }))
+  setTimeout( () => {
+    if (location.hash) {
+      const hash = '#' + CSS.escape(location.hash.slice(1))
+      observeStop = true
+      setTimeout(() => observeStop = false, 100)
+      openTocFor(hash)
+      closeAllEditor()
+      const elem = document.querySelector(hash)
+      if ( elem ) {
+        elem.scrollIntoView({block: 'start'})
+      }
+    }
+    document.body.classList.add('ready')
+  }, 1 )
 
-  if (location.hash) {
-    const hash = '#' + CSS.escape(location.hash.slice(1))
-    observeStop = true
-    setTimeout(() => observeStop = false, 100)
-    openTocFor(hash)
-    closeAllEditor()
-    document.querySelector(hash).scrollIntoView({block: 'top'})
-  }
 }
 
 async function loadEditor () {
 
   monaco = await loader.init()
 
-  const editorIds = [ 'tmpl', 'json', 'trans', 'out' ]
   const editorDefaults = {
     json: { language: 'json' },
     tmpl: { language: 'html' },
@@ -187,7 +198,7 @@ async function loadEditor () {
 
     editors[editorId] = editor
     const wrapper = document.getElementById(editorId + '-editor-wrapper')
-    editorWrappers.push(wrapper)
+
     const toggle = wrapper.getElementsByClassName('editor-toggle')
     toggle[0].addEventListener('click', (evt) => {
       if ( wrapper.classList.contains('off') ) {
@@ -294,7 +305,6 @@ function openAllEditor () {
 function closeAllEditor () {
   const len = editorWrappers.length
   const prev = `g${len - closedEditors}-${len}`
-  console.log(prev)
   editorWrappers.forEach( w => {
     w.classList.add('off')
     w.classList.remove(prev)
@@ -364,8 +374,14 @@ Promise.all([
   ])
 ]).then( setTimeout(() => {
   setUpPage()
+  setTimeout( () => {
+    setUpDoc()
+  }, 20)
+
   //render()
   // TODO: Invoke initial render() from editor's loaded callback,
   // Or set as initial value...
 }, 20))
+
+if (location.hash) { closeAllEditor() }
 
