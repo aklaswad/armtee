@@ -366,22 +366,21 @@ function render() {
   return
 }
 
-Promise.all([
-  loadEditor(),
-  loadContent([
-    { url: 'doc.html', to: '#doc-content' },
-    { url: 'toc.html', to: '#toc' }
+async function main () {
+  await Promise.all([
+    loadEditor(),
+    loadContent([
+      { url: 'doc.html', to: '#doc-content' },
+      { url: 'toc.html', to: '#toc' }
+    ])
   ])
-]).then( setTimeout(() => {
-  setUpPage()
-  setTimeout( () => {
-    setUpDoc()
+  setTimeout(() => {
+    setUpPage()
+    setTimeout( () => {
+      setUpDoc()
+    }, 20)
   }, 20)
-
-  //render()
-  // TODO: Invoke initial render() from editor's loaded callback,
-  // Or set as initial value...
-}, 20))
-
+}
+main()
 if (location.hash) { closeAllEditor() }
 
