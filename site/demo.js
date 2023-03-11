@@ -11,7 +11,7 @@ let rendering = false
 let closedEditors = 0
 let out
 const editorWrappers = []
-const editorIds = [ 'tmpl', 'json', 'trans', 'out' ]
+const editorIds = [ 'conf', 'json', 'tmpl', 'trans', 'out' ]
 
 editorIds.forEach( editorId => {
   const wrapper = document.getElementById(editorId + '-editor-wrapper')
@@ -29,7 +29,7 @@ const currentStyle = {
   mode: 'template'
 }
 
-Armtee.addFilter( 'upperCase', str => str.toUpperCase() )
+//Armtee.addFilter( 'upperCase', str => str.toUpperCase() )
 
 const commonEditorConfig = {
   language: 'javascript',
@@ -141,6 +141,7 @@ async function loadEditor () {
   monaco = await loader.init()
 
   const editorDefaults = {
+    conf: { language: 'javascript' },
     json: { language: 'json' },
     tmpl: { language: 'html' },
     trans: { language: 'javascript', readOnly: true },
@@ -159,11 +160,12 @@ async function loadEditor () {
   monaco.editor.setTheme("my-dark")
 
   const editorValues = {}
+  editorValues.conf = document.getElementById('conf').textContent
   editorValues.json = document.getElementById('json').textContent
   editorValues.tmpl = document.getElementById('tmpl').textContent
   let rendered
   try {
-    rendered = renderCore(editorValues.tmpl, editorValues.json)
+    rendered = renderCore(editorValues.tmpl, editorValues.json, editorValues.conf)
   }
   catch (e) { /* ignore. don't stop rendering entire page */}
   editorValues.trans = rendered[0] || ''
@@ -176,7 +178,7 @@ async function loadEditor () {
     const defaults = editorDefaults[editorId]
 
     let length = 0
-    if ( editorId === 'tmpl' || editorId === 'json' ) {
+    if ( editorId === 'tmpl' || editorId === 'json' || editorId === 'conf' ) {
       //set up editable config
     }
 
@@ -186,6 +188,7 @@ async function loadEditor () {
 
     const config = Object.assign({},commonEditorConfig, defaults)
     config.value = text
+    console.log({config,element})
     const editor = monaco.editor.create(element, config)
 
     if ( !defaults.readOnly ) {
@@ -328,7 +331,7 @@ function setError (error) {
   }
 }
 
-function renderCore (tmpl, json) {
+function renderCore (tmpl, json, conf) {
   let data, compiled, rendered
   try {
     data = JSON.parse(json)
@@ -336,7 +339,9 @@ function renderCore (tmpl, json) {
   catch (e) {
     throw( 'Waiting for JSON format corrected' )
   }
+  const setUp = new Function('Armtee', conf)
   const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
+  setUp(armtee)
   compiled = armtee.translate({mode:'function'})
   rendered = armtee.render(data, {
     includeFilters: true,
@@ -348,11 +353,12 @@ function renderCore (tmpl, json) {
 
 function render() {
   rendering = true
+  const conf = editors['conf'].getValue()
   const tmpl = editors['tmpl'].getValue()
   const json = editors['json'].getValue()
   let res
   try {
-    res = renderCore(tmpl,json)
+    res = renderCore(tmpl,json,conf)
   }
   catch (e) {
     setError(e)

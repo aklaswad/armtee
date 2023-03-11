@@ -78,6 +78,13 @@ h2.hero {
   transition: width 0.3s;
 }
 
+.editor-wrapper.g5-5 { width: calc(100% / 5) }
+.editor-wrapper.g4-5 { width: calc((100% - 1.6rem) / 4) }
+.editor-wrapper.g3-5 { width: calc((100% - 3.2rem) / 3) }
+.editor-wrapper.g2-5 { width: calc((100% - 4.8rem) / 2) }
+.editor-wrapper.g1-5 { width: calc(100% - 6.4rem) }
+.editor-wrapper.off  { width: 1.6rem; }
+
 .editor-wrapper.g4-4 { width: calc(100% / 4) }
 .editor-wrapper.g3-4 { width: calc((100% - 1.6rem) / 3) }
 .editor-wrapper.g2-4 { width: calc((100% - 3.2rem) / 2) }
@@ -140,7 +147,7 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 }
 
 
-#json, #tmpl, #trans, #out {
+#conf, #json, #tmpl, #trans, #out {
   font-size: 1.0rem;
   position: absolute;
   width: 100%;

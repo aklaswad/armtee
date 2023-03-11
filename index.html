@@ -49,7 +49,7 @@
   <div id="error-display">error faaaa</div>
   <div id="editors-wrapper" class="dynamic">
 
-    <div id="out-editor-wrapper" class="editor-wrapper g4-4">
+    <div id="out-editor-wrapper" class="editor-wrapper g5-5">
       <p class="editor-header">
         <a class="editor-toggle" href="#">&nbsp;</a>
         <span>output</span>
@@ -57,7 +57,7 @@
       <div id="out" class="editor-main"></div>
     </div>
 
-    <div id="trans-editor-wrapper" class="editor-wrapper g4-4">
+    <div id="trans-editor-wrapper" class="editor-wrapper g5-5">
       <p class="editor-header">
         <a class="editor-toggle" href="#">&nbsp;</a>
         <span>transpiled</span>
@@ -65,7 +65,7 @@
       <div id="trans" class="editor-main"></div>
     </div>
 
-    <div id="tmpl-editor-wrapper" class="editor-wrapper g4-4">
+    <div id="tmpl-editor-wrapper" class="editor-wrapper g5-5">
       <p class="editor-header">template
         <a class="editor-toggle" href="#">&nbsp;</a>
         <a href="#" class="convert" data-type="style">hashy</a>
@@ -74,7 +74,7 @@
       </p>
       <div id="tmpl" class="editor-main">//% TAG &lt;% %&gt;
 //% ROOT armtee
-&lt;h1&gt;&lt;%armtee.name%&gt;&lt;/h1&gt;
+&lt;h1&gt;&lt;%armtee.name.$Hey()%&gt;&lt;/h1&gt;
 &lt;ul&gt;
 //! const className = "item-class"
 //! armtee.items.forEach( item =&gt; {
@@ -85,7 +85,7 @@
 &lt;/ul&gt;</div>
     </div>
 
-    <div id="json-editor-wrapper" class="editor-wrapper g4-4">
+    <div id="json-editor-wrapper" class="editor-wrapper g5-5">
       <div id="json" class="editor-main">{
   "name": "ArmTee!",
   "items": [
@@ -101,6 +101,17 @@
         <a class="editor-toggle" href="#">&nbsp;</a>
       </p>
     </div>
+
+    <div id="conf-editor-wrapper" class="editor-wrapper g5-5">
+      <p class="editor-header">
+        <a class="editor-toggle" href="#">&nbsp;</a>
+        <span>config</span>
+      </p>
+      <div id="conf" class="editor-main">// set up armtee
+Armtee.addFilter('Hey', s => `Hey ${s}!`)
+      </div>
+    </div>
+
   </div>
 
 </body>
