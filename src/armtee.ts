@@ -134,7 +134,7 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
   resolvePos (dstLine:number,dstCol:number) {
     const idx = this.blocks.findIndex( b => b.dst.line && b.dst.line > dstLine - this.offset )
     if ( idx === -1 ) return
-    console.error(this.blocks[idx-1])
+    //console.error(this.blocks[idx-1])
     return this.blocks[idx-1].src
   }
 

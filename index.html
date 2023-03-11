@@ -72,31 +72,11 @@
         |
         <a href="#" class="convert" data-type="mode">template</a>
       </p>
-      <div id="tmpl" class="editor-main">//% TAG &lt;% %&gt;
-//% ROOT armtee
-&lt;h1&gt;&lt;%armtee.name.$Hey()%&gt;&lt;/h1&gt;
-&lt;ul&gt;
-//! const className = "item-class"
-//! armtee.items.forEach( item =&gt; {
-//- comment: This shows list of items!!
-//% TAG {{ }}
-  &lt;li class="{{className}}"&gt;{{item}}&lt;/li&gt;
-//! })
-&lt;/ul&gt;</div>
+      <div id="tmpl" class="editor-main">/</div>
     </div>
 
     <div id="json-editor-wrapper" class="editor-wrapper g5-5">
-      <div id="json" class="editor-main">{
-  "name": "ArmTee!",
-  "items": [
-    "Advanced",
-    "Resig",
-    "Micro",
-    "Template",
-    "Engine",
-    "End"
-  ]
-}</div>
+      <div id="json" class="editor-main"></div>
       <p class="editor-header">data
         <a class="editor-toggle" href="#">&nbsp;</a>
       </p>
@@ -107,8 +87,7 @@
         <a class="editor-toggle" href="#">&nbsp;</a>
         <span>config</span>
       </p>
-      <div id="conf" class="editor-main">// set up armtee
-Armtee.addFilter('Hey', s => `Hey ${s}!`)
+      <div id="conf" class="editor-main">
       </div>
     </div>
 

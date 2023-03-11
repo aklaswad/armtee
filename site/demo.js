@@ -2,10 +2,7 @@ import {Armtee} from '../src/index.ts'
 
 import loader from '@monaco-editor/loader'
 loader.config({ paths: { vs: 'https://unpkg.com/monaco-editor@0.33.0/min/vs' } })
-/* TODO: Which is better?
-import * as Monaco from 'monaco-editor';
-loader.config({ Monaco });
-*/
+
 let monaco
 let rendering = false
 let closedEditors = 0
@@ -23,13 +20,31 @@ const convertFlip = {
   style: { hashy: 'slashy', slashy: 'hashy' },
   mode:  { template: 'logic', logic: 'template' }
 }
-
+const editorDefaults = {
+  conf: { language: 'javascript', value: `// set up armtee
+armtee.addFilter('Hey', s => \`Hey ${'$'}{s}!\`)` },
+  json: { language: 'json', value: `{
+  "name": "armTee",
+  "fruits": [
+    "Apple",
+    "Blueberry",
+    "Cinnamon"
+  ]
+}` },
+  tmpl: { language: 'markdown', value: `//% TAG <% %>
+//% ROOT data
+# <% data.name.$Hey() %>
+//- This shows list of items
+//! data.fruits.forEach( fruit => {
+ - {{ fruit }}
+//! })` },
+  trans: { language: 'javascript', readOnly: true },
+  out:  { language: 'markdown', readOnly: true }
+}
 const currentStyle = {
   style: 'hashy',
   mode: 'template'
 }
-
-//Armtee.addFilter( 'upperCase', str => str.toUpperCase() )
 
 const commonEditorConfig = {
   language: 'javascript',
@@ -42,6 +57,9 @@ const commonEditorConfig = {
 //  wordWrap: 'on',
   scrollBeyondLastLine: false,
   contextmenu: false,
+  hover: {
+    enabled: false
+  },
   quickSuggestions: false,
   snippetSuggestions: false,
   suggestOnTriggerCharacters: false,
@@ -143,14 +161,6 @@ async function loadEditor () {
 
   monaco = await loader.init()
 
-  const editorDefaults = {
-    conf: { language: 'javascript' },
-    json: { language: 'json' },
-    tmpl: { language: 'html' },
-    trans: { language: 'javascript', readOnly: true },
-    out:  { language: 'html', readOnly: true }
-  }
-
   monaco.editor.defineTheme("my-dark", {
     base: "vs-dark",
     inherit: true,
@@ -162,36 +172,29 @@ async function loadEditor () {
   })
   monaco.editor.setTheme("my-dark")
 
-  const editorValues = {}
-  editorValues.conf = document.getElementById('conf').textContent
-  editorValues.json = document.getElementById('json').textContent
-  editorValues.tmpl = document.getElementById('tmpl').textContent
-  let rendered
   try {
-    rendered = renderCore(editorValues.tmpl, editorValues.json, editorValues.conf)
+    const rendered = renderCore(
+      editorDefaults.tmpl.value,
+      editorDefaults.json.value,
+      editorDefaults.conf.value,
+    )
+    editorDefaults.trans.value = rendered[0] || ''
+    editorDefaults.out.value = rendered[1] || ''
   }
   catch (e) { /* ignore. don't stop rendering entire page */}
-  editorValues.trans = rendered[0] || ''
-  editorValues.out = rendered[1] || ''
 
   editorIds.forEach( editorId => {
     const element = document.getElementById(editorId)
-    const text = editorValues[editorId]
     element.innerText = ''
     const defaults = editorDefaults[editorId]
 
     let length = 0
-    if ( editorId === 'tmpl' || editorId === 'json' || editorId === 'conf' ) {
-      //set up editable config
-    }
 
     if ( defaults.readOnly ) {
       // set up readonly
     }
 
     const config = Object.assign({},commonEditorConfig, defaults)
-    config.value = text
-    console.log({config,element})
     const editor = monaco.editor.create(element, config)
 
     if ( !defaults.readOnly ) {
@@ -273,7 +276,7 @@ function setUpPage () {
       const tmpl = editor.getValue();
       const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
       replace('tmpl', armtee.convert(currentStyle.style, currentStyle.mode))
-      const lang = currentStyle.mode === 'logic' ? 'javascript' : 'html'
+      const lang = currentStyle.mode === 'logic' ? 'javascript' : 'markdown'
       monaco.editor.setModelLanguage(editor.getModel(),lang)
       evt.target.text = newOne
       evt.target.blur()
@@ -293,8 +296,6 @@ function setUpPage () {
     evt.preventDefault()
     evt.stopPropagation()
   })
-
-
   out = document.getElementById('out')
 }
 
@@ -342,7 +343,7 @@ function renderCore (tmpl, json, conf) {
   catch (e) {
     throw( 'Waiting for JSON format corrected' )
   }
-  const setUp = new Function('Armtee', conf)
+  const setUp = new Function('armtee', conf)
   const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
   setUp(armtee)
   compiled = armtee.translate({mode:'function'})
