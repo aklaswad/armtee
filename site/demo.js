@@ -37,6 +37,9 @@ const commonEditorConfig = {
     enabled: false
   },
   automaticLayout: true,
+  lineNumbersMinChars: 4,
+  folding: false,
+//  wordWrap: 'on',
   scrollBeyondLastLine: false,
   contextmenu: false,
   quickSuggestions: false,
