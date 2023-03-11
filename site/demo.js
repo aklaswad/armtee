@@ -365,6 +365,10 @@ function render() {
   rendering = false
   return
 }
+if (location.hash) {
+  closeAllEditor()
+  document.querySelector('body').classList.add('hashed') 
+}
 
 async function main () {
   await Promise.all([
@@ -379,8 +383,7 @@ async function main () {
     setTimeout( () => {
       setUpDoc()
     }, 20)
-  }, 20)
+  }, location.hash ? 1 : 1000)
 }
 main()
-if (location.hash) { closeAllEditor() }
 

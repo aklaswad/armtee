@@ -8,8 +8,13 @@ body {
 
 .dynamic {
   opacity: 0;
-  transition: opacity .1s;
+  transition: opacity 1.5s;
 }
+
+.hashed .dynamic {
+  transition: opacity 0.2s;
+}
+
 
 .ready .dynamic {
   opacity: 1;
@@ -17,6 +22,7 @@ body {
 
 h1.hero {
   text-align: center;
+  letter-spacing: .25em;
   margin: 2rem 0 1rem 0;
   padding: 0 0 2rem 0;
 }
@@ -323,6 +329,7 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 
 .sub-hero-link, .sub-hero-link:hover, .sub-hero-link:active, .sub-hero-link:focus {
   color: rgba(10,18,12,0.3);
+  letter-spacing: 0.25em;
   padding-right: 3rem;
   text-decoration: none;
 }
