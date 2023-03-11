@@ -4,15 +4,18 @@ export type ArmteeLineType = "macro" | "script" | "template" | "comment" | "neve
 export type ArmteeFilter = (str: string) => string
 export type ArmteeBlockMetaInfo = { file?: string, line?: number, type?: string }
 export type ArmteeTranspileOptions = Record<string, any>
-export type ArmteePrinterContext = {f: ArmteeFilter, fa: ArmteeFilter }
+export type ArmteePrinterContext = {
+  tagFilter: ArmteeFilter,
+  lineFilter: ArmteeFilter
+}
 
 export interface IArmteePrinter extends Function {
-  _: ArmteePrinterContext[]
-  $: ArmteePrinterContext
-  _trace: Function
-  __filters: Record<string, ArmteeFilter>
-  push: Function
-  pop: Function
+  trace: Function
+  filters: Record<string, ArmteeFilter>
+  context: ArmteePrinterContext
+  contextStack: ArmteePrinterContext[]
+  pushToContextStack: Function
+  popFromContextStack: Function
 }
 
 export interface IArmteeBlock {

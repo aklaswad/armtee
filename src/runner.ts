@@ -166,24 +166,30 @@ ERROR: ${orig}
     js( data, printer )
   }
 
-  setUpPrinter (buf: string[],trace: any[]) {
-    const printer:IArmteePrinter = function (literals: TemplateStringsArray, ...placeholders: string[]) {
-      const raw = String.raw(literals, ...placeholders.map(str => printer.$.f(str)))
-      buf.push(printer.$.fa ? printer.$.fa(raw) : raw)
+  setUpPrinter (buf: string[], trace: any[]) {
+    const printer:IArmteePrinter = function (
+      literals: TemplateStringsArray,
+      ...placeholders: string[]
+    ) {
+      const raw = String.raw(
+        literals,
+        ...placeholders.map( str => printer.context.tagFilter(str))
+      )
+      buf.push(printer.context.lineFilter(raw))
     }
-    printer['_trace'] = function (block: IArmteeBlock) { trace.push(block) }
-    printer.__filters = __filters
-    printer._ = [] // context stack
-    printer.$ = {f: __filters.none, fa: __filters.none } // context
-    printer.push = function printerPush () {
-      const newContext = Object.assign({}, printer.$)
-      printer._.push(printer.$)
-      printer.$ = newContext
+    printer.trace = function (block: IArmteeBlock) { trace.push(block) }
+    printer.filters = __filters
+    printer.contextStack = []
+    printer.context = {tagFilter: __filters.none, lineFilter: __filters.none }
+    printer.pushToContextStack = function printerPush () {
+      const newContext = Object.assign({}, printer.context)
+      printer.contextStack.push(printer.context)
+      printer.context = newContext
     }
-    printer.pop = function printerPop () {
-      const $ = printer._.pop()
+    printer.popFromContextStack = function printerPop () {
+      const $ = printer.contextStack.pop()
       if ( !$ ) throw 'Invalid context'
-      printer.$ = $
+      printer.context = $
     }
     return printer
   }
