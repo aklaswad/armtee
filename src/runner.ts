@@ -168,7 +168,7 @@ ERROR: ${orig}
 
   setUpPrinter (buf: string[],trace: any[]) {
     const printer:IArmteePrinter = function (literals: TemplateStringsArray, ...placeholders: string[]) {
-      const raw = String.raw(literals, ...placeholders)
+      const raw = String.raw(literals, ...placeholders.map(str => printer.$.f(str)))
       buf.push(printer.$.fa ? printer.$.fa(raw) : raw)
     }
     printer['_trace'] = function (block: IArmteeBlock) { trace.push(block) }

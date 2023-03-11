@@ -160,7 +160,7 @@ ${ e instanceof Error ? e.toString() : e }
 -------------`)
         }
         this.colmap.push([ offset, buf.length ])
-        const exp = '${' + `${armtee.runtimeSymbols.printer}.$.f(${str})}`
+        const exp = '${' + str + '}'
         offset += exp.length + lenR
         buf += exp
       }
