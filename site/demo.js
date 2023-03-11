@@ -22,7 +22,12 @@ const convertFlip = {
 }
 const editorDefaults = {
   conf: { language: 'javascript', value: `// set up armtee
-armtee.addFilter('Hey', s => \`Hey ${'$'}{s}!\`)` },
+// const armtee = Armtee.fromText(txt)
+armtee.addFilter(
+  'Hey',
+  s => \`Hey ${'$'}{s}!\`)
+// console.log(armtee.render())
+` },
   json: { language: 'json', value: `{
   "name": "armTee",
   "fruits": [
@@ -31,12 +36,10 @@ armtee.addFilter('Hey', s => \`Hey ${'$'}{s}!\`)` },
     "Cinnamon"
   ]
 }` },
-  tmpl: { language: 'markdown', value: `//% TAG <% %>
-//% ROOT data
-# <% data.name.$Hey() %>
+  tmpl: { language: 'markdown', value: `# <% data.name.$Hey() %>
 //- This shows list of items
 //! data.fruits.forEach( fruit => {
- - {{ fruit }}
+ - <% fruit %>
 //! })` },
   trans: { language: 'javascript', readOnly: true },
   out:  { language: 'markdown', readOnly: true }
