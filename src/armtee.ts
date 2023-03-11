@@ -12,20 +12,17 @@ import {
 } from './types.js'
 
 import {
-  __macros,
   ArmteeBlock,
   ArmteeScriptBlock,
   ArmteeTemplateBlock,
 } from './block.js'
 
-//export const __macros:Record <string, IArmteeMacro> = {};
-
 import { ArmteeLineParser, Sigs, modeFromText } from './line-parser.js'
 
-export const __filters:Record <string, ArmteeFilter> = {}
 /**
  * Class represents parsed template
  */
+
 export class ArmteeTranspiler implements IArmteeTranspiler {
   debug: number
 
@@ -54,6 +51,8 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
   executable: Function | undefined
   rawScript: string
   offset: number
+  __filters: Record <string, ArmteeFilter>
+  __macros: Record <string, IArmteeMacro>
   __depth: number
   constructor ( txt: string, signature: ArmteeLineSignature, filemode: ArmteeTemplateMode, meta={} ) {
     const parser = new ArmteeLineParser()
@@ -65,6 +64,10 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
     this.signature = signature
     this.filemode = filemode
     this.rawScript = ''
+    this.__filters = {}
+    this.__macros = {}
+    setUpDefaultMacros(this)
+    setUpDefaultFilters(this)
     this.runtimeSymbols = {
       printer:  '_$',
       root: 'data',
@@ -80,12 +83,12 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
   wrap (txt: string, options: ArmteeTranspileOptions = {} ) {
     let filterInjection = ''
     if ( options.includeFilters ) {
-      filterInjection = Object.keys(__filters)
-        .map( f => `String.prototype.$${f} = function () {return (${__filters[f].toString()})(this)}`)
+      filterInjection = Object.keys(this.__filters)
+        .map( f => `String.prototype.$${f} = function () {return (${this.__filters[f].toString()})(this)}`)
         .join('\n')
     }
     else {
-      filterInjection = Object.keys(__filters)
+      filterInjection = Object.keys(this.__filters)
         .map( f => `String.prototype.$${f} = function () {return printer.__filters.${f}(this)}`)
         .join('\n')
     }
@@ -148,76 +151,82 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
     return buf.join('\n')
   }
 
-  static addMacro( command:string, macro:IArmteeMacro ) {
-    __macros[command] = macro
+  addMacro( command:string, macro:IArmteeMacro ) {
+    this.__macros[command] = macro
+    return this
   }
 
-  static addFilter ( name:string, fn: (str:string) => string ) {
-    __filters[name] = fn
+  addFilter ( name:string, fn: (str:string) => string ) {
+    this.__filters[name] = fn
+    return this
   }
 }
 
-ArmteeTranspiler.addMacro('TAG', {
-  compile: (armtee, args) => {
-    armtee.setTagSeparator( args[0], args[1] )
-  }
-})
-
-ArmteeTranspiler.addMacro('ROOT', {
-  precompile: (armtee, args, block) => {
-    armtee.runtimeSymbols.root = args[0]
-  }
-})
-
-ArmteeTranspiler.addMacro('FILTER', {
-  compile: (armtee, args) => {
-    const [ filterName ] = args
-    if ( ! __filters[filterName] ) {
-      throw 'Unknown filter ' + filterName
+function setUpDefaultMacros(armtee:IArmteeTranspiler) {
+  armtee.addMacro('TAG', {
+    compile: (armtee, args) => {
+      armtee.setTagSeparator( args[0], args[1] )
     }
-    const _$ = armtee.runtimeSymbols.printer
-    return [`${_$}.$.f = ${_$}.__filters.${filterName}`]
-  }
-})
+  })
 
-ArmteeTranspiler.addMacro('FILTERALL', {
-  compile: (armtee, args) => {
-    const [ filterName ] = args
-    if ( ! __filters[filterName] ) {
-      throw 'Unknown filter ' + filterName
+  armtee.addMacro('ROOT', {
+    precompile: (armtee, args, block) => {
+      armtee.runtimeSymbols.root = args[0]
     }
-    return [`${armtee.runtimeSymbols.printer}.$.fa = ${armtee.runtimeSymbols.printer}.__filters.${filterName}`]
-  }
-})
+  })
 
-ArmteeTranspiler.addMacro('INCLUDE', {
-  precompile: (armtee, args, block) => {
-    if ( armtee.__depth > 10 ) {
-      throw 'Too deep include'
+  armtee.addMacro('FILTER', {
+    compile: (armtee, args) => {
+      const [ filterName ] = args
+      if ( ! armtee.__filters[filterName] ) {
+        throw 'Unknown filter ' + filterName
+      }
+      const _$ = armtee.runtimeSymbols.printer
+      return [`${_$}.$.f = ${_$}.__filters.${filterName}`]
     }
-    if ( block.src.type !== 'file' ) {
-      return block.parseError('INCLUDE macro cannot be invoked from non-file template.')
-    }
-    if ( ! block.src?.file ) {
-      return block.parseError('INCLUDE macro cannot be invoked from non-file template.')
-    }
-    const rootPath = path.dirname(block.src.file)
-    const [ filename, context ] = args
-    const included = ArmteeTranspiler.fromFile(path.resolve(rootPath, filename), {__depth: armtee.__depth + 1})
-    const blocks = included.prepare()
-    // Semi-colon is required.
-    // Without this ';', got error "_(...) is not a function."
-    // TODO: understand why.
-    const systemSrc = { file: '__SYSTEM__' }
-    return [
-      ArmteeBlock.create('script', `;
-        ${armtee.runtimeSymbols.printer}.push();
-        ((${included.runtimeSymbols.root},${included.runtimeSymbols.printer}) => {`, systemSrc),
-      ...blocks,
-      ArmteeBlock.create('script', `})( ${context}, ${armtee.runtimeSymbols.printer} )
-      ${armtee.runtimeSymbols.printer}.pop()`, systemSrc)
-    ]
-  }
-})
+  })
 
-ArmteeTranspiler.addFilter( 'none', str => str )
+  armtee.addMacro('FILTERALL', {
+    compile: (armtee, args) => {
+      const [ filterName ] = args
+      if ( ! armtee.__filters[filterName] ) {
+        throw 'Unknown filter ' + filterName
+      }
+      return [`${armtee.runtimeSymbols.printer}.$.fa = ${armtee.runtimeSymbols.printer}.__filters.${filterName}`]
+    }
+  })
+
+  armtee.addMacro('INCLUDE', {
+    precompile: (armtee, args, block) => {
+      if ( armtee.__depth > 10 ) {
+        throw 'Too deep include'
+      }
+      if ( block.src.type !== 'file' ) {
+        return block.parseError('INCLUDE macro cannot be invoked from non-file template.')
+      }
+      if ( ! block.src?.file ) {
+        return block.parseError('INCLUDE macro cannot be invoked from non-file template.')
+      }
+      const rootPath = path.dirname(block.src.file)
+      const [ filename, context ] = args
+      const included = ArmteeTranspiler.fromFile(path.resolve(rootPath, filename), {__depth: armtee.__depth + 1})
+      const blocks = included.prepare()
+      // Semi-colon is required.
+      // Without this ';', got error "_(...) is not a function."
+      // TODO: understand why.
+      const systemSrc = { file: '__SYSTEM__' }
+      return [
+        ArmteeBlock.create('script', `;
+          ${armtee.runtimeSymbols.printer}.push();
+          ((${included.runtimeSymbols.root},${included.runtimeSymbols.printer}) => {`, systemSrc),
+        ...blocks,
+        ArmteeBlock.create('script', `})( ${context}, ${armtee.runtimeSymbols.printer} )
+        ${armtee.runtimeSymbols.printer}.pop()`, systemSrc)
+      ]
+    }
+  })
+}
+
+function setUpDefaultFilters(armtee:IArmteeTranspiler) {
+  armtee.addFilter( 'none', str => str )
+}

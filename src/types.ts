@@ -34,14 +34,18 @@ export interface IArmteeBlock {
 
 export interface IArmteeTranspiler {
   blocks: IArmteeBlock[]
+  addMacro: (armtee:string, macro:IArmteeMacro) => IArmteeTranspiler
+  addFilter: (armtee:string, filter:ArmteeFilter) => IArmteeTranspiler
   signature: ArmteeLineSignature
   filemode: ArmteeTemplateMode
   runtimeSymbols: Record<string, string | string[]>
   executable: Function | undefined
   rawScript: string
   offset: number
-  debug: number,
-  __depth: number,
+  debug: number
+  __depth: number
+  __filters: Record <string, ArmteeFilter>
+  __macros: Record <string, IArmteeMacro>
   setTagSeparator: (l:string, r:string) => void
 }
 

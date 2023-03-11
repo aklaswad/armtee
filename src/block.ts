@@ -6,9 +6,6 @@ import {
   IArmteeTranspiler
 } from './types.js'
 
-export const __macros:Record <string, IArmteeMacro> = {}
-
-
 /**
  * Base class for pre-transpile line/block
  */
@@ -96,7 +93,7 @@ export class ArmteeMacroBlock extends ArmteeBlock {
     if ( !command )
       this.parseError( 'Macro line needs at least 1 words' )
 
-    const handler = __macros[ command.toUpperCase() ]
+    const handler = armtee.__macros[ command.toUpperCase() ]
     if ( !handler ) {
       this.parseError( 'Unknown macro command: ' + command )
     }

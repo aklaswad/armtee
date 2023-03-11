@@ -9,7 +9,7 @@ import {
 
 import { ArmteeBlock } from './block.js'
 import { modeFromText } from './line-parser.js'
-import { ArmteeTranspiler, __filters } from './armtee.js'
+import { ArmteeTranspiler } from './armtee.js'
 
 /**
  * Class represents parsed template
@@ -178,9 +178,9 @@ ERROR: ${orig}
       buf.push(printer.context.lineFilter(raw))
     }
     printer.trace = function (block: IArmteeBlock) { trace.push(block) }
-    printer.filters = __filters
+    printer.filters = this.__filters
     printer.contextStack = []
-    printer.context = {tagFilter: __filters.none, lineFilter: __filters.none }
+    printer.context = {tagFilter: this.__filters.none, lineFilter: this.__filters.none }
     printer.pushToContextStack = function printerPush () {
       const newContext = Object.assign({}, printer.context)
       printer.contextStack.push(printer.context)
