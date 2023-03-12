@@ -10,6 +10,7 @@ import {
 import { ArmteeBlock } from './block.js'
 import { modeFromText } from './line-parser.js'
 import { ArmteeTranspiler } from './armtee.js'
+import { setUpPrinter } from './printer.js'
 
 /**
  * Dynamic compile for tranpiled js and execute render
@@ -199,7 +200,7 @@ ERROR: ${orig}
     const js = this.compile(options)
     const buf: string[] = []
     const trace: any[] = []
-    const printer = this.setUpPrinter(buf, trace)
+    const printer = setUpPrinter(buf, trace, this.__filters)
     try {
       js(data,printer)
     }
