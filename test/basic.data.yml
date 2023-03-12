@@ -49,7 +49,17 @@
     apt install foo \
       bar \
       buz
-
+- name: escape continuous backslashes at the end of line
+  data:
+    pkg: bar
+  tmpl: |-
+      <% data.pkg %> \\
+      buz \\\
+      boo \\\\
+  expected: |-
+      bar \\
+      buz \\\
+      boo \\\\
 - name: Render word in the middle of sentence
   data:
     emotion: love

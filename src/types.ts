@@ -3,7 +3,16 @@ export type ArmteeTemplateMode = "template" | "logic" | "something"
 export type ArmteeLineType = "macro" | "script" | "template" | "comment" | "never"
 export type ArmteeFilter = (str: string) => string
 export type ArmteeBlockMetaInfo = { file?: string, line?: number, type?: string }
-export type ArmteeTranspileOptions = Record<string, any>
+export type ArmteeTranspileOptions = {
+  meta?: ArmteeBlockMetaInfo
+  filters?: Record<string, ArmteeFilter>
+  macros?: Record<string, IArmteeMacro>
+  includeFilters?: boolean
+  __depth?: number
+  __inject?: IArmteeBlock
+  __injectLine?: number
+}
+
 export type ArmteePrinterContext = {
   tagFilter: ArmteeFilter,
   lineFilter: ArmteeFilter

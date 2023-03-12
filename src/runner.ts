@@ -12,15 +12,15 @@ import { modeFromText } from './line-parser.js'
 import { ArmteeTranspiler } from './armtee.js'
 
 /**
- * Class represents parsed template
+ * Dynamic compile for tranpiled js and execute render
  */
 export class ArmteeRunner extends ArmteeTranspiler {
   static debug = 0
 
   // TODO: How to call ancestor's static method in TS?
-  static fromText (txt: string, meta: ArmteeBlockMetaInfo={}) {
+  static fromText (txt: string, options:ArmteeTranspileOptions={}) {
     const mode = modeFromText(txt)
-    return new this(txt.replace(/\n$/,''), mode[0], mode[1], meta)
+    return new this(txt.replace(/\n$/,''), mode[0], mode[1], options)
   }
 
   /**
@@ -31,7 +31,8 @@ export class ArmteeRunner extends ArmteeTranspiler {
    */
   static fromFile(filename:string, options:ArmteeTranspileOptions={}) {
     const txt = fs.readFileSync(filename, 'utf-8')
-    const armtee = this.fromText(txt, { file: filename, type: 'file' })
+    options.meta = { file: filename, type: 'file' }
+    const armtee = this.fromText(txt, options)
     armtee.__depth = options.__depth || 0
     return armtee
   }
@@ -44,7 +45,7 @@ export class ArmteeRunner extends ArmteeTranspiler {
    * @returns {string} Rendered output
    */
   static render (tmpl:string, data:any, options:ArmteeTranspileOptions) {
-    const runner = ArmteeRunner.fromText(tmpl)
+    const runner = ArmteeRunner.fromText(tmpl, options)
     return runner.render(data, options)
   }
 
@@ -57,7 +58,7 @@ export class ArmteeRunner extends ArmteeTranspiler {
    */
 
   static renderFile(filename:string, data:any, options: ArmteeTranspileOptions) {
-    const runner = ArmteeRunner.fromFile(filename)
+    const runner = ArmteeRunner.fromFile(filename, options)
     return runner.render(data, options)
   }
 
@@ -100,8 +101,8 @@ export class ArmteeRunner extends ArmteeTranspiler {
         const injectBlock = ArmteeBlock.create('script',r, {})
         try {
           const js = this.translate({
-            injectLine: 0,
-            inject: injectBlock
+            __injectLine: 0,
+            __inject: injectBlock
           })
           new Function(js)
         }
@@ -125,7 +126,7 @@ export class ArmteeRunner extends ArmteeTranspiler {
       let isOrigError, lastOrig = 0, lastNew = 0
       while ( true ) {
         nth = t + Math.floor((b - t) / 2)
-        const js = this.translate({ injectLine: nth, inject: raiser })
+        const js = this.translate({ __injectLine: nth, __inject: raiser })
         try {
           new Function(js)
         }
@@ -219,7 +220,13 @@ ERROR: ${ e instanceof Error ? e.toString() : e}
         if ( e.stack ) {
           let matches
           if ( matches = e.stack.match(/(\d+):(\d+)\)?\n/m) ) {
-            const pos = this.resolvePos( parseInt(matches[1]), parseInt(matches[2]) )
+            let pos
+            try {
+              pos = this.resolvePos( parseInt(matches[1]), parseInt(matches[2]) )
+            }
+            catch(_e) {
+              throw( `Armtee render error: Got JS runtime error "${e}"` )
+            }
             if ( pos ) {
               throw( `Armtee render error: Got JS runtime error "${e}" at file ${pos.file} line ${pos.line}` )
             }

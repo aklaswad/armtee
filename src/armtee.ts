@@ -26,9 +26,9 @@ import { ArmteeLineParser, Sigs, modeFromText } from './line-parser.js'
 export class ArmteeTranspiler implements IArmteeTranspiler {
   debug: number
 
-  static fromText (txt: string, meta: ArmteeBlockMetaInfo={}) {
+  static fromText (txt: string,  options:ArmteeTranspileOptions={}) {
     const mode = modeFromText(txt)
-    return new this(txt.replace(/\n$/,''), mode[0], mode[1], meta)
+    return new this(txt.replace(/\n$/,''), mode[0], mode[1], options)
   }
 
   /**
@@ -39,7 +39,7 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
    */
   static fromFile(filename:string, options:ArmteeTranspileOptions={}) {
     const txt = fs.readFileSync(filename, 'utf-8')
-    const armtee = this.fromText(txt, { file: filename, type: 'file' })
+    const armtee = this.fromText(txt, { meta:{ file: filename, type: 'file' }})
     armtee.__depth = options.__depth || 0
     return armtee
   }
@@ -54,9 +54,10 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
   __filters: Record <string, ArmteeFilter>
   __macros: Record <string, IArmteeMacro>
   __depth: number
-  constructor ( txt: string, signature: ArmteeLineSignature, filemode: ArmteeTemplateMode, meta={} ) {
+  constructor ( txt: string, signature: ArmteeLineSignature, filemode: ArmteeTemplateMode, options: ArmteeTranspileOptions ) {
+    const {filters, macros, meta} = options
     const parser = new ArmteeLineParser()
-    const blocks = parser.parse(txt, meta, signature, filemode)
+    const blocks = parser.parse(txt, meta || {}, signature, filemode)
     this.offset = 0
     this.__depth = 0
     this.debug = 0
@@ -68,12 +69,26 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
     this.__macros = {}
     setUpDefaultMacros(this)
     setUpDefaultFilters(this)
+    this.importFilters(filters || {})
+    this.importMacros(macros || {})
     this.runtimeSymbols = {
       printer:  '_$',
       root: 'data',
       context: '$c',
       tagSeparator: ['<%','%>'],
     }
+  }
+
+  importFilters (filters: {[name: string]: ArmteeFilter}) {
+    Object.keys(filters).forEach( name => {
+      this.addFilter(name, filters[name])
+    })
+  }
+
+  importMacros (macros: {[name: string]: IArmteeMacro}) {
+    Object.keys(macros).forEach( name => {
+      this.addMacro(name, macros[name])
+    })
   }
 
   setTagSeparator ( begin:string, end:string ) {
@@ -93,10 +108,11 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
 
     // This could have a side effect... :thinking:
     let blocks = this.prepare()
-    if ( options.inject ) {
+    const inject = options.__inject
+    if ( 'undefined' !== typeof inject ) {
       blocks = blocks.flatMap( (block,idx) => {
-        if ( options.injectLine === idx ) {
-          return [ options.inject, block ]
+        if ( options.__injectLine === idx ) {
+          return [ inject, block ]
         }
         return block
       })
@@ -122,7 +138,7 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
     }
     else {
       filterInjection = Object.keys(this.__filters)
-        .map( f => `String.prototype.$${f} = function () {return printer.__filters.${f}(this)}`)
+        .map( f => `String.prototype.$${f} = function () {return printer.filters.${f}(this)}`)
         .join('\n')
     }
     const header = `${filterInjection};((${this.runtimeSymbols.root},${this.runtimeSymbols.printer}) => {`
@@ -182,7 +198,7 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
         throw 'Unknown filter ' + filterName
       }
       const _$ = armtee.runtimeSymbols.printer
-      return [`${_$}.$.f = ${_$}.__filters.${filterName}`]
+      return [`${_$}.context.tagFilter = ${_$}.filters.${filterName}`]
     }
   })
 
@@ -192,7 +208,7 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
       if ( ! armtee.__filters[filterName] ) {
         throw 'Unknown filter ' + filterName
       }
-      return [`${armtee.runtimeSymbols.printer}.$.fa = ${armtee.runtimeSymbols.printer}.__filters.${filterName}`]
+      return [`${armtee.runtimeSymbols.printer}.context.lineFilter = ${armtee.runtimeSymbols.printer}.filters.${filterName}`]
     }
   })
 
@@ -217,11 +233,11 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
       const systemSrc = { file: '__SYSTEM__' }
       return [
         ArmteeBlock.create('script', `;
-          ${armtee.runtimeSymbols.printer}.push();
+          ${armtee.runtimeSymbols.printer}.pushToContextStack();
           ((${included.runtimeSymbols.root},${included.runtimeSymbols.printer}) => {`, systemSrc),
         ...blocks,
         ArmteeBlock.create('script', `})( ${context}, ${armtee.runtimeSymbols.printer} )
-        ${armtee.runtimeSymbols.printer}.pop()`, systemSrc)
+        ${armtee.runtimeSymbols.printer}.popFromContextStack()`, systemSrc)
       ]
     }
   })

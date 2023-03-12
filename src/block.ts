@@ -165,7 +165,7 @@ ${ e instanceof Error ? e.toString() : e }
     })
     // JS template literal + String.raw() can ignore almost escape chars, but
     // only backslash at the end is not ignorable. Escape it.
-    const script = '`' + buf.replace(/\\$/, '${"\\\\"}') + '`'
+    const script = '`' + buf.replace(/\\+$/, (match) => '${"'+ match.repeat(2) + '"}') + '`'
 
     // Make sure this is valid JS fragment
     try {

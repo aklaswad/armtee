@@ -24,7 +24,7 @@
   "scripts": {
     "build": "npx tsc --outDir dist",
     "try": "node test.js",
-    "test": "npx vitest run --globals",
+    "test": "npx vitest run --globals --reporter verbose",
     "site-dev": "vite -c vite.config.site.js",
     "site-build": "node site/build.js && npm run build && vite build -c vite.config.site.js"
   },

@@ -1,5 +1,8 @@
-import { ArmteeRunner } from '../dist/runner.js'
+import { ArmteeRunner } from '../src/runner'
 import { testFromYaml } from './util.js'
-ArmteeRunner.addFilter( 'upper', str => str.toUpperCase() )
-ArmteeRunner.addFilter( 'lower', str => str.toLowerCase() )
-await testFromYaml('filter.data.yml', ArmteeRunner)
+await testFromYaml('filter.data.yml', ArmteeRunner, {
+  filters: {
+    upper: str => str.toUpperCase(),
+    lower: str => str.toLowerCase()
+  }
+})

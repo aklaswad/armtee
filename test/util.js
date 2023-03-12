@@ -12,7 +12,7 @@ const afters = []
 afterAll(async () => {
   await Promise.all(afters.map( fn => fn() ))
 })
-export async function testFromYaml( file, Armtee) {
+export async function testFromYaml( file, Armtee, options ) {
   const dataPath = path.resolve(here, file)
   const dataText = await fs.readFile(dataPath, 'utf-8')
   const data = YAML.parse(dataText)
@@ -46,7 +46,7 @@ export async function testFromYaml( file, Armtee) {
 
     const render = () => {
       Armtee.debug = t.debug ? 2 : 0
-      const res = Armtee[method](target, t.data)
+      const res = Armtee[method](target, t.data, options || {})
       Armtee.debug = 0
       return res
     }
