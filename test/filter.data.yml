@@ -38,3 +38,25 @@
   expected: |-
     test
     Test
+
+# For convenience, this test has put here
+
+- name: Void filter
+  data:
+    name: test
+  tmpl: |-
+    //% filter void
+    His name is <% name %>.
+  expected: |-
+    //% filter void
+    His name is .
+
+- name: Can escape tag literal correctly
+  data:
+    tag: test
+  tmpl: |-
+    //% filter void
+    This ${tag} is not a template tag
+  expected: |-
+    //% filter void
+    This ${tag} is not a template tag
