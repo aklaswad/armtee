@@ -1,49 +1,32 @@
 #!/usr/bin/env node
-import Armtee from '../dist/armtee.js'
+import {Armtee, Transpiler} from '../dist/index.js'
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-import fs from 'fs/promises'
+import fs from 'node:fs/promises'
 
 const parser = yargs(hideBin(process.argv))
 
-parser.command('convert <file> <style>', 'Convert template file style', yargs => {
-  yargs
-    .positional('file', {
-      describe: 'Template file path',
-      type: 'file',
-      required: true
-    })
-    .positional('style', {
-      required: true,
-      describe: 'Template style to convert to',
-      choices: [
-        'hashy-template',
-        'hashy-logic',
-        'slashy-template',
-        'slashy-logic' ]
-    })
-})
-
-parser.command('render <file>', 'Load template from file, and render input', yargs => {
-  yargs
-    .positional('file', {
-      describe: 'Template file path',
-      type: 'file',
-      required: true
-    })
-    .option('json', {
-      describe: 'Load data from json file',
-      type: 'file'
-    })
-    .example('$0 render foo.tmpl --json bar.json', 'Read data from bar.json and render with foo.tmpl')
-    .example('gh api repos/aklaswad/armtee/issues | $0 render daily-report.tmpl', 'Read data from STDIN and render with daily-report.tmpl')
-})
-
-
-parser.completion('completion')
-
-const Commands = {
-  "convert": async (options) => {
+parser.command({
+  command: 'convert <file> <style>',
+  desc: 'Convert template file style',
+  builder: yargs => {
+    yargs
+      .positional('file', {
+        describe: 'Template file path',
+        type: 'file',
+        required: true
+      })
+      .positional('style', {
+        required: true,
+        describe: 'Template style to convert to',
+        choices: [
+          'hashy-template',
+          'hashy-logic',
+          'slashy-template',
+          'slashy-logic' ]
+      })
+  },
+  handler: async options => {
     const bk = options.file + '.bk'
     await fs.rename(options.file, bk)
     try {
@@ -57,8 +40,27 @@ const Commands = {
       await fs.rename(bk, options.file)
       throw e
     }
+  }
+})
+
+parser.command({
+  command: 'render <file>',
+  desc: 'Load template from file, and render input',
+  builder: yargs => {
+    yargs
+      .positional('file', {
+        describe: 'Template file path',
+        type: 'file',
+        required: true
+      })
+      .option('json', {
+        describe: 'Load data from json file',
+        type: 'file'
+      })
+      .example('$0 render foo.tmpl --json bar.json', 'Read data from bar.json and render with foo.tmpl')
+      .example('gh api repos/aklaswad/armtee/issues | $0 render daily-report.tmpl', 'Read data from STDIN and render with daily-report.tmpl')
   },
-  "render": async (options) => {
+  handler: async (options) => {
     let input
     if ( options.json ) {
       input = await fs.readFile(options.json)
@@ -75,16 +77,35 @@ const Commands = {
     const armtee = Armtee.fromFile(options.file)
     console.log(armtee.render(data))
   }
-}
+})
 
-const opts = parser.argv
-const command = Commands[opts._[0]]
+parser.command({
+  command: 'build <file>',
+  desc: 'Transpile template to JS module, or stand alone script',
+  builder: yargs => {
+    yargs
+      .positional('file', {
+        describe: 'Template file path',
+        type: 'file',
+        required: true
+      })
+      .option('outfile', {
+        describe: 'Filename to output',
+        type: 'file'
+      })
+      .option('type', {
+        describe: 'File type of to build',
+        default: 'module',
+        choices: ['module', 'script']
+      })
+  },
+  handler: async (argv) => {
+    const armtee = await Transpiler.fromFile(argv.file, {includeFilters: true, __buildType: 'module'})
+    console.log(armtee.wrap(armtee.translate(), { __buildType: argv.type, includeFilters: true}))
+  }
 
-if (command) {
-  const retObj = command(opts)
-  const ret = retObj instanceof Promise ? await retObj : retObj
-}
-else {
-  console.error("Unknown command: " + opts._[0])
-  process.exit(1)
-}
+})
+
+parser.completion('completion')
+
+parser.argv

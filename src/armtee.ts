@@ -1,10 +1,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import {setUpPrinter} from './printer.js'
+
 import {
   ArmteeLineSignature,
   ArmteeTemplateMode,
   ArmteeFilter,
-  ArmteeBlockMetaInfo,
   ArmteeTranspileOptions,
   IArmteeMacro,
   IArmteeBlock,
@@ -129,21 +130,48 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
     return this.rawScript = compiledLines.join('\n')
   }
 
-  wrap (txt: string, options: ArmteeTranspileOptions = {} ) {
+  wrap (txt: string, options: ArmteeTranspileOptions ) {
     let filterInjection = ''
+    const headerLines = []
+    if ( options.__buildType === 'script' ) {
+      headerLines.push('#!/usr/bin/env node')
+    }
     if ( options.includeFilters ) {
-      filterInjection = Object.keys(this.__filters)
-        .map( f => `String.prototype.$${f} = function () {return (${this.__filters[f].toString()})(this)}`)
-        .join('\n')
+      headerLines.push('const filters = {')
+      const filters:string[] = []
+      Object.keys(this.__filters).forEach( name => {
+        filters.push(`"${name}": ${ this.__filters[name].toString() }`)
+      })
+      headerLines.push( filters.join('\n'))
+      headerLines.push('}')
     }
-    else {
-      filterInjection = Object.keys(this.__filters)
+    headerLines.push( Object.keys(this.__filters)
         .map( f => `String.prototype.$${f} = function () {return printer.filters.${f}(this)}`)
-        .join('\n')
+        .join('\n') )
+    let executor
+    switch ( options.__buildType ) {
+      case 'function':
+        executor = '_render(data, printer)'
+        break
+      case 'module':
+        executor = [
+          setUpPrinter.toString(),
+          moduleRunner
+        ].join('\n')
+        break
+      case 'script':
+        executor = [
+          setUpPrinter.toString(),
+          scriptRunner
+        ].join('\n')
+        break
     }
-    const header = `${filterInjection};((${this.runtimeSymbols.root},${this.runtimeSymbols.printer}) => {`
+    const header = `${headerLines.join('\n')};
+function _render (${this.runtimeSymbols.root}, ${this.runtimeSymbols.printer}) {`
     this.offset = header.split('\n').length;
-    const footer = '})(data,printer)'
+    const footer = `}
+${executor}
+`
     return [ header, '/*___ARMTEE___*/', txt, footer ].join('\n')
   }
 
@@ -246,3 +274,36 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
 function setUpDefaultFilters(armtee:IArmteeTranspiler) {
   armtee.addFilter( 'none', str => str )
 }
+
+const moduleRunner = `
+export function render (data) {
+  const buf = []
+  const trace = []
+  const printer = setUpPrinter(buf,trace,filters)
+  _render(data, printer)
+  return buf.join('\\n')
+}
+`
+
+const scriptRunner = `
+process.stdin.setEncoding("utf8");
+
+var lines = [];
+var reader = require("readline").createInterface({
+  input: process.stdin,
+});
+
+reader.on("line", (line) => {
+  lines.push(line);
+});
+
+reader.on("close", () => {
+  const input = lines.join('\\n')
+  const data = JSON.parse(input)
+  const buf = []
+  const trace = []
+  const printer = setUpPrinter(buf,trace,filters)
+  _render(data, printer)
+  console.log( buf.join('\\n') )
+});
+`

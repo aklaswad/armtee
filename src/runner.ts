@@ -68,7 +68,7 @@ export class ArmteeRunner extends ArmteeTranspiler {
     //  return this.executable
     //}
 
-    const js = this.wrap( this.translate(options), options )
+    const js = this.wrap( this.translate(options), { ...options, __buildType: 'function' } )
     if ( this.debug > 1 ) {
       console.error( 'DEBUG: armtee gerenated render script')
       console.error( '------------------------------------------')

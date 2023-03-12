@@ -11,6 +11,8 @@ export type ArmteeTranspileOptions = {
   __depth?: number
   __inject?: IArmteeBlock
   __injectLine?: number
+  __buildType?: 'function' | 'module' | 'script'
+
 }
 
 export type ArmteePrinterContext = {
@@ -61,4 +63,11 @@ export interface IArmteeTranspiler {
 export interface IArmteeMacro {
   precompile?: (armtee: IArmteeTranspiler, args: string[], block: IArmteeBlock ) => void | undefined | IArmteeBlock | IArmteeBlock[]
   compile?: (armtee: IArmteeTranspiler, args: string[], block: IArmteeBlock ) => void | undefined | string | string[]
+}
+
+export interface IArmteeRuntimeSymbols {
+  printer: string
+  root: string
+  context: string
+  tagSeparator: [string, string]
 }

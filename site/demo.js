@@ -21,13 +21,12 @@ const convertFlip = {
   mode:  { template: 'logic', logic: 'template' }
 }
 const editorDefaults = {
-  conf: { language: 'javascript', value: `// set up armtee
-// const armtee = Armtee.fromText(txt)
-armtee.addFilter(
-  'Hey',
-  s => \`Hey ${'$'}{s}!\`)
-// console.log(armtee.render())
-` },
+  conf: { language: 'javascript', value: `return {
+  filters: {
+    Hey: s => \`Hey ${'$'}{s}!\`
+  },
+  macros: {}
+}` },
   json: { language: 'json', value: `{
   "name": "armTee",
   "fruits": [
@@ -344,15 +343,22 @@ function renderCore (tmpl, json, conf) {
     data = JSON.parse(json)
   }
   catch (e) {
-    throw( 'Waiting for JSON format corrected' )
+    throw( 'Waiting for JSON format corrected: ' + e )
   }
-  const setUp = new Function('armtee', conf)
-  const armtee = Armtee.fromText(tmpl, { file: 'fromtext' })
-  setUp(armtee)
+  let confObj
+  try {
+    const confFunc = new Function('armtee', conf)
+    confObj = confFunc()
+  }
+  catch (e) {
+    throw( 'Waiting for conf JS syntax corrected: ' + e)
+  }
+  const armtee = Armtee.fromText(
+    tmpl,
+    Object.assign({}, { file: '__TEXT__' }, confObj)
+  )
   compiled = armtee.translate({mode:'function'})
   rendered = armtee.render(data, {
-    includeFilters: true,
-    mode: 'function'
   })
 
   return [compiled, rendered]
