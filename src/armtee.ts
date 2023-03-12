@@ -80,24 +80,6 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
     this.runtimeSymbols.tagSeparator = [ begin, end ]
   }
 
-  wrap (txt: string, options: ArmteeTranspileOptions = {} ) {
-    let filterInjection = ''
-    if ( options.includeFilters ) {
-      filterInjection = Object.keys(this.__filters)
-        .map( f => `String.prototype.$${f} = function () {return (${this.__filters[f].toString()})(this)}`)
-        .join('\n')
-    }
-    else {
-      filterInjection = Object.keys(this.__filters)
-        .map( f => `String.prototype.$${f} = function () {return printer.__filters.${f}(this)}`)
-        .join('\n')
-    }
-    const header = `${filterInjection};((${this.runtimeSymbols.root},${this.runtimeSymbols.printer}) => {`
-    this.offset = header.split('\n').length;
-    const footer = '})(data,printer)'
-    return [ header, '/*___ARMTEE___*/', txt, footer ].join('\n')
-  }
-
   prepare (options:ArmteeTranspileOptions={}) {
     return this.blocks.flatMap( (block, idx) => {
       return block.precompile(this, block.txt)
@@ -129,6 +111,24 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
       totalLines += b.compiledLineCount()
     })
     return this.rawScript = compiledLines.join('\n')
+  }
+
+  wrap (txt: string, options: ArmteeTranspileOptions = {} ) {
+    let filterInjection = ''
+    if ( options.includeFilters ) {
+      filterInjection = Object.keys(this.__filters)
+        .map( f => `String.prototype.$${f} = function () {return (${this.__filters[f].toString()})(this)}`)
+        .join('\n')
+    }
+    else {
+      filterInjection = Object.keys(this.__filters)
+        .map( f => `String.prototype.$${f} = function () {return printer.__filters.${f}(this)}`)
+        .join('\n')
+    }
+    const header = `${filterInjection};((${this.runtimeSymbols.root},${this.runtimeSymbols.printer}) => {`
+    this.offset = header.split('\n').length;
+    const footer = '})(data,printer)'
+    return [ header, '/*___ARMTEE___*/', txt, footer ].join('\n')
   }
 
   resolvePos (dstLine:number,dstCol:number) {
