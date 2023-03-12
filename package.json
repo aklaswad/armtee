@@ -22,7 +22,7 @@
     "umd"
   ],
   "scripts": {
-    "build": "npx tsc --outDir dist",
+    "build": "vite build -c vite.config.js",
     "try": "node test.js",
     "test": "npx vitest run --globals --reporter verbose",
     "site-dev": "vite -c vite.config.site.js",
