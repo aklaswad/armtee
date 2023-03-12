@@ -168,34 +168,6 @@ ERROR: ${orig}
     js( data, printer )
   }
 
-  setUpPrinter (buf: string[], trace: any[]) {
-    const printer:IArmteePrinter = function (
-      literals: TemplateStringsArray,
-      ...placeholders: string[]
-    ) {
-      const raw = String.raw(
-        literals,
-        ...placeholders.map( str => printer.context.tagFilter(str))
-      )
-      buf.push(printer.context.lineFilter(raw))
-    }
-    printer.trace = function (block: IArmteeBlock) { trace.push(block) }
-    printer.filters = this.__filters
-    printer.contextStack = []
-    printer.context = {tagFilter: this.__filters.none, lineFilter: this.__filters.none }
-    printer.pushToContextStack = function printerPush () {
-      const newContext = Object.assign({}, printer.context)
-      printer.contextStack.push(printer.context)
-      printer.context = newContext
-    }
-    printer.popFromContextStack = function printerPop () {
-      const $ = printer.contextStack.pop()
-      if ( !$ ) throw 'Invalid context'
-      printer.context = $
-    }
-    return printer
-  }
-
   render (data:any, options:ArmteeTranspileOptions={}) {
     const js = this.compile(options)
     const buf: string[] = []
