@@ -46,9 +46,8 @@
     name: test
   tmpl: |-
     //% filter void
-    His name is <% name %>.
+    His name is <% data.name %>.
   expected: |-
-    //% filter void
     His name is .
 
 - name: Can escape tag literal correctly
@@ -58,5 +57,4 @@
     //% filter void
     This ${tag} is not a template tag
   expected: |-
-    //% filter void
     This ${tag} is not a template tag

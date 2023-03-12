@@ -27,6 +27,7 @@ export interface IArmteePrinter extends Function {
   contextStack: ArmteePrinterContext[]
   pushToContextStack: Function
   popFromContextStack: Function
+  $: (symbol:string) => symbol
 }
 
 export interface IArmteeBlock {

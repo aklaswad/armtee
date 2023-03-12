@@ -140,7 +140,9 @@ export class ArmteeTemplateBlock extends ArmteeBlock {
     let isText = true
     parts.forEach( str => {
       if ( isText ) {
-        const txt = str.replace(new RegExp('([`$])', 'g'), '${"$1"}')
+        const txt = str.replace(
+          new RegExp('\\$\\{|`', 'g'),
+          (match) => '${' + armtee.runtimeSymbols.printer + '.$("'+match+'")}')
         offset += str.length + lenL
         buf += txt
       }
