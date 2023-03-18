@@ -27,7 +27,7 @@ friends.json
 ```
 [
   { "name": "Alice" },
-  { "name": "Charly" },
+  { "name": "Carl" },
   { "name": "Decoy" }
 ]
 ```
@@ -63,131 +63,133 @@ console.log( Armtee.render(tmpl, data) )
 
 Main features of armtee
 
-### Line Oriented MarkUp {#en/line-oriented-markup}
+## Line Oriented MarkUp {#en/line-oriented-markup}
 
 armtee's template syntax have clearly different functions for each lines. By this, you can get these benefits;
 
-#### ロジックと記述の分離
+#### Separation of Logic and Template Descriptions
 
-テンプレートロジックとテンプレート出力の記述を、同一ファイル内で取り扱いつつ、明確に分離させることで可読性とメンテナンス性を向上させます。
+Improve readability and maintainability by clearly separating template logic and template output descriptions while handling them in the same file.
 
-#### 既存のシンタックス解析機能との親和性
+#### Compatibility with existing syntax parsing functions
 
-armteeの行修飾子はプログラム言語の行コメントに似せてあるため、うまく組み合わせることで、すでにあるsyntax highlightや入力補完の資産を簡単に再利用できます。
+Because armtee's line modifiers mimic line comments in programming languages, they can easily be reused in conjunction with existing syntax highlighting and input completion assets.
 
-#### タグ記法のカプセル化
+#### Tag Notation Encapsulation
 
-テンプレート内に埋め込むタグの形式をテンプレート側から自由に変更できます。
-タグの形式(`<%`...`%>` なのか `{{`...`}}`なのか、のような)は、テンプレートが何を記述すべきかにあわせて選択されるべきで、それはテンプレートが知っていれば良いことです。armteeはテンプレートタグの処理と行単位の処理を分離することで、テンプレート側でタグ記述の形式変更が可能になっています。
+You can freely change the format of tags to be embedded in the template from the template side.
+The tag format (`<%`... `%>` or `{{`... `}}`) should be chosen according to what the template needs to describe, which should be known by the template. armtee separates the processing of template tags from the line-by-line processing, allowing the template to change the format of tag descriptions.
 
-### トランスパイラである
+## It's transpiler {#en/armtee-is-transpiler}
 
-armteeを使って直接テンプレートの出力を得るだけでなく、トランスパイルされたレンダラーをファイルに出力できます。
+In addition to using armtee to directly get template output, you can output a transpiled renderer to a file.
 
-#### JSモジュールとしての再利用
+#### Reuse as a JS module
 
-JSライブラリ開発の一部にarmteeを利用する場合などには、トランスパイルされたレンダラーをJSモジュールとして出力することで、実行時にarmteeに依存する必要がなくなります。
+If you use armtee as part of your JS library development, for example, you can output the transpiled renderer as a JS module so that you do not need to rely on armtee at runtime.
 
-#### シンプルなデータ整形ツールの生成
+#### Generate a simple data shaping tool
 
-特定のWebAPIから取得したJSONを読みやすいテキストやMarkdownに変換する単一機能の実行ファイルとして書き出すことで、日常の業務に利用することもできます。
+Exporting JSON retrieved from a specific WebAPI as a single-function executable that converts it to readable text or Markdown can also be used for everyday tasks.
 
-# Template Syntax Guide
+# Template Syntax Guide {#en/template-syntax-guide}
 
-具体的にテンプレートの記述を見ていきましょう。
-armteeのテンプレートは、後述するようにファイルモードやタグの記法を自由に選ぶ柔軟性がありますが、この文章内では説明がない場合は**hashy-template**モードで、タグはデフォルトのタグ記法 `<%`と`%>` で説明します。
+Let's look at the template description in detail.
+Although armtee templates have the flexibility to choose file mode and tag notation as described below, we will use the **hashy-template** mode and default tag notation `<%` and `%>` for tags if not explained within this text.
 
-## 行リテラル
+## Line descriptor {#en/line-descriptor}
 
-armteeのテンプレートは、行(または複数行のブロック)単位で何を行うかが明確に別れています。
-以下の４種類があります。
+The armtee templates are clearly separated by what they do on a line (or block of multiple lines) basis.
+There are four types
 
  - template
  - script
  - macro
  - comment
 
-各行を`##! `のような、空白を含めた __4文字__ ではじめることでarmteeにそれぞれの行が何かを伝えます。
-この４文字を __行修飾子__ と呼びましょう。
+Tells armtee what each line is about by formatting each line with __4 characters__ including spaces, such as `##! ` tells armtee what each line is about.
+Let's call these four characters the __line descriptor__.
 
-後述するファイルのモードによって、それ以外の行はtemplate行かscript行であるとみなされます。
+Depending on the file mode described below, any other line is considered to be a template line or a script line.
 
 
-いわゆるテンプレートタグは、template行でのみ有効です。
+So-called template tags are only valid on template lines.
 
-## ファイルのモード
 
-armteeのテンプレートではいくつかのバリエーションを持つシンタックスを使い分けることができます。
+## file-mode {#en/file-mode}
 
-行リテラルには、`##! `のように２つのハッシュ`#`で始まる **hashy** スタイルと、`//! `のように２つのスラッシュで始まる **slashy** スタイルがあります。
-（この意図はいくつかのプログラム言語に触れたことがあるユーザーには理解できると思います）
+The armtee template can use several different variations of line syntax.
 
-それに加えて、JavaScriptのロジック行を`##! `行で記述し、シンボルなしの行をテンプレート行とみなすテンプレートモードと、シンボルなしの行をスクリプト行とみなし、テンプレート行を`##> `行修飾子で記述するロジックモードを使い分けることができます。
+Lines can contain **hashy** style, which begins with two hashes `#`, as in `##! `.
+Also can use another **slashy** style, which begins with two slashes `/`, as in `//! `.
+(This intention will be understood by users who have been exposed to several programming languages.)
 
-つまり、以下の４種類の記法が利用できます。これらは表面的なマークアップが異なるだけで、行われる処理に違いはありません。
+In addition to that, it is possible to use **template mode** which write JavaScript logic lines with `##! ` lines and consider lines without symbols to be template lines, or use a **logic mode** in which lines without symbols are considered script lines and template lines are described with the `##> ` line modifier.
+
+In other words, the following four types of notation are available. They differ only in their superficial markup; there is no difference in the processing that takes place.
 
 **hashy-template**
 
 ```
-##! data.items.forEach( item => {     // この行はscript行
-##-     コメント行
-テンプレートからアイテム「<% item.toString() %>」を出力
-##! })
+##! data.items.forEach( item => { // This is script line
+##- Comment line
+Template text, can use <% item.toString() %> tag.
+##! }) // Also script line.
 ```
 
 **hashy-logic**
 ```
-data.items.forEach( item => {     // この行はscript行
-##-     コメント行
-##> テンプレートからアイテム「<% item.toString() %>」を出力
-})
+data.items.forEach( item => { // This is script line
+##- Comment line
+##> Template text, can use <% item.toString() %> tag.
+}) // Also script line.
 ```
 
 **slashy-template**
 ```
-//! data.items.forEach( item => {     // この行はscript行
-//-     コメント行
-テンプレートからアイテム「<% item.toString() %>」を出力
-//! })
+//! data.items.forEach( item => { // This is script line
+//- Comment line
+Template text, can use <% item.toString() %> tag.
+//! }) // Also script line.
 ```
 
 **slashy-logic**
 ```
-data.items.forEach( item => {     // この行はscript行
-//-     コメント行
-//> テンプレートからアイテム「<% item.toString() %>」を出力
-})
+data.items.forEach( item => { // This is script line
+//- Comment line
+//> Template text, can use <% item.toString() %> tag.
+}) // Also script line.
 ```
 
-これらの４つの記法は相互変換可能であり、記述したいテンプレートの内容や、テンプレートにフォーカスして作業しているか、あるいはロジックを(シンタックスハイライトを有効にして)作成しているかなど、状況に合わせて使い分けることができます。
+These four notations are inter-convertible and can be used in different situations, depending on the template you wish to describe, whether you are working with a template in focus or creating logic (with syntax highlighting enabled).
 
-armteeはこれらのモードを自動的に判別します。(テンプレート行リテラルもscript行リテラルも存在しないなど）判別できない場合はテンプレートモードとみなされます。
+armtee automatically detects these modes. If neither a template line literal nor a script line literal is present (for example, neither a template line literal nor a script line literal is present), it is assumed to be in template mode.
 
-これらの記法は１ファイルの中で混在させることはできません。
-具体的には1ファイル中にhashyリテラルとslashyリテラルが同時に存在した場合、またはテンプレート行リテラルとscript行リテラルが同時に存在した場合には読み込みエラーとなります。
+These notations cannot be mixed in a single file.
+Specifically, if a hashy literal and a slashy literal exist in a file at the same time, or if a template line literal and a script line literal exist at the same time, a read error occurs.
 
-### テンプレート行
+### template-line {#en/template-line}
 
-出力される内容を決定するテンプレートです。
-テンプレートタグを埋め込んでJavaScriptの式を展開できます。
+This template determines what is output.
+You can embed template tags to expand JavaScript expressions.
 
-テンプレートモードでは、他の行リテラルではないすべての行がテンプレート行になります。
-ロジックモードでは、`##> ` （または`//> `)ではじまる行がテンプレート行になります。
+In template mode, all lines that are not other line literals are template lines.
+In logic mode, any line beginning with `##> ` (or `//> `) becomes a template line.
 
-他のマイクロテンプレートエンジンにあるような`<% 文または文やブロックの断片 %>`のような使い方はできません。すべてのタグ内部は評価可能なJavaScriptの式である必要があります。
+You cannot use `<% statement or sentence or block fragment %>` as in other micro template engines. All tag internals must be evaluatable JavaScript expressions.
 
-タグは改行をまたぐことはできません。ある行で始まったタグは、その行で終了する必要があります。
-タグの中にメソッドチェーンを埋め込んでいたら一行に収まらなくなった。そんなときは、事前にスクリプトブロックで処理を行うことを検討してください。
+Tags cannot span line breaks. Tags that begin on a line must end on that line.
+If a method chain is embedded within a tag, it can no longer fit on a single line. If this is the case, consider using a script block to handle the process in advance.
 
-### スクリプト行
+### script-line {#en/script-line}
 
-主にテンプレートのロジカルな処理を行うためのJavaScriptを記述します。改変されることなくトランスパイル後のファイルに出力されます。
+Describes JavaScript primarily for the logical processing of the template. It will be output to the transpiled file without modification.
 
-テンプレートモードでは `##! ` または（`//! `）ではじまる行がscript行になります。
-ロジックモードでは、他の行リテラルではないすべての行がscript行になります。
+In template mode, use `##! ` or (`//! `) will be the script lines.
+In logic mode, all lines that are not other line literals are script lines.
 
-スクリプト行にのみある制約として、JavaScriptとしてまとまった分割できない処理は間に別の種類の行や空行などを挟むことはできません。（armteeは内部的には、スクリプト行のみ、まとまったブロックとして扱っています。）
-armteeがデバッグ情報を埋め込むことが可能だと判断するためです。以下はうまく動かない例です。
+The only restriction on script lines is that processing that cannot be split up into coherent JavaScript lines cannot have another kind of line, blank line, etc., in between. (Internally, armtee treats only script lines as a coherent block.)
+) The reason is that armtee determines that it is possible to embed debugging information. Here is an example of how it does not work.
 
 ```javascript {.ng}
 ##! data.longNamedArrayMember
@@ -196,41 +198,41 @@ armteeがデバッグ情報を埋め込むことが可能だと判断するた�
 ##!   .filter( item => item.mustBeTruthy )
 ```
 
-逆に、複数行にまたがるスクリプト行でエラーが発生した場合、分割可能な場所に空行を追加することでエラー発生箇所が絞り込める場合もあります。 {.tips}
+Conversely, if an error occurs in a script line that spans multiple lines, adding a blank line in a place where it can be split may narrow down the error location. {.tips}
 
-### マクロ行
+### macro-line {#en/macro-line}
 
-テンプレートの解析前に処理するべきことや、ユーティリティ関数の挿入など、様々な処理をマクロ行から行うことができます。
-`##% `または `//% `ではじまる行がmacro行になります。
+Various things that should be processed before parsing the template, inserting utility functions, etc., can be done from macro lines.
+Lines beginning with `##% ` or `//% ` are macro lines.
 
-一般的には以下のような形でコマンド名、引数と記述します。
+Generally, it is written with the command name and arguments in the following form.
 
 ```
 ##% MACRONAME arg1 arg2...
 ```
 
-### コメント行
+### comment-line {#en/comment-line}
 
-コメント行です。単に無視されます。
+Comment line. Simply ignored.
 
-`##- `または  `//- `で始まる行がコメント行になります。
+Lines beginning with `##- ` or `/- ` are comment lines.
 
-以前は `### ` という記法でした。コメントのダメ押し感が好きだったのですが、まさに今ドキュメントをマークダウンで書いていて、マークダウンのHeading記法と衝突することに気づき変更しました :-) 。
-マイナスだから取り去るんだろうと思ってください。 {.offtopic}
+Previously, the notation was `### `. I liked the no-nonsense feel of comments, but I'm writing a document in markdown right now, and I noticed that it conflicts with the Heading notation in markdown, so I changed it :-).
+Think it's a negative, so you're taking it away. {.offtopic}
 
-## タグを記述する
+## writing-with-tags {#en/writing-with-tags}
 
-## テキストフィルタの利用
+### using text filters {#en/using-text-filter}
 
-テキストフィルタを利用できます。armteeに読み込まれたテキストフィルタは、いくつかの方法で利用できます。
+You can use text filters loaded in armtee in several ways.
 
-armteeは読み込み済みのテキストフィルタを、トランスパイル時に`String.prototype`に`$`プレフィックスとともに注入します。これはタグ出力の際に利用できます。
+armtee will inject the loaded text filter into `String.prototype` with a `$` prefix at transpile time. This can be used for tag output.
 
 ```
  - <% data.text.$myFilter() %>
 ```
 
-また、`FILTER`マクロを使って、すべてのタグ出力にフィルタを適用することもできます。
+You can also use the `FILTER` macro to apply a filter to all tag output.
 
 ```
 ##% FILTER lower
@@ -238,22 +240,22 @@ My name is <% data.name %>
 ##% FILTER none
 ```
 
-現在のところ、armteeに標準で搭載されているのは、`none`フィルタだけです。これは何もしないフィルタです。
+Currently, the only filter that comes standard with armtee is the `none` filter. This is a filter that does nothing.
 
 
-## 宣言済みマクロ
+## Declared macros {#en/predefined-macro}
 
-マクロ行では、事前に用意されたいくつかのマクロを呼び出すことができます。コマンド名と、コマンドによってはいくつかの引数を空白区切りで渡す必要があります。
+The macro line allows you to call several pre-defined macros. The command name and, depending on the command, some arguments must be passed, separated by spaces.
 
-### ROOT
+### ROOT {#en/macro-root}
 
-テンプレートの中でルートオブジェクトを受け取る際の変数名を指定できます。デフォルトでは`data`として渡されますが、そのテンプレートが何を扱うかを明確化するためなどいくつかの目的で変更を行えます。
+You can specify the name of the variable that will receive the root object in the template. By default, it is passed as `data`, but you can change it for several purposes, including to clarify what the template is supposed to handle.
 
 ```
 My name is <% data.name %>
 ```
 
-これはトランスパイルの出力としては以下のようになります。（実際の出力とは異なります。)
+This will result in the following output from the transpile (not the actual output) (This is not the actual output.)
 
 ```javascript
 ((data,_$) => {
@@ -261,7 +263,7 @@ My name is <% data.name %>
 })(data,printer)
 ```
 
-次のように`ROOT`を利用することで意図を明確にすることができます。
+You can clarify your intent by using `ROOT` as follows.
 
 ```
 ##% ROOT user
@@ -274,15 +276,16 @@ My name is <% user.name %>
 })(data,printer)
 ```
 
-### TAG
+### TAG {#en/macro-tag}
 
-テンプレートの中で、以降の行でタグとして認識される記号のペアを設定できます。
+You can set pairs of symbols that will be recognized as tags in subsequent lines in the template.
 
 ```
 ##% TAG START_TAG END_TAG
 ```
 
-以下のように、複数のタグ記法を同一テンプレート内で使い分けることもできます。
+You can also use multiple tag notations in the same template, as follows
+
 ```
 ##% TAG {{ }}
 My name is {{ data.name }}
@@ -291,28 +294,28 @@ My name is {{ data.name }}
 I came from <! data.country !>
 ```
 
-デフォルトは`<%` `%>`です。
+Default is `<%` `%>`.
 
-### FILTER
+### FILTER {#en/macro-filter}
 
-すべてのタグ出力に適用するフィルタを指定します。
+Specifies a filter to be applied to all tag output.
 
 ```
 ##% FILTER escapeSomething
 ```
 
 
-### INCLUDE
+### INCLUDE {#en/macro-include}
 
 ```
 ##% INCLUDE filepath <ROOT_ITEM>
 ```
 
-他のテンプレートをインクルードします。インクルードはトランスパイル前に静的に処理されます。トランスパイル時、あるいはレンダリングの実行時に読み込むテンプレートを変更するようなことはできません。
+Include other templates. Includes are handled statically before transpiling. It is not possible to change the template to be loaded at transpile time or when rendering is performed.
 
-読み込むテンプレートのパスは、現在のテンプレートからの相対パスになります。shellの$PATHのようなサーチパスやフォールバック機構はありません。
+The path of the template to be loaded is relative to the current template; there is no search path or fallback mechanism such as $PATH in shell.
 
-ROOT_ITEMを指定することで、現在のテンプレート内で有効なデータの一部だけを、読み込むテンプレートのロート処理対象として渡すことができます。省略した場合、呼び出し元テンプレートのルートデータが渡されます **TODO要検討**
+By specifying ROOT_ITEM, only a portion of the data valid in the current template can be passed as the target of the read template's roto process. If omitted, the root data of the calling template is passed **TODO consideration required**.
 
 ```
 ##! data.friends.forEach( friend => {
@@ -320,28 +323,18 @@ ROOT_ITEMを指定することで、現在のテンプレート内で有効な�
 ##! })
 ```
 
-nodejs環境でのみ利用可能です。
+Available only in nodejs environment.
 
+## Preinstalled Filters {#en/predefined-text-filters}
 
-## Preinstalled Filters
+# Tutorial {#en/tutorial}
 
-# チュートリアル
+This section explains how to use the system for each purpose.
 
-目的別に使い方を解説します。
+## Extend {#en/extending-armtee}
 
-## データ整形ツールとして使う
+### Add Macro {#en/add-macro}
 
-## テンプレートをすらすら書く
-
-## JSライブラリに組み込む
-
-## JSライブラリの開発に使う
-
-## 拡張する
-
-### Macroを追加する
-
-マクロを追加することができます。
 
 ```javascript
 Armtee.addMacro( name, {
@@ -354,35 +347,35 @@ Armtee.addMacro( name, {
 })
 ```
 
-マクロはオブジェクトとして設定します。以下のいずれか（あるいは両方）のメンバを指定します。
+A macro is set as an object. Specify one (or both) of the following members
 
 #### precompile
 
-トランスパイル実行前に呼び出されます。ArmteeBlockを戻り値として返すことで、自身の内容を別のブロックに置き換えることができます。
+Called before a transpile is executed, returning ArmteeBlock as return value to replace its own contents with another block.
 
 #### compile
 
-トランスパイル実行時に呼び出されます。JavaScriptに変換可能な文字列を配列で返すことで、トランスパイルの内容を追加できます。
+Called at transpile execution time to return an array of strings that can be converted to JavaScript to add content to the transpile.
 
 
-### Filterを追加する
+### Add Filter {#en/add-filter}
 
-テキストフィルターを追加することができます。
-以下は文字列を大文字にするフィルタの例です。
+You can add a text filter.
+Here is an example of a filter that capitalizes strings.
 
 ```javascript
 Armtee.addFilter( upper, str => str.toUpperCase() )
 ```
 
-これはテンプレート内で以下のように利用できます。
+This can be used in a template as follows.
 
 ```
-##> I spell it <% "dmv".$upper() %>
+##> I spell it <% "dmv". $upper() %>
 ```
 
-# リファレンス
+# Reference guide {#en/reference-guide}
 
-機能の網羅的なガイドです。
+This is an exhaustive guide to the features.
 
 ## JavaScript API
 
@@ -403,49 +396,24 @@ const rendered = Armtee.renderFile(filename, data)
 
 ### armtee render
 
-ファイルに保存されたテンプレートを使って、入力されたデータをレンダリングします。
+Renders input data using a template stored in a file.
 
-`--json` 読み込むデータがJSONファイルの場合に指定します。
+`--json` Specify if the data to be read is a JSON file.
 
-指定がない場合、標準入力からの読み込みを試みます。
+If not specified, attempts to read from standard input.
 
 ```
-$ npx armtee render <template_file> [--json <data_file_name>] 
+$ npx armtee render <template_file> [--json <data_file_name>]
 ```
 
 ### armtee convert
 
-ファイルに保存されたテンプレートのテンプレート形式を変換します。
+Converts the template format of a template stored in a file.
 
 ```
 $ npx armtee convert <file> <hashy-template|hashy-logic|slashy-template|slashy-logic>
 ```
-
-# おまけ
-
-
-## なんでこんなの作ってんの
-
-私は、acliiというソフトの開発のために、純粋なテキストテンプレートエンジンを探していました。小さくて拡張性が高く、ウェブ専用の余計な機能がついていないものです。
-強いて言えば Go のtext templateが理想に近いものでしたが、そのためだけに開発言語を Go に変更するのは厳しい状況でした。
-
-正直言って単に自分のエンジンが欲しかっただけかも知れません。
-
-懐かしいResig Micro Templatingを出発点に、HTMLに依存した部分を取り除くことからはじめました。
-次に、ファイルのインクルードのために新しい構文を組み込みました。
-RMTはJSをその場で生成する仕組みのため、おかしなところにファイルをインクルードするとJS自体が破壊されます。
-どこにインクルードが行われるかをわかりやすくするよう、マクロ行のかたちにして事前処理することにしました。
-
-私がそのときトライしていたのはBashスクリプトを生成するテンプレートだったので、`#`から始まる行にマクロを組み込めばシンタックスハイライトの邪魔にもならず都合が良かったのでそうしました。
-すぐに、これは他のループ処理などの複雑な部分をテンプレートから分離することにも応用できることに気づきました。
-
-このアイデアはなかなか気に入っています。でも、この頃までは、別のソフトの１モジュールのままにしておくべきだっと考えていました。
-いまさらテンプレートエンジンを公開しても仕方ないと思っていたし、なにより決り文句「こいつはエスケープなんて丁寧なことはしてくれないから、なにがユーザー入力かもわからない状態でウェブコンテンツに出力させるな」といったやつを自分の口から言うのが嫌だったのもあります。
-
-開発が進み、テンプレートが複雑になるに従ってデバッグが難しくなってきたので、もう少ししっかりとテンプレートと成果物のエラー行の対応を追跡できるように手を入れ始めました。まるでsource mapですね。
-そうか、こいつはトランスコンパイラでもあるんだなあ、と考えを広げていって、思った以上に応用できる範囲が広そうな事に気づきました。そこでこれは公開する価値があるかも知れない、とはじめて思いました。
-
-今はまだ開発の初期段階で、この先どうなるかわかりませんが、まあ何か価値のあるものを形にできれば嬉しいなと思ってます。
+> Some ot this text was translated with www.DeepL.com/Translator (free version)
 
 
 
