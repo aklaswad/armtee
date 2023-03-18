@@ -40,9 +40,20 @@ function setUpMarkDown (lang) {
   return md
 }
 
+try {
+  fs.statSync('public/')
+}
+catch (e) {
+  fs.mkdirSync('public/')
+}
+
 function buildDocs (lang) {
-  if ( ! fs.statSync('public/' + lang))
+  try {
+    fs.statSync('public/' + lang)
+  }
+  catch(e) {
     fs.mkdirSync('public/' + lang)
+  }
   const md = setUpMarkDown(lang)
   const doc = fs.readFileSync('./site/docs/'+lang+'/doc.md', 'utf-8')
   let tocHtml
