@@ -255,13 +255,12 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
       const [ filename, context ] = args
       const included = ArmteeTranspiler.fromFile(path.resolve(rootPath, filename), {__depth: armtee.__depth + 1})
       const blocks = included.prepare()
-      // Semi-colon is required.
-      // Without this ';', got error "_(...) is not a function."
-      // TODO: understand why.
       const systemSrc = { file: '__SYSTEM__' }
       const $armtee = armtee.runtimeSymbols
       const $included = included.runtimeSymbols
       return [
+        // Semi-colon is required.
+        // Statement before this line could take a function call round brackets
         ArmteeBlock.create('script', `;
           ${$armtee.printer}.pushToContextStack();
           ((${$included.root},${$included.printer}) => {`, systemSrc),
