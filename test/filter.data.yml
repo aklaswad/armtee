@@ -58,3 +58,17 @@
     This ${tag} is not a template tag
   expected: |-
     This ${tag} is not a template tag
+- name: Can escape backslashes before EOL
+  data:
+    tag: test
+  tmpl: |-
+    //% filter void
+    \
+    \\
+    \\\
+    \\\\
+  expected: |-
+    \
+    \\
+    \\\
+    \\\\

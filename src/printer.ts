@@ -7,7 +7,8 @@ import {
 
 export function setUpPrinter (buf: string[], trace: any[], filters: {[name: string]: ArmteeFilter}) {
   const symBackTick = Symbol('`')
-  const symDollerCurlyBrace = Symbol('${')
+  const symDollarCurlyBrace = Symbol('${')
+  const symBackSlash = Symbol('bs')
   const context = {tagFilter: filters.none, lineFilter: filters.none }
 
   const printer = function (
@@ -24,8 +25,9 @@ export function setUpPrinter (buf: string[], trace: any[], filters: {[name: stri
             return context.tagFilter(str.toString())
           case 'symbol':
             switch (str) {
-              case symDollerCurlyBrace: return '${'
+              case symDollarCurlyBrace: return '${'
               case symBackTick: return '`'
+              case symBackSlash: return '\\'
               default: throw 'Unknown symbol'
             }
           default:
@@ -38,7 +40,8 @@ export function setUpPrinter (buf: string[], trace: any[], filters: {[name: stri
   printer.$ = function (symbol: string) {
     switch (symbol) {
       case '`': return symBackTick;
-      case '${': return symDollerCurlyBrace;
+      case '${': return symDollarCurlyBrace;
+      case 'bs': return symBackSlash;
     }
     throw "Unexpected Symbol;"
   }
