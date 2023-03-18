@@ -4,6 +4,7 @@ import toc from "markdown-it-table-of-contents"
 import anchor from "markdown-it-anchor"
 import attrs from 'markdown-it-attrs'
 import fs from 'fs'
+import Yaml from 'yaml'
 
 function setUpMarkDown (lang) {
   const md = new MD()
@@ -67,3 +68,8 @@ function buildDocs (lang) {
 }
 
 ['en','ja'].forEach( lang => buildDocs(lang) )
+
+const examplesInYaml = fs.readFileSync('./site/examples.yml', 'utf-8')
+const examples = Yaml.parse(examplesInYaml)
+fs.writeFileSync('./public/examples.json', JSON.stringify(examples))
+

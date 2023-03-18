@@ -186,7 +186,7 @@ If a method chain is embedded within a tag, it can no longer fit on a single lin
 Describes JavaScript primarily for the logical processing of the template. It will be output to the transpiled file without modification.
 
 In template mode, use `##! ` or (`//! `) will be the script lines.
-In logic mode, all lines that are not other line literals are script lines.
+In logic mode, all lines that not having line descriptor are script lines.
 
 The only restriction on script lines is that processing that cannot be split up into coherent JavaScript lines cannot have another kind of line, blank line, etc., in between. (Internally, armtee treats only script lines as a coherent block.)
 ) The reason is that armtee determines that it is possible to embed debugging information. Here is an example of how it does not work.
@@ -413,6 +413,36 @@ Converts the template format of a template stored in a file.
 ```
 $ npx armtee convert <file> <hashy-template|hashy-logic|slashy-template|slashy-logic>
 ```
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+
 > Some ot this text was translated with www.DeepL.com/Translator (free version)
 
 

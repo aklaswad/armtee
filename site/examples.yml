@@ -1,0 +1,64 @@
+defaults:
+  default:
+    conf: |-
+      return {
+        filters: {
+          Hey: s => `Hey ${s}!`
+        },
+        macros: {}
+      }
+    json:
+      name: armTee
+      fruits:
+      - Apple
+      - Blueberry
+      - Cinnamon
+    tmpl: |-
+      # <% data.name.$Hey() %>
+      //- This shows list of items
+      //! data.fruits.forEach( fruit => {
+       - <% fruit %>
+      //! })
+tag-change:
+  show:
+    tmpl: true
+    out: true
+  tmpl: |-
+    //- Before any TAG macro, <% %> is enable.
+    This is <% data.name %>.
+
+    //% TAG <! !>
+    Again, this is <! data.name !>.
+
+    //% TAG BEGIN END
+    Thrice, this is BEGIN data.name END.
+root-change:
+  show:
+    tmpl: true
+    trans: true
+    out: true
+  tmpl: |-
+    //% ROOT foo
+    This is <% foo.name %>.
+
+add-filter:
+  show:
+    conf: true
+    tmpl: true
+    out: true
+  conf: |-
+    return {
+      filters: {
+        upper: s => s.toUpperCase()
+      }
+    }
+  tmpl: |-
+    Use in template tag: <% data.name.$upper() %>
+
+    //- With FILTER macro
+    //% FILTER upper
+    Always filtered: <% data.name %>
+
+    //- set `none` no-op filter to reset
+    //% FILTER none
+    Now not filtered: <% data.name %>

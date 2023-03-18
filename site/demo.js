@@ -37,9 +37,9 @@ const editorDefaults = {
 }` },
   tmpl: { language: 'markdown', value: `# <% data.name.$Hey() %>
 //- This shows list of items
-//! data.fruits.forEach( fruit => {
+//! for ( let fruit of data.fruits ) {
  - <% fruit %>
-//! })` },
+//! }` },
   trans: { language: 'javascript', readOnly: true },
   out:  { language: 'markdown', readOnly: true }
 }
@@ -159,6 +159,51 @@ function setUpDoc () {
     document.body.classList.add('ready')
   }, 1 )
 
+  const demos = document.getElementsByClassName('demo')
+  for ( let i=0; i<demos.length; i++ ) {
+    const elem = demos[i]
+    elem.addEventListener('click', function runDemo(evt) {
+      const demoName = elem.getAttribute('data-demo')
+      applyDemo(demoName)
+      evt.target.blur()
+      evt.preventDefault()
+      evt.stopPropagation()
+    } )
+  }
+}
+
+function setEditorStatus(editorId, onOff) {
+  const wrapper = document.getElementById(editorId + '-editor-wrapper')
+  const current = ! wrapper.classList.contains('off')
+  if ( current == onOff ) return
+  if ( current ) {
+    const len = editorWrappers.length
+    const prev = `g${len - closedEditors}-${len}`
+    editorWrappers.forEach( w => w.classList.remove(prev) )
+    closedEditors++
+    if ( closedEditors === len ) {
+      document.body.classList.add('no-editor')
+    }
+    const next = `g${len - closedEditors}-${len}`
+    wrapper.classList.add('off')
+    editorWrappers.forEach( w => {
+      if ( ! w.classList.contains('off') )
+        w.classList.add(next)
+    })
+  }
+  else {
+    const len = editorWrappers.length
+    const prev = `g${len - closedEditors}-${len}`
+    editorWrappers.forEach( w => w.classList.remove(prev) )
+    closedEditors--
+    document.body.classList.remove('no-editor')
+    const next = `g${len - closedEditors}-${len}`
+    wrapper.classList.remove('off')
+    editorWrappers.forEach( w => {
+      if ( !w.classList.contains('off') )
+        w.classList.add(next)
+    })
+  }
 }
 
 async function loadEditor () {
@@ -215,32 +260,10 @@ async function loadEditor () {
     const toggle = wrapper.getElementsByClassName('editor-toggle')
     toggle[0].addEventListener('click', (evt) => {
       if ( wrapper.classList.contains('off') ) {
-        const len = editorWrappers.length
-        const prev = `g${len - closedEditors}-${len}`
-        editorWrappers.forEach( w => w.classList.remove(prev) )
-        closedEditors--
-        document.body.classList.remove('no-editor')
-        const next = `g${len - closedEditors}-${len}`
-        wrapper.classList.remove('off')
-        editorWrappers.forEach( w => {
-          if ( !w.classList.contains('off') )
-            w.classList.add(next)
-        })
+        setEditorStatus(editorId, true)
       }
       else {
-        const len = editorWrappers.length
-        const prev = `g${len - closedEditors}-${len}`
-        editorWrappers.forEach( w => w.classList.remove(prev) )
-        closedEditors++
-        if ( closedEditors === len ) {
-          document.body.classList.add('no-editor')
-        }
-        const next = `g${len - closedEditors}-${len}`
-        wrapper.classList.add('off')
-        editorWrappers.forEach( w => {
-          if ( ! w.classList.contains('off') )
-            w.classList.add(next)
-        })
+        setEditorStatus(editorId, false)
       }
       evt.target.blur()
       evt.preventDefault()
@@ -315,24 +338,15 @@ function setUpPage () {
 }
 
 function openAllEditor () {
-  const len = editorWrappers.length
-  editorWrappers.forEach( w => {
-    w.classList.remove('off')
-    w.classList.add(`g${len}-${len}`)
-    document.body.classList.remove('no-editor')
-  })
-  closedEditors = 0
+  for ( let eid of editorIds ) {
+    setEditorStatus(eid, true)
+  }
 }
 
 function closeAllEditor () {
-  const len = editorWrappers.length
-  const prev = `g${len - closedEditors}-${len}`
-  editorWrappers.forEach( w => {
-    w.classList.add('off')
-    w.classList.remove(prev)
-    document.body.classList.add('no-editor')
-  })
-  closedEditors = len
+  for ( let eid of editorIds ) {
+    setEditorStatus(eid, false)
+  }
 }
 
 function replace(editorId, txt) {
@@ -398,6 +412,26 @@ function render() {
   return
 }
 
+function applyDemo (demoName) {
+  const demo = examples[demoName]
+  if (!demo) return
+  const baseName = demo.base || 'default'
+  const demoData = Object.assign(
+    {},
+    examples.defaults[baseName],
+    demo
+  )
+  console.log({demoName,demoData})
+  editors['conf'].setValue(demoData.conf)
+  editors['tmpl'].setValue(demoData.tmpl)
+  editors['json'].setValue(JSON.stringify(demoData.json, null, 2))
+  render()
+  if ( demoData.show ) {
+    for ( let eid of editorIds ) {
+      setEditorStatus(eid, !!demoData.show[eid])
+    }
+  }
+}
 
 let currentLang = 'en'
 let currentChapter = ''
@@ -425,13 +459,22 @@ const DocumentSources = {
   ]
 }
 
+let examples
+async function loadExamples () {
+  const res = await fetch('examples.json')
+  const txt = await res.text()
+  examples = JSON.parse(txt)
+}
+
 async function main () {
   const contents = DocumentSources[currentLang] || DocumentSources['en']
   await Promise.all([
     loadEditor(),
-    loadContent(contents)
+    loadContent(contents),
+    loadExamples()
   ])
   setTimeout(() => {
+    console.log(examples)
     setUpPage()
     setTimeout( () => {
       setUpDoc()

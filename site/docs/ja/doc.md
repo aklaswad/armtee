@@ -233,7 +233,7 @@ armteeは読み込み済みのテキストフィルタを、トランスパイ�
 
 ```
 ##% FILTER lower
-My name is <% data.name %> 
+My name is <% data.name %>
 ##% FILTER none
 ```
 
@@ -273,6 +273,8 @@ My name is <% user.name %>
 })(data,printer)
 ```
 
+[試す](#){.demo}{data-demo=root-change}
+
 ### TAG {#ja/macro-tag}
 
 テンプレートの中で、以降の行でタグとして認識される記号のペアを設定できます。
@@ -289,6 +291,8 @@ My name is {{ data.name }}
 ##% TAG <! !>
 I came from <! data.country !>
 ```
+
+[試す](#){.demo}{data-demo=tag-change}
 
 デフォルトは`<%` `%>`です。
 
@@ -371,6 +375,8 @@ Armtee.addFilter( upper, str => str.toUpperCase() )
 ##> I spell it <% "dmv".$upper() %>
 ```
 
+[試す](#){.demo}{data-demo=add-filter}
+
 # リファレンス {#ja/reference-guide}
 
 機能の網羅的なガイドです。
@@ -439,4 +445,31 @@ RMTはJSをその場で生成する仕組みのため、おかしなところに
 今はまだ開発の初期段階で、この先どうなるかわかりませんが、まあ何か価値のあるものを形にできれば嬉しいなと思ってます。
 
 
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
+
+&nbsp;
 
