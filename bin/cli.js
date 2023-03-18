@@ -108,10 +108,7 @@ parser.command({
     else {
       console.log(content)
     }
-
-
   }
-
 })
 
 parser.completion('completion')
