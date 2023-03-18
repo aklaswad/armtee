@@ -259,13 +259,15 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
       // Without this ';', got error "_(...) is not a function."
       // TODO: understand why.
       const systemSrc = { file: '__SYSTEM__' }
+      const $armtee = armtee.runtimeSymbols
+      const $included = included.runtimeSymbols
       return [
         ArmteeBlock.create('script', `;
-          ${armtee.runtimeSymbols.printer}.pushToContextStack();
-          ((${included.runtimeSymbols.root},${included.runtimeSymbols.printer}) => {`, systemSrc),
+          ${$armtee.printer}.pushToContextStack();
+          ((${$included.root},${$included.printer}) => {`, systemSrc),
         ...blocks,
-        ArmteeBlock.create('script', `})( ${context}, ${armtee.runtimeSymbols.printer} )
-        ${armtee.runtimeSymbols.printer}.popFromContextStack()`, systemSrc)
+        ArmteeBlock.create('script', `})( ${context}, ${$armtee.printer} )
+        ${$armtee.printer}.popFromContextStack()`, systemSrc)
       ]
     }
   })
