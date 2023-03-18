@@ -151,7 +151,7 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
     let executor
     switch ( options.__buildType ) {
       case 'function':
-        executor = '_render(data, printer)'
+        executor = 'await _render(data, printer)'
         break
       case 'module':
         executor = [
@@ -167,7 +167,7 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
         break
     }
     const header = `${headerLines.join('\n')};
-function _render (${this.runtimeSymbols.root}, ${this.runtimeSymbols.printer}) {`
+async function _render (${this.runtimeSymbols.root}, ${this.runtimeSymbols.printer}) {`
     this.offset = header.split('\n').length;
     const footer = `}
 ${executor}
@@ -277,11 +277,11 @@ function setUpDefaultFilters(armtee:IArmteeTranspiler) {
 }
 
 const moduleRunner = `
-export function render (data) {
+export async function render (data) {
   const buf = []
   const trace = []
   const printer = setUpPrinter(buf,trace,filters)
-  _render(data, printer)
+  await _render(data, printer)
   return buf.join('\\n')
 }
 `
@@ -298,13 +298,13 @@ reader.on("line", (line) => {
   lines.push(line);
 });
 
-reader.on("close", () => {
+reader.on("close", async () => {
   const input = lines.join('\\n')
   const data = JSON.parse(input)
   const buf = []
   const trace = []
   const printer = setUpPrinter(buf,trace,filters)
-  _render(data, printer)
+  await _render(data, printer)
   console.log( buf.join('\\n') )
 });
 `

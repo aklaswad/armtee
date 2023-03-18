@@ -44,20 +44,21 @@ export async function testFromYaml( file, Armtee, options ) {
       afters.push( () => tmpfile.removeCallback() )
     }
 
-    const render = () => {
+    const render = async () => {
       Armtee.debug = t.debug ? 2 : 0
-      const res = Armtee[method](target, t.data, options || {})
+      const res = await Armtee[method](target, t.data, options || {})
       Armtee.debug = 0
       return res
     }
 
-    it( t.name, () => {
+    it( t.name, async () => {
       if ( t.error ) {
         expect(render)
+          .rejects
           .toThrow(new RegExp(t.error))
       }
       else {
-        expect(render()).toBe(t.expected)
+        expect(await render()).toBe(t.expected)
       }
     })
   }, 10)

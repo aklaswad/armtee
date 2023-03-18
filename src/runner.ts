@@ -12,6 +12,13 @@ import { modeFromText } from './line-parser.js'
 import { ArmteeTranspiler } from './armtee.js'
 import { setUpPrinter } from './printer.js'
 
+// Need to make AsyncFunction constructor by hand.
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction
+// Type annotation was taken from here (unresolved issue though, at least this can stop TS warnings )
+// https://www.reddit.com/r/typescript/comments/qwe3bc/typing_of_async_function_constructor_with/
+const AsyncFunction:new (...args: any[]) => (...args: any[]) => Promise<any>
+  = Object.getPrototypeOf(async function(){}).constructor
+
 /**
  * Dynamic compile for tranpiled js and execute render
  */
@@ -45,9 +52,9 @@ export class ArmteeRunner extends ArmteeTranspiler {
    * @param {TranspileOptions} options - option
    * @returns {string} Rendered output
    */
-  static render (tmpl:string, data:any, options:ArmteeTranspileOptions) {
+  static async render (tmpl:string, data:any, options:ArmteeTranspileOptions) {
     const runner = ArmteeRunner.fromText(tmpl, options)
-    return runner.render(data, options)
+    return await runner.render(data, options)
   }
 
   /**
@@ -76,7 +83,7 @@ export class ArmteeRunner extends ArmteeTranspiler {
     }
 
     try {
-      this.executable = new Function('data', 'printer', js)
+      this.executable = new AsyncFunction('data', 'printer', js)
       const sig = '/*___ARMTEE___*/'
       this.offset = this.executable.toString().split(sig,2)[0].split('\n').length
       return this.executable
@@ -168,13 +175,13 @@ ERROR: ${orig}
     js( data, printer )
   }
 
-  render (data:any, options:ArmteeTranspileOptions={}) {
+  async render (data:any, options:ArmteeTranspileOptions={}) {
     const js = this.compile(options)
     const buf: string[] = []
     const trace: any[] = []
     const printer = setUpPrinter(buf, trace, this.__filters)
     try {
-      js(data,printer)
+      await js(data,printer)
     }
     catch (e) {
       if (this.debug > 0 ) {
