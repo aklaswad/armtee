@@ -93,6 +93,7 @@ function setUpDoc () {
     }
 
     let target = document.querySelector("a[href='" + href + "']")
+    if ( !target ) return
     const container = document.querySelector("#toc")
     if ( !noScroll ) {
       container.scrollTop = target.offsetTop - ( container.clientHeight / 2 )
@@ -120,6 +121,7 @@ function setUpDoc () {
       const id = evts.filter(evt => evt.isIntersecting).map( e => e.target.id)[0]
       if ( id ) {
         openTocFor('#' + id)
+        currentChapter = id.slice(3)
       }
 
     }, observeOptions
@@ -299,6 +301,17 @@ function setUpPage () {
     evt.stopPropagation()
   })
   out = document.getElementById('out')
+
+  const langs = document.querySelectorAll('.lang-selector')
+  langs.forEach(elem => elem.addEventListener('click', (evt) => {
+    const lang = elem.getAttribute('data-lang')
+    window.open('/armtee/#' + lang + '/' + currentChapter, '_self')
+    location.reload()
+    evt.target.blur()
+    evt.preventDefault()
+    evt.stopPropagation()
+
+  }))
 }
 
 function openAllEditor () {
@@ -384,18 +397,39 @@ function render() {
   rendering = false
   return
 }
-if (location.hash) {
+
+
+let currentLang = 'en'
+let currentChapter = ''
+if ( location.hash && location.hash.length ) {
+  currentLang = location.hash.slice(1,3)
+  localStorage.lastLang = currentLang
+  currentChapter = location.hash.slice(4)
+}
+else {
+  currentLang = localStorage.lastLang || 'en'
+}
+
+if (currentChapter) {
   closeAllEditor()
-  document.querySelector('body').classList.add('hashed') 
+  document.querySelector('body').classList.add('hashed')
+}
+const DocumentSources = {
+  ja: [
+    { url: 'ja/doc.html', to: '#doc-content' },
+    { url: 'ja/toc.html', to: '#toc' }
+  ],
+  en: [
+    { url: 'en/doc.html', to: '#doc-content' },
+    { url: 'en/toc.html', to: '#toc' }
+  ]
 }
 
 async function main () {
+  const contents = DocumentSources[currentLang] || DocumentSources['en']
   await Promise.all([
     loadEditor(),
-    loadContent([
-      { url: 'doc.html', to: '#doc-content' },
-      { url: 'toc.html', to: '#toc' }
-    ])
+    loadContent(contents)
   ])
   setTimeout(() => {
     setUpPage()
@@ -405,4 +439,3 @@ async function main () {
   }, location.hash ? 1 : 1000)
 }
 main()
-

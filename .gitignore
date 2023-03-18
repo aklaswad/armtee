@@ -106,12 +106,13 @@ dist
 # For demo site develop and build
 public/**/*
 !public/.gitkeep
+
 armtee/**/*
 !armtee/.gitkeep
 
 # JSdoc outputs
-out/
-docs/
+/out/
+/docs/
 
 
 

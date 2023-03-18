@@ -2,18 +2,18 @@ TOCBEGIN
 [[toc]]
 TOCEND
 
-# クイックスタート
+# Getting Started
 
-## インストール
+## Install {#en/install}
 
 ```
 npm i armtee
 ```
 
-## テンプレートを書いてみる
+## Writing template {#en/writing-template}
 
 
-### CLIでレンダリングする。
+### Render with CLI {#en/render-with-cli}
 
 friends.tmpl
 ```
@@ -32,7 +32,8 @@ friends.json
 ]
 ```
 
-これは以下のように実行できます。
+They can be rendered from cli like this;
+
 ```
 $ npx armtee render friends.tmpl --json friends.json
  - Alice
@@ -40,7 +41,7 @@ $ npx armtee render friends.tmpl --json friends.json
  - Decoy
 ```
 
-### JavaScript でレンダリングする。
+### Render in Your Script {#en/render-in-your-script}
 
 ```javascript
 import Armtee from 'armtee'
@@ -58,13 +59,13 @@ console.log( Armtee.render(tmpl, data) )
 // - Bob
 ```
 
-# 特徴
+# Features {#en/features}
 
-armteeの主な機能と特徴
+Main features of armtee
 
-### 行指向のマークアップ
+### Line Oriented MarkUp {#en/line-oriented-markup}
 
-armteeのテンプレート文法は行単位で明確に異なる役割を持ちます。この事により以下のメリットが得られます。
+armtee's template syntax have clearly different functions for each lines. By this, you can get these benefits;
 
 #### ロジックと記述の分離
 
