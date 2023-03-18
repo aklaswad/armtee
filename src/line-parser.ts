@@ -94,10 +94,10 @@ export class ArmteeLineParser {
    * @param {*} txt
    * @param {*} meta
    * @param {LineSignature} mode
-   * @param {*} filemode
+   * @param {*} fileMode
    * @returns {?} output
    */
-  parse (txt: string, meta: ArmteeBlockMetaInfo, mode:ArmteeLineSignature='hashy', filemode:ArmteeTemplateMode='template') {
+  parse (txt: string, meta: ArmteeBlockMetaInfo, mode:ArmteeLineSignature='hashy', fileMode:ArmteeTemplateMode='template') {
     const re = RE[mode].line
     txt.split("\n").forEach( (line, idx) => {
       const _meta = Object.assign( {}, meta, { line: idx + 1, colOffset: 4 } )
@@ -106,13 +106,13 @@ export class ArmteeLineParser {
         this._addLine('macro', line.slice(4), _meta)
       else if ( re.comment.test(line) )
         this._addLine('comment', line.slice(4), _meta)
-      else if ( filemode === 'template' && re.script.test(line) )
+      else if ( fileMode === 'template' && re.script.test(line) )
         this._addLine('script', line.slice(4), _meta)
-      else if ( filemode === 'logic' && re.template.test(line) )
+      else if ( fileMode === 'logic' && re.template.test(line) )
         this._addLine('template', line.slice(4), _meta)
       else
         this._addLine(
-          (filemode === 'logic' ? 'script' : 'template'),
+          (fileMode === 'logic' ? 'script' : 'template'),
           line,
           _meta_wo_prefix)
     })

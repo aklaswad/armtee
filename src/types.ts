@@ -34,7 +34,7 @@ export interface IArmteeBlock {
   txt: string
   src: ArmteeBlockMetaInfo
   dst: ArmteeBlockMetaInfo
-  colmap: [number,number][]
+  colMap: [number,number][]
   compiled: string[],
   type: () => ArmteeLineType,
   precompile: (armtee: IArmteeTranspiler, txt: string) => IArmteeBlock[]

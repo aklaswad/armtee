@@ -181,7 +181,7 @@ You cannot use `<% statement or sentence or block fragment %>` as in other micro
 Tags cannot span line breaks. Tags that begin on a line must end on that line.
 If a method chain is embedded within a tag, it can no longer fit on a single line. If this is the case, consider using a script block to handle the process in advance.
 
-### script-line {#en/script-line}
+### script line {#en/script-line}
 
 Describes JavaScript primarily for the logical processing of the template. It will be output to the transpiled file without modification.
 

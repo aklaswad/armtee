@@ -14,14 +14,14 @@ export class ArmteeBlock implements IArmteeBlock {
   txt: string
   src: ArmteeBlockMetaInfo
   dst: ArmteeBlockMetaInfo
-  colmap: [number,number][]
+  colMap: [number,number][]
   compiled: string[]
 
   constructor (txt: string, src: ArmteeBlockMetaInfo) {
     this.txt = txt
     this.src = src
     this.dst = {}
-    this.colmap = [[1,1]] // src, dst
+    this.colMap = [[1,1]] // src, dst
     this.compiled = []
   }
 
@@ -158,7 +158,7 @@ ${ str }
 ${ e instanceof Error ? e.toString() : e }
 -------------`)
         }
-        this.colmap.push([ offset, buf.length ])
+        this.colMap.push([ offset, buf.length ])
         const exp = '${' + str + '}'
         offset += exp.length + lenR
         buf += exp
