@@ -1,4 +1,4 @@
-import { ATError } from './error.js'
+import { ATError, ATUnexpectedError } from './error.js'
 import {
   ArmteeLineType,
   ArmteeBlockMetaInfo,
@@ -10,8 +10,8 @@ import {
 /**
  * Base class for pre-transpile line/block
  */
-export class ArmteeBlock implements IArmteeBlock {
-  type (): ArmteeLineType { return 'never' }
+export abstract class ArmteeBlock implements IArmteeBlock {
+  abstract type () : ArmteeLineType
   txt: string
   src: ArmteeBlockMetaInfo
   dst: ArmteeBlockMetaInfo
@@ -33,7 +33,6 @@ export class ArmteeBlock implements IArmteeBlock {
 
   async compile (armtee: IArmteeTranspiler, txt: string): Promise<string | void | undefined> { return '' }
   precompile (armtee :IArmteeTranspiler, txt :string) {}
-  postcompile () {}
 
   async _compile (armtee: IArmteeTranspiler, txt: string) {
     return this.compile(armtee, txt).then( ret => {
@@ -54,18 +53,14 @@ export class ArmteeBlock implements IArmteeBlock {
     switch (type) {
       case 'macro' :
         return new ArmteeMacroBlock(txt, src)
-        break
       case 'script' :
         return new ArmteeScriptBlock(txt, src)
-        break
       case 'template' :
         return new ArmteeTemplateBlock(txt, src)
-        break
       case 'comment' :
         return new ArmteeCommentBlock(txt, src)
-        break
       default :
-        throw 'unknown block type: ' + type
+        throw new ATUnexpectedError(type)
     }
   }
 }
@@ -116,10 +111,10 @@ export class ArmteeMacroBlock extends ArmteeBlock {
     if ( Array.isArray(res) ) {
       return res.join('\n')
     }
-    else if (res)
+    else if ('string' === typeof res)
       return res
     else
-      throw "!???"
+      return
   }
 }
 

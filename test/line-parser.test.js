@@ -110,6 +110,14 @@ describe('line-parser', () => {
     expect(result[4].txt).toBe('script1\nscript2')
     expect(result[5].txt).toBe('comment1')
     expect(result[6].txt).toBe('comment2')
+
+    expect(result[0].type()).toBe('macro')
+    expect(result[1].type()).toBe('macro')
+    expect(result[2].type()).toBe('template')
+    expect(result[3].type()).toBe('template')
+    expect(result[4].type()).toBe('script')
+    expect(result[5].type()).toBe('comment')
+    expect(result[6].type()).toBe('comment')
   })
 
   test('can parse hashy template template', () => {
@@ -122,6 +130,14 @@ describe('line-parser', () => {
     expect(result[4].txt).toBe('script1\nscript2')
     expect(result[5].txt).toBe('comment1')
     expect(result[6].txt).toBe('comment2')
+
+    expect(result[0].type()).toBe('macro')
+    expect(result[1].type()).toBe('macro')
+    expect(result[2].type()).toBe('template')
+    expect(result[3].type()).toBe('template')
+    expect(result[4].type()).toBe('script')
+    expect(result[5].type()).toBe('comment')
+    expect(result[6].type()).toBe('comment')
   })
   test('can parse hashy logic template', () => {
     const parser = new ArmteeLineParser()
@@ -133,6 +149,14 @@ describe('line-parser', () => {
     expect(result[4].txt).toBe('script1\nscript2')
     expect(result[5].txt).toBe('comment1')
     expect(result[6].txt).toBe('comment2')
+
+    expect(result[0].type()).toBe('macro')
+    expect(result[1].type()).toBe('macro')
+    expect(result[2].type()).toBe('template')
+    expect(result[3].type()).toBe('template')
+    expect(result[4].type()).toBe('script')
+    expect(result[5].type()).toBe('comment')
+    expect(result[6].type()).toBe('comment')
   })
 
   test('can parse slashy template template', () => {
@@ -145,6 +169,14 @@ describe('line-parser', () => {
     expect(result[4].txt).toBe('script1\nscript2')
     expect(result[5].txt).toBe('comment1')
     expect(result[6].txt).toBe('comment2')
+
+    expect(result[0].type()).toBe('macro')
+    expect(result[1].type()).toBe('macro')
+    expect(result[2].type()).toBe('template')
+    expect(result[3].type()).toBe('template')
+    expect(result[4].type()).toBe('script')
+    expect(result[5].type()).toBe('comment')
+    expect(result[6].type()).toBe('comment')
   })
 
   test('can parse slashy logic template', () => {
@@ -157,6 +189,14 @@ describe('line-parser', () => {
     expect(result[4].txt).toBe('script1\nscript2')
     expect(result[5].txt).toBe('comment1')
     expect(result[6].txt).toBe('comment2')
+
+    expect(result[0].type()).toBe('macro')
+    expect(result[1].type()).toBe('macro')
+    expect(result[2].type()).toBe('template')
+    expect(result[3].type()).toBe('template')
+    expect(result[4].type()).toBe('script')
+    expect(result[5].type()).toBe('comment')
+    expect(result[6].type()).toBe('comment')
   })
 
 })

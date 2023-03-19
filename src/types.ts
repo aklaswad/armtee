@@ -1,6 +1,6 @@
 export type ArmteeLineSignature = "hashy" | "slashy"
 export type ArmteeTemplateMode = "template" | "logic" | "something"
-export type ArmteeLineType = "macro" | "script" | "template" | "comment" | "never"
+export type ArmteeLineType = "macro" | "script" | "template" | "comment"
 export type ArmteeFilter = (str: string) => string
 export type ArmteeBlockMetaInfo = { file?: string, line?: number, type?: string }
 export type ArmteeTranspileOptions = {

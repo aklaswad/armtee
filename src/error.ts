@@ -26,3 +26,9 @@ export class ATError extends Error {
     return [ this.message, ...lines.reverse() ].join('\n')
   }
 }
+
+export class ATUnexpectedError extends Error {
+  constructor(value: never, message = `Unsupported type: ${value}`) {
+    super(message);
+  }
+}
