@@ -171,10 +171,6 @@ ERROR: ${orig}
     }
   }
 
-  _render_core (js: Function, data: any, printer: Function) {
-    js( data, printer )
-  }
-
   async render (data:any, options:ArmteeTranspileOptions={}) {
     const js = await this.compile(options)
     const buf: string[] = []
