@@ -447,6 +447,12 @@ if (currentChapter) {
   closeAllEditor()
   document.querySelector('body').classList.add('hashed')
 }
+else {
+  const defaultOpenEditors = { conf: false, json: true, tmpl: true, trans: false, out: true }
+  for (let eid of editorIds) {
+    setEditorStatus(eid, defaultOpenEditors[eid])
+  }
+}
 const DocumentSources = {
   ja: [
     { url: 'ja/doc.html', to: '#doc-content' },
