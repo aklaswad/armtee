@@ -13,5 +13,12 @@ export default defineConfig({
       fileName: 'index',
       formats: ['es', 'cjs', 'umd'],
     },
+  },
+  test: {
+    globals: true,
+    coverage: {
+      provider: 'istanbul', // or 'c8'
+      reporter: ['text', 'json', 'html']
+    },
   }
 })
