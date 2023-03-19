@@ -421,7 +421,6 @@ function applyDemo (demoName) {
     examples.defaults[baseName],
     demo
   )
-  console.log({demoName,demoData})
   editors['conf'].setValue(demoData.conf)
   editors['tmpl'].setValue(demoData.tmpl)
   editors['json'].setValue(JSON.stringify(demoData.json, null, 2))
