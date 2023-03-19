@@ -35,11 +35,11 @@ export interface IArmteeBlock {
   src: ArmteeBlockMetaInfo
   dst: ArmteeBlockMetaInfo
   colMap: [number,number][]
-  compiled: string[],
+  compiled: string | undefined,
   type: () => ArmteeLineType,
-  precompile: (armtee: IArmteeTranspiler, txt: string) => IArmteeBlock[]
-  compile: (armtee: IArmteeTranspiler, txt: string) => string[]
-  _compile: (armtee: IArmteeTranspiler, txt: string) => string[]
+  precompile: (armtee: IArmteeTranspiler, txt: string) => void
+  compile: (armtee: IArmteeTranspiler, txt: string) => Promise<string | void | undefined>
+  _compile: (armtee: IArmteeTranspiler, txt: string) => Promise<string | void | undefined>
   compiledLineCount: () => number,
   parseError(error: string | Error): void
 }
@@ -62,8 +62,8 @@ export interface IArmteeTranspiler {
 }
 
 export interface IArmteeMacro {
-  precompile?: (armtee: IArmteeTranspiler, args: string[], block: IArmteeBlock ) => void | undefined | IArmteeBlock | IArmteeBlock[]
-  compile?: (armtee: IArmteeTranspiler, args: string[], block: IArmteeBlock ) => void | undefined | string | string[]
+  precompile?: (armtee: IArmteeTranspiler, args: string[], block: IArmteeBlock ) => void
+  compile?: (armtee: IArmteeTranspiler, args: string[], block: IArmteeBlock ) => Promise<void | undefined | string | string[]>
 }
 
 export interface IArmteeRuntimeSymbols {

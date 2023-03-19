@@ -8,9 +8,7 @@ let WorkDir
 
 describe("CLI", () => {
   beforeEach(() => {
-    console.error(process.cwd())
     WorkDir = fs.mkdtempSync('armtee-test')
-    console.error(WorkDir)
   })
 
   afterEach(() => {
@@ -80,8 +78,9 @@ template`
       'module',
       tmplPath
     ])
+
     const created = await import(modulePath)
-    expect(created.render(data)).toBe(expected)
+    expect(await created.render(data)).toBe(expected)
   })
 
 })

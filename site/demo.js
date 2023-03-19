@@ -384,7 +384,7 @@ async function renderCore (tmpl, json, conf) {
     tmpl,
     Object.assign({}, { file: '__TEXT__' }, confObj)
   )
-  compiled = armtee.translate({mode:'function'})
+  compiled = await armtee.translate({mode:'function'})
   rendered = await armtee.render(data, {
   })
 

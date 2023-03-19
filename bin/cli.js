@@ -74,8 +74,8 @@ parser.command({
       input = buffer.toString();
     }
     const data = JSON.parse(input)
-    const armtee = Armtee.fromFile(options.file)
-    console.log(armtee.render(data))
+    const armtee = await Armtee.fromFile(options.file)
+    console.log(await armtee.render(data))
   }
 })
 
@@ -101,9 +101,10 @@ parser.command({
   },
   handler: async (argv) => {
     const armtee = await Transpiler.fromFile(argv.file, {includeFilters: true, __buildType: 'module'})
-    const content = armtee.wrap(armtee.translate(), { __buildType: argv.type, includeFilters: true})
+    const content = armtee.wrap(await armtee.translate(), { __buildType: argv.type, includeFilters: true})
+    console.error({argv, content})
     if ( argv.outfile ) {
-      return fs.writeFile(argv.outfile, content, 'utf-8')
+      return await fs.writeFile(argv.outfile, content, 'utf-8')
     }
     else {
       console.log(content)

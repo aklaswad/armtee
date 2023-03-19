@@ -1,6 +1,17 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import {setUpPrinter} from './printer.js'
+import util from 'node:util'
+
+// XXX: How to avoid run on browser
+// XXX: And give typedef for them...?
+let readFileAsync: (...args: any) => Promise<any>
+if (Object.hasOwn(util, 'promisify')) {
+  readFileAsync = util.promisify(fs.readFile)
+}
+else {
+  readFileAsync = () => new Promise((r) => r(''))
+}
 
 import {
   ArmteeLineSignature,
@@ -97,18 +108,19 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
   }
 
   prepare (options:ArmteeTranspileOptions={}) {
-    return this.blocks.flatMap( (block, idx) => {
-      return block.precompile(this, block.txt)
-    })
+    for ( let block of this.blocks ) {
+      block.precompile(this, block.txt)
+    }
   }
 
-  translate (options:ArmteeTranspileOptions={}) {
+  async translate (options:ArmteeTranspileOptions={}) {
     //if ( this.rawScript ) {
     //  return this.rawScript
     //}
 
     // This could have a side effect... :thinking:
-    let blocks = this.prepare()
+    this.prepare()
+    let blocks = this.blocks
     const inject = options.__inject
     if ( 'undefined' !== typeof inject ) {
       blocks = blocks.flatMap( (block,idx) => {
@@ -119,15 +131,18 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
       })
     }
 
-    const compiledLines = blocks
-      .flatMap( block => block._compile(this, block.txt))
-      .filter( str => { return 'undefined' !== typeof str && str !== null })
+    const compiledLines = await Promise.all(
+      blocks.map(
+        block => block._compile(this, block.txt)
+      )
+    )
+
     let totalLines = 0
     blocks.forEach( b => {
       b.dst.line = totalLines + 1
       totalLines += b.compiledLineCount()
     })
-    return this.rawScript = compiledLines.join('\n')
+    return this.rawScript = compiledLines.filter(ln => 'string' === typeof ln).join('\n')
   }
 
   wrap (txt: string, options: ArmteeTranspileOptions ) {
@@ -208,7 +223,7 @@ ${executor}
 
 function setUpDefaultMacros(armtee:IArmteeTranspiler) {
   armtee.addMacro('TAG', {
-    compile: (armtee, args) => {
+    compile: async (armtee, args) => {
       armtee.setTagSeparator( args[0], args[1] )
     }
   })
@@ -220,7 +235,7 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
   })
 
   armtee.addMacro('FILTER', {
-    compile: (armtee, args) => {
+    compile: async (armtee, args) => {
       const [ filterName ] = args
       if ( ! armtee.__filters[filterName] ) {
         throw 'Unknown filter ' + filterName
@@ -231,7 +246,7 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
   })
 
   armtee.addMacro('FILTERALL', {
-    compile: (armtee, args) => {
+    compile: async (armtee, args) => {
       const [ filterName ] = args
       if ( ! armtee.__filters[filterName] ) {
         throw 'Unknown filter ' + filterName
@@ -241,7 +256,7 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
   })
 
   armtee.addMacro('INCLUDE', {
-    precompile: (armtee, args, block) => {
+    compile: async (armtee, args, block) => {
       if ( armtee.__depth > 10 ) {
         throw 'Too deep include'
       }
@@ -253,21 +268,23 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
       }
       const rootPath = path.dirname(block.src.file)
       const [ filename, context ] = args
-      const included = ArmteeTranspiler.fromFile(path.resolve(rootPath, filename), {__depth: armtee.__depth + 1})
+      const included = await ArmteeTranspiler.fromFile(path.resolve(rootPath, filename), {__depth: armtee.__depth + 1})
       const blocks = included.prepare()
       const systemSrc = { file: '__SYSTEM__' }
       const $armtee = armtee.runtimeSymbols
       const $included = included.runtimeSymbols
-      return [
-        // Semi-colon is required.
-        // Statement before this line could take a function call round brackets
-        ArmteeBlock.create('script', `;
-          ${$armtee.printer}.pushToContextStack();
-          ((${$included.root},${$included.printer}) => {`, systemSrc),
-        ...blocks,
-        ArmteeBlock.create('script', `})( ${context}, ${$armtee.printer} )
-        ${$armtee.printer}.popFromContextStack()`, systemSrc)
-      ]
+      const translated = await included.translate()
+
+      // Semi-colon is required.
+      // Statement before this line could take a function call round brackets
+
+      return `;
+${$armtee.printer}.pushToContextStack();
+((${$included.root},${$included.printer}) => {
+  ${translated}
+})( ${context}, ${$armtee.printer} )
+${$armtee.printer}.popFromContextStack()
+`
     }
   })
 }
