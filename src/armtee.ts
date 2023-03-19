@@ -1,6 +1,17 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import {setUpPrinter} from './printer.js'
+import util from 'node:util'
+
+// XXX: How to avoid run on browser
+// XXX: And give typedef for them...?
+let readFileAsync: (...args: any) => Promise<any>
+if (Object.hasOwn(util, 'promisify')) {
+  readFileAsync = util.promisify(fs.readFile)
+}
+else {
+  readFileAsync = () => new Promise((r) => r(''))
+}
 
 import {
   ArmteeLineSignature,
@@ -97,18 +108,19 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
   }
 
   prepare (options:ArmteeTranspileOptions={}) {
-    return this.blocks.flatMap( (block, idx) => {
-      return block.precompile(this, block.txt)
-    })
+    for ( let block of this.blocks ) {
+      block.precompile(this, block.txt)
+    }
   }
 
-  translate (options:ArmteeTranspileOptions={}) {
+  async translate (options:ArmteeTranspileOptions={}) {
     //if ( this.rawScript ) {
     //  return this.rawScript
     //}
 
     // This could have a side effect... :thinking:
-    let blocks = this.prepare()
+    this.prepare()
+    let blocks = this.blocks
     const inject = options.__inject
     if ( 'undefined' !== typeof inject ) {
       blocks = blocks.flatMap( (block,idx) => {
@@ -119,15 +131,18 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
       })
     }
 
-    const compiledLines = blocks
-      .flatMap( block => block._compile(this, block.txt))
-      .filter( str => { return 'undefined' !== typeof str && str !== null })
+    const compiledLines = await Promise.all(
+      blocks.map(
+        block => block._compile(this, block.txt)
+      )
+    )
+
     let totalLines = 0
     blocks.forEach( b => {
       b.dst.line = totalLines + 1
       totalLines += b.compiledLineCount()
     })
-    return this.rawScript = compiledLines.join('\n')
+    return this.rawScript = compiledLines.filter(ln => 'string' === typeof ln).join('\n')
   }
 
   wrap (txt: string, options: ArmteeTranspileOptions ) {
@@ -151,7 +166,7 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
     let executor
     switch ( options.__buildType ) {
       case 'function':
-        executor = '_render(data, printer)'
+        executor = 'await _render(data, printer)'
         break
       case 'module':
         executor = [
@@ -167,7 +182,7 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
         break
     }
     const header = `${headerLines.join('\n')};
-function _render (${this.runtimeSymbols.root}, ${this.runtimeSymbols.printer}) {`
+async function _render (${this.runtimeSymbols.root}, ${this.runtimeSymbols.printer}) {`
     this.offset = header.split('\n').length;
     const footer = `}
 ${executor}
@@ -208,7 +223,7 @@ ${executor}
 
 function setUpDefaultMacros(armtee:IArmteeTranspiler) {
   armtee.addMacro('TAG', {
-    compile: (armtee, args) => {
+    compile: async (armtee, args) => {
       armtee.setTagSeparator( args[0], args[1] )
     }
   })
@@ -220,7 +235,7 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
   })
 
   armtee.addMacro('FILTER', {
-    compile: (armtee, args) => {
+    compile: async (armtee, args) => {
       const [ filterName ] = args
       if ( ! armtee.__filters[filterName] ) {
         throw 'Unknown filter ' + filterName
@@ -231,7 +246,7 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
   })
 
   armtee.addMacro('FILTERALL', {
-    compile: (armtee, args) => {
+    compile: async (armtee, args) => {
       const [ filterName ] = args
       if ( ! armtee.__filters[filterName] ) {
         throw 'Unknown filter ' + filterName
@@ -241,7 +256,7 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
   })
 
   armtee.addMacro('INCLUDE', {
-    precompile: (armtee, args, block) => {
+    compile: async (armtee, args, block) => {
       if ( armtee.__depth > 10 ) {
         throw 'Too deep include'
       }
@@ -253,20 +268,23 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
       }
       const rootPath = path.dirname(block.src.file)
       const [ filename, context ] = args
-      const included = ArmteeTranspiler.fromFile(path.resolve(rootPath, filename), {__depth: armtee.__depth + 1})
+      const included = await ArmteeTranspiler.fromFile(path.resolve(rootPath, filename), {__depth: armtee.__depth + 1})
       const blocks = included.prepare()
-      // Semi-colon is required.
-      // Without this ';', got error "_(...) is not a function."
-      // TODO: understand why.
       const systemSrc = { file: '__SYSTEM__' }
-      return [
-        ArmteeBlock.create('script', `;
-          ${armtee.runtimeSymbols.printer}.pushToContextStack();
-          ((${included.runtimeSymbols.root},${included.runtimeSymbols.printer}) => {`, systemSrc),
-        ...blocks,
-        ArmteeBlock.create('script', `})( ${context}, ${armtee.runtimeSymbols.printer} )
-        ${armtee.runtimeSymbols.printer}.popFromContextStack()`, systemSrc)
-      ]
+      const $armtee = armtee.runtimeSymbols
+      const $included = included.runtimeSymbols
+      const translated = await included.translate()
+
+      // Semi-colon is required.
+      // Statement before this line could take a function call round brackets
+
+      return `;
+${$armtee.printer}.pushToContextStack();
+((${$included.root},${$included.printer}) => {
+  ${translated}
+})( ${context}, ${$armtee.printer} )
+${$armtee.printer}.popFromContextStack()
+`
     }
   })
 }
@@ -276,11 +294,11 @@ function setUpDefaultFilters(armtee:IArmteeTranspiler) {
 }
 
 const moduleRunner = `
-export function render (data) {
+export async function render (data) {
   const buf = []
   const trace = []
   const printer = setUpPrinter(buf,trace,filters)
-  _render(data, printer)
+  await _render(data, printer)
   return buf.join('\\n')
 }
 `
@@ -297,13 +315,13 @@ reader.on("line", (line) => {
   lines.push(line);
 });
 
-reader.on("close", () => {
+reader.on("close", async () => {
   const input = lines.join('\\n')
   const data = JSON.parse(input)
   const buf = []
   const trace = []
   const printer = setUpPrinter(buf,trace,filters)
-  _render(data, printer)
+  await _render(data, printer)
   console.log( buf.join('\\n') )
 });
 `

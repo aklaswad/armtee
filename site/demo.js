@@ -222,7 +222,7 @@ async function loadEditor () {
   monaco.editor.setTheme("my-dark")
 
   try {
-    const rendered = renderCore(
+    const rendered = await renderCore(
       editorDefaults.tmpl.value,
       editorDefaults.json.value,
       editorDefaults.conf.value,
@@ -364,7 +364,7 @@ function setError (error) {
   }
 }
 
-function renderCore (tmpl, json, conf) {
+async function renderCore (tmpl, json, conf) {
   let data, compiled, rendered
   try {
     data = JSON.parse(json)
@@ -384,21 +384,21 @@ function renderCore (tmpl, json, conf) {
     tmpl,
     Object.assign({}, { file: '__TEXT__' }, confObj)
   )
-  compiled = armtee.translate({mode:'function'})
-  rendered = armtee.render(data, {
+  compiled = await armtee.translate({mode:'function'})
+  rendered = await armtee.render(data, {
   })
 
   return [compiled, rendered]
 }
 
-function render() {
+async function render() {
   rendering = true
   const conf = editors['conf'].getValue()
   const tmpl = editors['tmpl'].getValue()
   const json = editors['json'].getValue()
   let res
   try {
-    res = renderCore(tmpl,json,conf)
+    res = await renderCore(tmpl,json,conf)
   }
   catch (e) {
     setError(e)

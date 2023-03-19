@@ -12,6 +12,13 @@ import { modeFromText } from './line-parser.js'
 import { ArmteeTranspiler } from './armtee.js'
 import { setUpPrinter } from './printer.js'
 
+// Need to make AsyncFunction constructor by hand.
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncFunction
+// Type annotation was taken from here (unresolved issue though, at least this can stop TS warnings )
+// https://www.reddit.com/r/typescript/comments/qwe3bc/typing_of_async_function_constructor_with/
+const AsyncFunction:new (...args: any[]) => (...args: any[]) => Promise<any>
+  = Object.getPrototypeOf(async function(){}).constructor
+
 /**
  * Dynamic compile for tranpiled js and execute render
  */
@@ -45,9 +52,9 @@ export class ArmteeRunner extends ArmteeTranspiler {
    * @param {TranspileOptions} options - option
    * @returns {string} Rendered output
    */
-  static render (tmpl:string, data:any, options:ArmteeTranspileOptions) {
+  static async render (tmpl:string, data:any, options:ArmteeTranspileOptions) {
     const runner = ArmteeRunner.fromText(tmpl, options)
-    return runner.render(data, options)
+    return await runner.render(data, options)
   }
 
   /**
@@ -63,20 +70,20 @@ export class ArmteeRunner extends ArmteeTranspiler {
     return runner.render(data, options)
   }
 
-  compile (options: ArmteeTranspileOptions) {
+  async compile (options: ArmteeTranspileOptions) {
     //if ( this.executable ) {
     //  return this.executable
     //}
 
-    const js = this.wrap( this.translate(options), { ...options, __buildType: 'function' } )
+    const js = this.wrap( await this.translate(options), { ...options, __buildType: 'function' } )
     if ( this.debug > 1 ) {
-      console.error( 'DEBUG: armtee gerenated render script')
+      console.error( 'DEBUG: armtee generated render script')
       console.error( '------------------------------------------')
       console.error( js )
     }
 
     try {
-      this.executable = new Function('data', 'printer', js)
+      this.executable = new AsyncFunction('data', 'printer', js)
       const sig = '/*___ARMTEE___*/'
       this.offset = this.executable.toString().split(sig,2)[0].split('\n').length
       return this.executable
@@ -90,22 +97,22 @@ export class ArmteeRunner extends ArmteeTranspiler {
 
       const orig = e instanceof Error ? e.message : e
 
-      // At first, inject various type of script snipet which could
+      // At first, inject various type of script snippet which could
       // possibly raise another error at begin of script, and
       // choose one which could raise a error different from original error
       // And then, use binary search for which line is the edge of
-      // original error to be shown or not, by injecting error snipet
+      // original error to be shown or not, by injecting error snippet
       const errorRaisers = [ 'for ""', '`${}`', '"']
       let raiser
       let raiserError
       FIND: for ( const r of errorRaisers ) {
         const injectBlock = ArmteeBlock.create('script',r, {})
         try {
-          const js = this.translate({
+          const js = await this.translate({
             __injectLine: 0,
             __inject: injectBlock
           })
-          new Function(js)
+          new AsyncFunction(js)
         }
         catch (e) {
           if ( e instanceof Error ) {
@@ -129,7 +136,7 @@ export class ArmteeRunner extends ArmteeTranspiler {
         nth = t + Math.floor((b - t) / 2)
         const js = this.translate({ __injectLine: nth, __inject: raiser })
         try {
-          new Function(js)
+          new AsyncFunction(js)
         }
         catch(e) {
           if ( !(e instanceof Error) ) {
@@ -149,7 +156,7 @@ export class ArmteeRunner extends ArmteeTranspiler {
         }
         if ( t + 1 >= b ) break
       }
-      // Insert error-ish snipet before this block will change the
+      // Insert error-ish snippet before this block will change the
       // error message, so this block might have something wrong!
       //  ( Sometimes this will point wrong line... )
       const errorBlock = this.blocks[lastNew]
@@ -168,13 +175,13 @@ ERROR: ${orig}
     js( data, printer )
   }
 
-  render (data:any, options:ArmteeTranspileOptions={}) {
-    const js = this.compile(options)
+  async render (data:any, options:ArmteeTranspileOptions={}) {
+    const js = await this.compile(options)
     const buf: string[] = []
     const trace: any[] = []
     const printer = setUpPrinter(buf, trace, this.__filters)
     try {
-      js(data,printer)
+      await js(data,printer)
     }
     catch (e) {
       if (this.debug > 0 ) {
