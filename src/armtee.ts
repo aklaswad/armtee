@@ -261,10 +261,10 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
         throw 'Too deep include'
       }
       if ( block.src.type !== 'file' ) {
-        return block.parseError('INCLUDE macro cannot be invoked from non-file template.')
+        return block.parseError('INCLUDE macro cannot be invoked from non-file template.', 'InvalidIncludeInvoke')
       }
       if ( ! block.src?.file ) {
-        return block.parseError('INCLUDE macro cannot be invoked from non-file template.')
+        return block.parseError('INCLUDE macro cannot be invoked from non-file template.', 'InvalidIncludeContext')
       }
       const rootPath = path.dirname(block.src.file)
       const [ filename, context ] = args

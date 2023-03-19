@@ -41,4 +41,12 @@ describe('ArmteeTranspiler', () => {
     }).rejects.toThrow(/Unknown macro command/i)
   })
 
+  test('can throw if include was invoked from non file template', async () => {
+    expect(async () => {
+      return await ArmteeRunner.render(
+        '//% INCLUDE foo.txt',
+        'def')
+    }).rejects.toThrow(/INCLUDE macro cannot be invoked/i)
+  })
+
 })
