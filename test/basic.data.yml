@@ -38,6 +38,14 @@
   expected: |-
     age "0" ok
 
+- name: Render backtick
+  data:
+    age: 0
+  tmpl: |-
+    age `<% data.age %>` ok
+  expected: |-
+    age `0` ok
+
 - name: Render shell style EOL escape
   data:
     pkg: bar

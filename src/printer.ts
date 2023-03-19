@@ -43,7 +43,7 @@ export function setUpPrinter (buf: string[], trace: any[], filters: {[name: stri
       case '${': return symDollarCurlyBrace;
       case 'bs': return symBackSlash;
     }
-    throw "Unexpected Symbol;"
+    throw "Invalid Symbol;"
   }
   printer.trace = function (block: IArmteeBlock) { trace.push(block) }
   printer.filters = filters
