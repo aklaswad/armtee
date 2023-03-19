@@ -25,6 +25,10 @@ export class ATError extends Error {
     }
     return [ this.message, ...lines.reverse() ].join('\n')
   }
+
+  appendHistory (meta: ArmteeBlockMetaInfo) {
+    this.history.push(meta)
+  }
 }
 
 export class ATUnexpectedError extends Error {

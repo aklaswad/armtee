@@ -7,6 +7,7 @@ import {
   IArmteeBlock
 } from './types.js'
 
+import { ATError } from './error.js'
 import { ArmteeBlock } from './block.js'
 import { modeFromText } from './line-parser.js'
 import { ArmteeTranspiler } from './armtee.js'
@@ -20,7 +21,7 @@ const AsyncFunction:new (...args: any[]) => (...args: any[]) => Promise<any>
   = Object.getPrototypeOf(async function(){}).constructor
 
 /**
- * Dynamic compile for tranpiled js and execute render
+ * Dynamic compile for transpiled js and execute render
  */
 export class ArmteeRunner extends ArmteeTranspiler {
   static debug = 0
@@ -89,20 +90,24 @@ export class ArmteeRunner extends ArmteeTranspiler {
       return this.executable
     }
     catch (e) {
-      // Find error block by using binary search, since
-      // v8/browsers doesn't return error line in `new Function()` ... *sigh*
+      // v8/browsers doesn't return error line in `new Function()`
+      //              ******sigh******
       // Also tried acorn/esprima/espree to catch error line
       // But they all doesn't have enough compatibility for
       // browsers, at least on my setup...
+
+      // Let's try to find error position by another way.
 
       const orig = e instanceof Error ? e.message : e
 
       // At first, inject various type of script snippet which could
       // possibly raise another error at begin of script, and
-      // choose one which could raise a error different from original error
+      // choose one which raised an error different from original error.
       // And then, use binary search for which line is the edge of
       // original error to be shown or not, by injecting error snippet
-      const errorRaisers = [ 'for ""', '`${}`', '"']
+
+      // Should it be a simple throw? I'm not sure...
+      const errorRaisers = [ 'for ""', '`${}`', '"' ]
       let raiser
       let raiserError
       FIND: for ( const r of errorRaisers ) {
@@ -123,15 +128,22 @@ export class ArmteeRunner extends ArmteeTranspiler {
             }
           }
           else {
-            throw "Armtee: Panic at finding cause of compile error :" + orig
+            const ae = new ATError("Panic at finding cause of compile error : Error was unexpected" + orig)
+            ae.name = "PanicAtCompileErrorHandling"
+            throw ae
           }
         }
       }
-      if ( ! raiser )
-        throw "Armtee: Panic at finding cause of compile error :" + orig
+      if ( ! raiser ) {
+        const ae = new ATError("Panic at finding cause of compile error : No error position found:" + orig)
+        ae.name = "PanicAtCompileErrorHandling"
+        throw ae
+      }
+
       // Binary search. using top(t) and bottom(b)
       let nth, got, t = 0, b = this.blocks.length - 1
       let isOrigError, lastOrig = 0, lastNew = 0
+
       while ( true ) {
         nth = t + Math.floor((b - t) / 2)
         const js = this.translate({ __injectLine: nth, __inject: raiser })
@@ -140,7 +152,9 @@ export class ArmteeRunner extends ArmteeTranspiler {
         }
         catch(e) {
           if ( !(e instanceof Error) ) {
-            throw "Armtee: Panic at finding cause of compile error :" + orig
+            const ae = new ATError( "Armtee: Panic at finding cause of compile error : Not expected:" + orig )
+            ae.name = "PanicAtCompileErrorHandling"
+            throw ae
           }
           got = e.message
         }
@@ -161,18 +175,25 @@ export class ArmteeRunner extends ArmteeTranspiler {
       //  ( Sometimes this will point wrong line... )
       const errorBlock = this.blocks[lastNew]
 
-      throw( `Armtee compile error: Got JS compile error around file ${ errorBlock.src.file } line ${ errorBlock.src.line }:
+      const ae = new ATError( `Armtee compile error: Got JS compile error around file ${ errorBlock.src.file } line ${ errorBlock.src.line }:
 -------------
 ${ errorBlock.txt }
 -------------
 ERROR: ${orig}
--------------`)
+-------------`, [errorBlock.src])
+      ae.name = "CompileError"
+      throw ae
 
     }
   }
 
   async render (data:any, options:ArmteeTranspileOptions={}) {
     const js = await this.compile(options)
+    if ( 'undefined' === typeof js ) {
+      const ae = new ATError('Cannot get compiled artifact')
+      ae.name = 'ExecutableIsUndefined'
+      throw ae
+    }
     const buf: string[] = []
     const trace: any[] = []
     const printer = setUpPrinter(buf, trace, this.__filters)
