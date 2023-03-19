@@ -102,7 +102,6 @@ parser.command({
   handler: async (argv) => {
     const armtee = await Transpiler.fromFile(argv.file, {includeFilters: true, __buildType: 'module'})
     const content = armtee.wrap(await armtee.translate(), { __buildType: argv.type, includeFilters: true})
-    console.error({argv, content})
     if ( argv.outfile ) {
       return await fs.writeFile(argv.outfile, content, 'utf-8')
     }
