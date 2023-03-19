@@ -41,7 +41,7 @@ export interface IArmteeBlock {
   compile: (armtee: IArmteeTranspiler, txt: string) => Promise<string | void | undefined>
   _compile: (armtee: IArmteeTranspiler, txt: string) => Promise<string | void | undefined>
   compiledLineCount: () => number,
-  parseError(error: string | Error): void
+  parseError(error: string | Error, name: string): void
 }
 
 export interface IArmteeTranspiler {

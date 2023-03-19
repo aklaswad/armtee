@@ -1,3 +1,4 @@
+import { ATError } from './error.js'
 import {
   ArmteeLineType,
   ArmteeBlockMetaInfo,
@@ -24,8 +25,10 @@ export class ArmteeBlock implements IArmteeBlock {
     this.colMap = [[1,1]] // src, dst
   }
 
-  parseError (error:string) {
-    throw `Armtee template error: ${error} at ${ this.src.file } line ${ this.src.line }`
+  parseError (error:string, name:string) {
+    const e = new ATError(`Armtee template error: ${error}`, [this.src])
+    e.name = name || error.slice(0,20)
+    throw e
   }
 
   async compile (armtee: IArmteeTranspiler, txt: string): Promise<string | void | undefined> { return '' }
@@ -92,11 +95,11 @@ export class ArmteeMacroBlock extends ArmteeBlock {
   precompile (armtee :IArmteeTranspiler, txt :string): void {
     const [ command, ...args ] = txt.trim().split(/\s+/)
     if ( !command )
-      this.parseError( 'Macro line needs at least 1 words' )
+      this.parseError( 'Macro line needs at least 1 words', 'EmptyMacro' )
 
     const handler = armtee.__macros[ command.toUpperCase() ]
     if ( !handler ) {
-      this.parseError( 'Unknown macro command: ' + command )
+      this.parseError( 'Unknown macro command: ' + command, 'UnknownMacro' )
     }
     this.handler = handler
     this.args = args
@@ -133,7 +136,7 @@ export class ArmteeTemplateBlock extends ArmteeBlock {
     const lenR = armtee.runtimeSymbols.tagSeparator[1].length
 
     if ( parts.length % 2 === 0 )
-      this.parseError( 'Unmatched tag separator' )
+      this.parseError( 'Unmatched tag delimiter', 'UnmatchedTagDelimiter' )
 
     let isText = true
     parts.forEach( str => {
@@ -154,7 +157,7 @@ export class ArmteeTemplateBlock extends ArmteeBlock {
 ${ str }
 -------------
 ${ e instanceof Error ? e.toString() : e }
--------------`)
+-------------`, 'InvalidTagContent')
         }
         this.colMap.push([ offset, buf.length ])
         const exp = '${' + str + '}'
@@ -174,12 +177,13 @@ ${ e instanceof Error ? e.toString() : e }
       const fn = new Function(script)
     }
     catch (e) {
+      // XXX: No chance to come here?
       this.parseError( `Failed to convert template
 -------------
 ${ script }
 -------------
 ${ e instanceof Error ? e.toString() : e }
--------------`)
+-------------`, 'WrongTemplateLine')
     }
     if ( armtee.debug ) {
       ret.push( armtee.runtimeSymbols.printer + '._trace(' + JSON.stringify(this) + ')' )
