@@ -213,12 +213,12 @@ function setEditorStatus(editorId, onOff) {
 
 function langDef () {
   return {
-    defaultToken: 'string',
+    defaultToken: 'identifier',
     tokenPostfix: '.at',
     tokenizer: {
       root: [
               [/^(?:\/\/|##)- .*$/, 'comment'],
-              [/^(?:\/\/|##)% .*$/, 'keyword'],
+              [/^(?:\/\/|##)% .*$/, 'string.key'],
               [/^(?:\/\/|##)! .*$/, 'tag' ],
               [/^(?:\/\/|##)> .*$/, 'type'],
       ],

@@ -24,7 +24,7 @@ friends.tmpl
 ```
 
 friends.json
-```
+```json
 [
   { "name": "Alice" },
   { "name": "Charly" },
@@ -33,7 +33,7 @@ friends.json
 ```
 
 これは以下のように実行できます。
-```
+```shell
 $ npx armtee render friends.tmpl --json friends.json
  - Alice
  - Charly
@@ -128,32 +128,37 @@ armteeのテンプレートではいくつかのバリエーションを持つ�
 **hashy-template**
 
 ```
-##! data.items.forEach( item => {     // この行はscript行
-##-     コメント行
+##! data.items.forEach( item => { // この行はscript行
+##% TAG <% %>
+##-  <-コメント行   ^^^ マクロ行
 テンプレートからアイテム「<% item.toString() %>」を出力
 ##! })
 ```
 
 **hashy-logic**
 ```
-data.items.forEach( item => {     // この行はscript行
-##-     コメント行
+data.items.forEach( item => { // この行はscript行
+##% TAG <% %>
+##-  <-コメント行   ^^^ マクロ行
 ##> テンプレートからアイテム「<% item.toString() %>」を出力
 })
 ```
 
 **slashy-template**
+
 ```
-//! data.items.forEach( item => {     // この行はscript行
-//-     コメント行
+//! data.items.forEach( item => { // この行はscript行
+//% TAG <% %>
+//-  <-コメント行   ^^^ マクロ行
 テンプレートからアイテム「<% item.toString() %>」を出力
 //! })
 ```
 
 **slashy-logic**
-```
-data.items.forEach( item => {     // この行はscript行
-//-     コメント行
+```javascript
+data.items.forEach( item => { // この行はscript行
+//% TAG <% %>
+//-  <-コメント行   ^^^ マクロ行
 //> テンプレートからアイテム「<% item.toString() %>」を出力
 })
 ```
@@ -188,7 +193,7 @@ armteeはこれらのモードを自動的に判別します。(テンプレー�
 スクリプト行にのみある制約として、JavaScriptとしてまとまった分割できない処理は間に別の種類の行や空行などを挟むことはできません。（armteeは内部的には、スクリプト行のみ、まとまったブロックとして扱っています。）
 armteeがデバッグ情報を埋め込むことが可能だと判断するためです。以下はうまく動かない例です。
 
-```javascript {.ng}
+```{.ng}
 ##! data.longNamedArrayMember
 ##!   .map( item => item.foo ? item.bar : item.buz )
 ##- comment: I found a bug so I'll add one more filter...
@@ -398,25 +403,18 @@ const rendered = Armtee.renderFile(filename, data)
 
 ## Command Line Interface
 
-### armtee render
+現在、コマンドラインツールでは
 
-ファイルに保存されたテンプレートを使って、入力されたデータをレンダリングします。
+ 1. テンプレートファイルのシンタックスの変換
+ 1. テンプレートファイルを指定してのレンダリング処理
+ 1. テンプレートファイルのモジュールあるいはコマンドラインスクリプトへの変換
 
-`--json` 読み込むデータがJSONファイルの場合に指定します。
+を行うコマンドが用意されています。詳細は以下のヘルプコマンドをご確認ください。
 
-指定がない場合、標準入力からの読み込みを試みます。
-
-```
-$ npx armtee render <template_file> [--json <data_file_name>]
-```
-
-### armtee convert
-
-ファイルに保存されたテンプレートのテンプレート形式を変換します。
-
-```
-$ npx armtee convert <file> <hashy-template|hashy-logic|slashy-template|slashy-logic>
-```
+ - `$ npx armtee --help`
+ - `$ npx armtee build --help`
+ - `$ npx armtee render --help`
+ - `$ npx armtee convert --help`
 
 # おまけ {#ja/appendix}
 

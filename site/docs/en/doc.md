@@ -24,7 +24,7 @@ friends.tmpl
 ```
 
 friends.json
-```
+```json
 [
   { "name": "Alice" },
   { "name": "Carl" },
@@ -34,7 +34,7 @@ friends.json
 
 They can be rendered from cli like this;
 
-```
+```shell
 $ npx armtee render friends.tmpl --json friends.json
  - Alice
  - Charly
@@ -132,7 +132,8 @@ In other words, the following four types of notation are available. They differ 
 
 ```
 ##! data.items.forEach( item => { // This is script line
-##- Comment line
+##% TAG <% %>
+##- This is Comment line. ^^^ Macro line.
 Template text, can use <% item.toString() %> tag.
 ##! }) // Also script line.
 ```
@@ -140,7 +141,8 @@ Template text, can use <% item.toString() %> tag.
 **hashy-logic**
 ```
 data.items.forEach( item => { // This is script line
-##- Comment line
+##% TAG <% %>
+##- This is Comment line. ^^^ Macro line.
 ##> Template text, can use <% item.toString() %> tag.
 }) // Also script line.
 ```
@@ -148,15 +150,17 @@ data.items.forEach( item => { // This is script line
 **slashy-template**
 ```
 //! data.items.forEach( item => { // This is script line
-//- Comment line
+//% TAG <% %>
+//- This is Comment line. ^^^ Macro line.
 Template text, can use <% item.toString() %> tag.
 //! }) // Also script line.
 ```
 
 **slashy-logic**
-```
+```javascript
 data.items.forEach( item => { // This is script line
-//- Comment line
+//% TAG <% %>
+//- This is Comment line. ^^^ Macro line.
 //> Template text, can use <% item.toString() %> tag.
 }) // Also script line.
 ```
@@ -191,7 +195,7 @@ In logic mode, all lines that not having line descriptor are script lines.
 The only restriction on script lines is that processing that cannot be split up into coherent JavaScript lines cannot have another kind of line, blank line, etc., in between. (Internally, armtee treats only script lines as a coherent block.)
 ) The reason is that armtee determines that it is possible to embed debugging information. Here is an example of how it does not work.
 
-```javascript {.ng}
+```{.ng}
 ##! data.longNamedArrayMember
 ##!   .map( item => item.foo ? item.bar : item.buz )
 ##- comment: I found a bug so I'll add one more filter...
@@ -236,7 +240,7 @@ You can also use the `FILTER` macro to apply a filter to all tag output.
 
 ```
 ##% FILTER lower
-My name is <% data.name %> 
+My name is <% data.name %>
 ##% FILTER none
 ```
 
@@ -394,25 +398,18 @@ const rendered = Armtee.renderFile(filename, data)
 
 ## Command Line Interface
 
-### armtee render
+Currently, the command line tool allows you to
 
-Renders input data using a template stored in a file.
+ 1. conversion of template file syntax
+ 1. rendering process by specifying a template file
+ 1. Conversion of template files to modules or command line scripts
 
-`--json` Specify if the data to be read is a JSON file.
+For details, please refer to the following help commands.
 
-If not specified, attempts to read from standard input.
-
-```
-$ npx armtee render <template_file> [--json <data_file_name>]
-```
-
-### armtee convert
-
-Converts the template format of a template stored in a file.
-
-```
-$ npx armtee convert <file> <hashy-template|hashy-logic|slashy-template|slashy-logic>
-```
+ - `$ npx armtee --help`
+ - `$ npx armtee build --help`
+ - `$ npx armtee render --help`
+ - `$ npx armtee convert --help`
 
 &nbsp;
 
