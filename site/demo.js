@@ -44,7 +44,7 @@ const editorDefaults = {
   out:  { language: 'markdown', readOnly: true }
 }
 const currentStyle = {
-  style: 'hashy',
+  style: 'slashy',
   mode: 'template'
 }
 

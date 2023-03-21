@@ -6,9 +6,7 @@ TOCEND
 
 ## Install {#en/install}
 
-```
-npm i armtee
-```
+N/A
 
 ## Writing template {#en/writing-template}
 
@@ -97,72 +95,74 @@ Exporting JSON retrieved from a specific WebAPI as a single-function executable 
 Let's look at the template description in detail.
 Although armtee templates have the flexibility to choose file mode and tag notation as described below, we will use the **hashy-template** mode and default tag notation `<%` and `%>` for tags if not explained within this text.
 
-## Line descriptor {#en/line-descriptor}
+## file mode {#en/file-mode}
 
 The armtee templates are clearly separated by what they do on a line (or block of multiple lines) basis.
 There are four types
 
- - template
- - script
- - macro
- - comment
+ - Template
+ - Script
+ - Macro
+ - Comment
 
 Tells armtee what each line is about by formatting each line with __4 characters__ including spaces, such as `##! ` tells armtee what each line is about.
 Let's call these four characters the __line descriptor__.
 
-Depending on the file mode described below, any other line is considered to be a template line or a script line.
+You don't need to start every lines with __line descriptor__. You can omit descriptor for template line or script line (in other words, you need to omit them.)
+By the file mode, it'll be decided that which type of line descriptor should be omitted.
 
-
-So-called template tags are only valid on template lines.
-
-
-## file-mode {#en/file-mode}
+### 2 styles, 2 modes {#en/2-styles-x-2-modes}
 
 The armtee template can use several different variations of line syntax.
 
 Lines can contain **hashy** style, which begins with two hashes `#`, as in `##! `.
+
 Also can use another **slashy** style, which begins with two slashes `/`, as in `//! `.
-(This intention will be understood by users who have been exposed to several programming languages.)
 
-In addition to that, it is possible to use **template mode** which write JavaScript logic lines with `##! ` lines and consider lines without symbols to be template lines, or use a **logic mode** in which lines without symbols are considered script lines and template lines are described with the `##> ` line modifier.
+You can choose one from these 2 styles in a template.
 
-In other words, the following four types of notation are available. They differ only in their superficial markup; there is no difference in the processing that takes place.
+This intention will be understood by users who have been exposed to several programming languages.{.offtopic}
+
+In addition to that, there are 2 modes. In **template mode** you can write templates without line descriptors, and apply line descriptors for JavaScript logic lines.
+In other **logic mode**, vice versa, you can write JavaScript without line descriptors, and instead use line descriptor for template lines.
+
+Putting these together, the following four types of notation are available. They are different only for mark up looking, but will outputs same contents.
 
 **hashy-template**
 
 ```
-##! data.items.forEach( item => { // This is script line
+##! for ( let item of data ) { // This is script line
 ##% TAG <% %>
 ##- This is Comment line. ^^^ Macro line.
 Template text, can use <% item.toString() %> tag.
-##! }) // Also script line.
+##! } // Also script line.
 ```
 
 **hashy-logic**
 ```
-data.items.forEach( item => { // This is script line
+for ( let item of data ) { // This is script line
 ##% TAG <% %>
 ##- This is Comment line. ^^^ Macro line.
 ##> Template text, can use <% item.toString() %> tag.
-}) // Also script line.
+} // Also script line.
 ```
 
 **slashy-template**
 ```
-//! data.items.forEach( item => { // This is script line
+//! for ( let item of data ) { // This is script line
 //% TAG <% %>
 //- This is Comment line. ^^^ Macro line.
 Template text, can use <% item.toString() %> tag.
-//! }) // Also script line.
+//! } // Also script line.
 ```
 
 **slashy-logic**
 ```javascript
-data.items.forEach( item => { // This is script line
+for ( let item of data ) { // This is script line
 //% TAG <% %>
 //- This is Comment line. ^^^ Macro line.
 //> Template text, can use <% item.toString() %> tag.
-}) // Also script line.
+} // Also script line.
 ```
 
 These four notations are inter-convertible and can be used in different situations, depending on the template you wish to describe, whether you are working with a template in focus or creating logic (with syntax highlighting enabled).
@@ -170,9 +170,14 @@ These four notations are inter-convertible and can be used in different situatio
 armtee automatically detects these modes. If neither a template line literal nor a script line literal is present (for example, neither a template line literal nor a script line literal is present), it is assumed to be in template mode.
 
 These notations cannot be mixed in a single file.
-Specifically, if a hashy literal and a slashy literal exist in a file at the same time, or if a template line literal and a script line literal exist at the same time, a read error occurs.
+In these cases, templates could not be loaded;
 
-### template-line {#en/template-line}
+ - Both hashy descriptor and slashy descriptor are exist in a same template
+ - Both template line descriptor and script line descriptor are exist in same template
+
+## Line descriptors {#en/line-descriptors}
+
+### //> : Template {#en/template-line}
 
 This template determines what is output.
 You can embed template tags to expand JavaScript expressions.
@@ -185,7 +190,7 @@ You cannot use `<% statement or sentence or block fragment %>` as in other micro
 Tags cannot span line breaks. Tags that begin on a line must end on that line.
 If a method chain is embedded within a tag, it can no longer fit on a single line. If this is the case, consider using a script block to handle the process in advance.
 
-### script line {#en/script-line}
+### //! : Script {#en/script-line}
 
 Describes JavaScript primarily for the logical processing of the template. It will be output to the transpiled file without modification.
 
@@ -204,7 +209,7 @@ The only restriction on script lines is that processing that cannot be split up 
 
 Conversely, if an error occurs in a script line that spans multiple lines, adding a blank line in a place where it can be split may narrow down the error location. {.tips}
 
-### macro-line {#en/macro-line}
+### //% : Macro {#en/macro-line}
 
 Various things that should be processed before parsing the template, inserting utility functions, etc., can be done from macro lines.
 Lines beginning with `##% ` or `//% ` are macro lines.
@@ -215,11 +220,11 @@ Generally, it is written with the command name and arguments in the following fo
 ##% MACRONAME arg1 arg2...
 ```
 
-### comment-line {#en/comment-line}
+### //- : Comment {#en/comment-line}
 
 Comment line. Simply ignored.
 
-Lines beginning with `##- ` or `/- ` are comment lines.
+Lines starts with `##- ` or `//- ` are comment lines.
 
 Previously, the notation for comment was `### `. I liked it since it make me feel it's strongly comment. But I'm writing a document in markdown right now, and I noticed that it conflicts with the Heading notation in markdown, so I changed it :-).{.offtopic}
 
@@ -279,6 +284,8 @@ My name is <% user.name %>
 })(data,printer)
 ```
 
+[Try it](#){.demo}{data-demo=root-change}
+
 ### TAG {#en/macro-tag}
 
 You can set pairs of symbols that will be recognized as tags in subsequent lines in the template.
@@ -297,6 +304,8 @@ My name is {{ data.name }}
 I came from <! data.country !>
 ```
 
+[Try it](#){.demo}{data-demo=tag-change}
+
 Default is `<%` `%>`.
 
 ### FILTER {#en/macro-filter}
@@ -309,6 +318,8 @@ Specifies a filter to be applied to all tag output.
 
 
 ### INCLUDE {#en/macro-include}
+
+Available only in nodejs environment.{.warning}
 
 ```
 ##% INCLUDE filepath <ROOT_ITEM>
@@ -325,8 +336,6 @@ By specifying ROOT_ITEM, only a portion of the data valid in the current templat
 ##%   INCLUDE deathnote.tmpl friend
 ##! })
 ```
-
-Available only in nodejs environment.
 
 ## Preinstalled Filters {#en/predefined-text-filters}
 
@@ -375,6 +384,9 @@ This can be used in a template as follows.
 ```
 ##> I spell it <% "dmv".$upper() %>
 ```
+
+[Try it](#){.demo}{data-demo=add-filter}
+
 
 # Reference guide {#en/reference-guide}
 

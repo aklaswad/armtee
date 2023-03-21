@@ -44,7 +44,8 @@ function setUpMarkDown (lang) {
     md.renderer.rules.fence = function (tokens, idx, options, env, slf) {
       var token = tokens[idx];
       const attrs = token.attrs || []
-      return `<pre ${attrs.map( attr => `${attr[0]}="${attr[1]}"`).join(' ')}><code class="code-fence" data-lang="${token.info || 'armtee'}">${token.content}</code></pre>`
+      const content = token.content.replace(/\n+$/, '')
+      return `<pre ${attrs.map( attr => `${attr[0]}="${attr[1]}"`).join(' ')}><code class="code-fence" data-lang="${token.info || 'armtee'}">${content}</code></pre>`
 
     }
   })
