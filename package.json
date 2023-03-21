@@ -13,16 +13,20 @@
   "bin": {
     "armtee": "./bin/cli.js"
   },
-  "main": "./lib/index.js",
-  "module": "./esm/index.js",
+  "main": "./dist/index.umd.cjs",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs"
+    }
+  },
   "files": [
-    "lib",
-    "bin",
-    "esm",
-    "umd"
+    "dist/",
+    "src/"
   ],
   "scripts": {
-    "build": "vite build -c vite.config.js",
+    "build": "vite build",
     "try": "node test.js",
     "test": "npx vitest run --globals --reporter verbose",
     "site-dev": "vite -c vite.config.site.js",

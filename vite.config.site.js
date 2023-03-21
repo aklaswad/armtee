@@ -5,13 +5,5 @@ export default defineConfig({
   base: '/armtee/',
   build: {
     outDir: './armtee',
-  },
-/*
-  plugins: [
-    monaco({
-       //languages: ['editorWorkerService', 'css', 'html', 'json', 'typescript'],
-       forceBuildCDN: true
-    })
-  ],
-*/
+  }
 })

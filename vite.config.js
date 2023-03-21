@@ -11,7 +11,8 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'armtee',
       fileName: 'index',
-      formats: ['es', 'cjs', 'umd'],
+      copyPublicDir: false,
+      sourcemap: true
     },
   },
   test: {

@@ -221,8 +221,7 @@ Comment line. Simply ignored.
 
 Lines beginning with `##- ` or `/- ` are comment lines.
 
-Previously, the notation was `### `. I liked the no-nonsense feel of comments, but I'm writing a document in markdown right now, and I noticed that it conflicts with the Heading notation in markdown, so I changed it :-).
-Think it's a negative, so you're taking it away. {.offtopic}
+Previously, the notation for comment was `### `. I liked it since it make me feel it's strongly comment. But I'm writing a document in markdown right now, and I noticed that it conflicts with the Heading notation in markdown, so I changed it :-).{.offtopic}
 
 ## writing-with-tags {#en/writing-with-tags}
 
@@ -374,7 +373,7 @@ Armtee.addFilter( upper, str => str.toUpperCase() )
 This can be used in a template as follows.
 
 ```
-##> I spell it <% "dmv". $upper() %>
+##> I spell it <% "dmv".$upper() %>
 ```
 
 # Reference guide {#en/reference-guide}

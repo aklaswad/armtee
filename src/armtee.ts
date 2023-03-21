@@ -6,7 +6,7 @@ import util from 'node:util'
 // XXX: How to avoid run on browser
 // XXX: And give typedef for them...?
 let readFileAsync: (...args: any) => Promise<any>
-if (Object.hasOwn(util, 'promisify')) {
+if ('undefined' !== typeof util && Object.hasOwn(util, 'promisify')) {
   readFileAsync = util.promisify(fs.readFile)
 }
 else {

@@ -469,10 +469,14 @@ if (currentChapter) {
   document.querySelector('body').classList.add('hashed')
 }
 else {
+  // All open by default or essential editors only...
+  // Simply thinking which is cool...
+  /*
   const defaultOpenEditors = { conf: false, json: true, tmpl: true, trans: false, out: true }
   for (let eid of editorIds) {
     setEditorStatus(eid, defaultOpenEditors[eid])
   }
+  */
 }
 const DocumentSources = {
   ja: [
@@ -500,7 +504,6 @@ async function main () {
     loadExamples()
   ])
   setTimeout(() => {
-    console.log(examples)
     setUpPage()
     setTimeout( () => {
       setUpDoc()
