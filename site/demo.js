@@ -445,7 +445,7 @@ function applyDemo (demoName) {
   editors['conf'].setValue(demoData.conf)
   editors['tmpl'].setValue(demoData.tmpl)
   editors['json'].setValue(JSON.stringify(demoData.json, null, 2))
-  render()
+  setTimeout(render,20)
   if ( demoData.show ) {
     for ( let eid of editorIds ) {
       setEditorStatus(eid, !!demoData.show[eid])
