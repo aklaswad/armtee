@@ -295,7 +295,7 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   background: linear-gradient(#282c34, rgba(0,0,0,0.0));
 }
 
-.offtopic {
+.offtopic, .author-note {
   border: 1px solid #303440;
   color: #aaa;
   padding: 2rem;
@@ -304,6 +304,10 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 
 .offtopic::before {
   content: '(offtopic): '
+}
+
+.author-note::before {
+  content: '(Author Note:) '
 }
 
 .warning {

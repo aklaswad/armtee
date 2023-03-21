@@ -329,7 +329,9 @@ Include other templates. Includes are handled statically before transpiling. It 
 
 The path of the template to be loaded is relative to the current template; there is no search path or fallback mechanism such as $PATH in shell.
 
-By specifying ROOT_ITEM, only a portion of the data valid in the current template can be passed as the target of the read template's roto process. If omitted, the root data of the calling template is passed **TODO consideration required**.
+By specifying ROOT_ITEM, only a portion of the data valid in the current template can be passed as the target of the read template's roto process. If omitted, the root data of the calling template is passed.
+
+ (TODO consideration required){.author-note}
 
 ```
 ##! data.friends.forEach( friend => {
