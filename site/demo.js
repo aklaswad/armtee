@@ -170,6 +170,11 @@ function setUpDoc () {
       evt.stopPropagation()
     } )
   }
+
+  const codeFences = document.querySelectorAll('#doc .code-fence')
+  for ( let codeFence of codeFences ) {
+    monaco.editor.colorizeElement( codeFence, {theme: 'my-dark'})
+  }
 }
 
 function setEditorStatus(editorId, onOff) {
@@ -206,10 +211,26 @@ function setEditorStatus(editorId, onOff) {
   }
 }
 
+function langDef () {
+  return {
+    defaultToken: 'string',
+    tokenPostfix: '.at',
+    tokenizer: {
+      root: [
+              [/^(?:\/\/|##)- .*$/, 'comment'],
+              [/^(?:\/\/|##)% .*$/, 'keyword'],
+              [/^(?:\/\/|##)! .*$/, 'tag' ],
+              [/^(?:\/\/|##)> .*$/, 'type'],
+      ],
+    }
+  }
+}
+
 async function loadEditor () {
 
   monaco = await loader.init()
-
+  monaco.languages.register({id: 'armtee'})
+  monaco.languages.setMonarchTokensProvider('armtee',langDef())
   monaco.editor.defineTheme("my-dark", {
     base: "vs-dark",
     inherit: true,

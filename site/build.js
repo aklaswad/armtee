@@ -38,6 +38,18 @@ function setUpMarkDown (lang) {
             '</code>';
     }
   })
+
+  // Syntax highlighting
+  md.use( md => {
+    md.renderer.rules.fence = function (tokens, idx, options, env, slf) {
+      var token = tokens[idx];
+      console.log(token)
+      const attrs = token.attrs || []
+      return `<pre ${attrs.map( attr => `${attr[0]}="${attr[1]}"`).join(' ')}><code class="code-fence" data-lang="${token.info || 'armtee'}">${token.content}</code></pre>`
+
+    }
+  })
+
   return md
 }
 
