@@ -58,7 +58,7 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
 
   blocks: IArmteeBlock[]
   signature: ArmteeLineSignature
-  filemode: ArmteeTemplateMode
+  fileMode: ArmteeTemplateMode
   runtimeSymbols: Record<string, string | string[]>
   executable: Function | undefined
   rawScript: string
@@ -66,16 +66,16 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
   __filters: Record <string, ArmteeFilter>
   __macros: Record <string, IArmteeMacro>
   __depth: number
-  constructor ( txt: string, signature: ArmteeLineSignature, filemode: ArmteeTemplateMode, options: ArmteeTranspileOptions ) {
+  constructor ( txt: string, signature: ArmteeLineSignature, fileMode: ArmteeTemplateMode, options: ArmteeTranspileOptions ) {
     const {filters, macros, meta} = options
     const parser = new ArmteeLineParser()
-    const blocks = parser.parse(txt, meta || {}, signature, filemode)
+    const blocks = parser.parse(txt, meta || {}, signature, fileMode)
     this.offset = 0
     this.__depth = 0
     this.debug = 0
     this.blocks = blocks
     this.signature = signature
-    this.filemode = filemode
+    this.fileMode = fileMode
     this.rawScript = ''
     this.__filters = {}
     this.__macros = {}
@@ -83,6 +83,9 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
     setUpDefaultFilters(this)
     this.importFilters(filters || {})
     this.importMacros(macros || {})
+    // This should be set by context initializer.
+    // Just put here pointless initializer for suppress TS warning 2564...
+    this.runtimeSymbols = {}
     this.initialize()
   }
 

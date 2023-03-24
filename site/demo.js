@@ -116,9 +116,9 @@ function setUpDoc () {
   }
 
   const observer = new IntersectionObserver(
-    (evts) => {
+    (events) => {
       if ( observeStop ) return
-      const id = evts.filter(evt => evt.isIntersecting).map( e => e.target.id)[0]
+      const id = events.filter(evt => evt.isIntersecting).map( e => e.target.id)[0]
       if ( id ) {
         openTocFor('#' + id)
         currentChapter = id.slice(3)
