@@ -18,8 +18,8 @@ export default defineConfig({
   test: {
     globals: true,
     coverage: {
-      provider: 'istanbul', // or 'c8'
-      reporter: ['text', 'json', 'html']
+      provider: 'c8',
+      reporter: ['json']
     },
   }
 })
