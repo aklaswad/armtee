@@ -2,6 +2,9 @@
 
 Line oriented text template tool
 
+[![Test](https://github.com/aklaswad/armtee/actions/workflows/test.yml/badge.svg)](https://github.com/aklaswad/armtee/actions/workflows/test.yml) [![codecov](https://codecov.io/gh/aklaswad/armtee/branch/main/graph/badge.svg?token=BL9RBPRG8N)](https://codecov.io/gh/aklaswad/armtee)
+
+
 ## Install
 _Not yet shipped. Try from this repository..._
 
