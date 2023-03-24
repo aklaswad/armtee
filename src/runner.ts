@@ -224,6 +224,7 @@ ERROR: ${ e instanceof Error ? e.toString() : e}
   }
 
   async render (data:any, options:ArmteeTranspileOptions={}) {
+    this.initialize()
     const js = await this.compile(options)
     if ( 'undefined' === typeof js ) {
       const ae = new ATError('Cannot get compiled artifact')

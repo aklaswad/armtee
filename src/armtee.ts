@@ -83,6 +83,10 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
     setUpDefaultFilters(this)
     this.importFilters(filters || {})
     this.importMacros(macros || {})
+    this.initialize()
+  }
+
+  initialize () {
     this.runtimeSymbols = {
       printer:  '_$',
       root: 'data',
