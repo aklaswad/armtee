@@ -187,6 +187,42 @@ ERROR: ${orig}
     }
   }
 
+  parseJSError (e:any, trace: any[]) {
+    if (this.debug > 0 ) {
+      const errorBlock = trace[ trace.length - 1 ]
+      return `Armtee render error: Got JS runtime error around file ${ errorBlock.src.file } line ${ errorBlock.src.line }:
+-------------
+${ errorBlock.txt }
+-------------
+ERROR: ${ e instanceof Error ? e.toString() : e}
+-------------`
+    }
+    else {
+      if ( !(e instanceof Error) ) {
+        return e
+      }
+      if ( e.stack ) {
+        let matches
+        if ( matches = e.stack.match(/(\d+):(\d+)\)?\n/m) ) {
+          let pos
+          try {
+            pos = this.resolvePos( parseInt(matches[1]), parseInt(matches[2]) )
+          }
+          catch(_e) {
+            return `Armtee render error: Got JS runtime error "${e}"`
+          }
+          if ( pos ) {
+            return `Armtee render error: Got JS runtime error "${e}" at file ${pos.file} line ${pos.line}`
+          }
+          else {
+            return `Armtee render error: Got JS runtime error "${e}"`
+          }
+        }
+      }
+      return e.toString()
+    }
+  }
+
   async render (data:any, options:ArmteeTranspileOptions={}) {
     const js = await this.compile(options)
     if ( 'undefined' === typeof js ) {
@@ -201,39 +237,7 @@ ERROR: ${orig}
       await js(data,printer)
     }
     catch (e) {
-      if (this.debug > 0 ) {
-        const errorBlock = trace[ trace.length - 1 ]
-        throw( `Armtee render error: Got JS runtime error around file ${ errorBlock.src.file } line ${ errorBlock.src.line }:
--------------
-${ errorBlock.txt }
--------------
-ERROR: ${ e instanceof Error ? e.toString() : e}
--------------`)
-      }
-      else {
-        if ( !(e instanceof Error) ) {
-          throw e
-        }
-        if ( e.stack ) {
-          let matches
-          if ( matches = e.stack.match(/(\d+):(\d+)\)?\n/m) ) {
-            let pos
-            try {
-              pos = this.resolvePos( parseInt(matches[1]), parseInt(matches[2]) )
-            }
-            catch(_e) {
-              throw( `Armtee render error: Got JS runtime error "${e}"` )
-            }
-            if ( pos ) {
-              throw( `Armtee render error: Got JS runtime error "${e}" at file ${pos.file} line ${pos.line}` )
-            }
-            else {
-              throw( `Armtee render error: Got JS runtime error "${e}"` )
-            }
-          }
-        }
-        e.toString()
-      }
+      throw this.parseJSError(e, trace)
     }
     return buf.join('\n')
   }
