@@ -62,3 +62,44 @@ add-filter:
     //- set `none` no-op filter to reset
     //% FILTER none
     Now not filtered: <% data.name %>
+indent:
+  show:
+    conf: false
+    json: true
+    tmpl: true
+    trans: false
+    out: true
+  json:
+  - name: Mercury
+  - name: Venus
+    atmosphere:
+    - CO2
+    - Clouds of sulfuric acid
+  - name: Earth
+    moons:
+    - Moon
+    atmosphere:
+    - Troposphere
+    - Stratosphere
+    - Mesosphere
+    - Thermosphere
+    - Exosphere
+  - name: Mars
+    moons:
+    - Phobos
+    - Deimos
+  tmpl: |-
+    //% ROOT planets
+    //! for ( let planet of planets ) {
+    # <% planet.name %>
+    //!   for (let air of (planet.atmosphere || [])) {
+    //% INDENT +2
+    - <% air %>
+    //!   }
+    //% INDENT reset
+    //!   for (let moon of (planet.moons || [])) {
+    //% INDENT +2
+    1. <% moon %>
+    //% INDENT -
+    //!   }
+    //! }

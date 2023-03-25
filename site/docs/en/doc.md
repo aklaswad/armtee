@@ -316,6 +316,24 @@ Specifies a filter to be applied to all tag output.
 ##% FILTER escapeSomething
 ```
 
+### INDENT {#en/macro-indent}
+
+Set indent level of upcoming outputs.
+
+```
+##% INDENT < - | reset | +N(t(ab)?)? >
+```
+_N could be an integer_
+
+INDENT macro will accept these values.
+
+ - `-`: Remove the latest indent level
+ - `reset`: Unset all indent level
+ - `+N`: Add indent level with N white spaces
+    - `##% INDENT +4` will add 4 more spaces to the current indent level
+    - `##% INDENT +1tab` will add 1 TAB (`'\t'`) to the current indent level
+
+[Try it](#){.demo}{data-demo=indent}
 
 ### INCLUDE {#en/macro-include}
 

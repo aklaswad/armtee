@@ -274,6 +274,9 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
       if ( op === '-' ) {
         return `${$c}.indents.pop(); ${$c}.indent = [${$c}.indentBase, ...${$c}.indents].join("")`
       }
+      if ( /reset/i.test(op) ) {
+        return `${$c}.indents = [];${$c}.indent = '';`
+      }
       const isTab = /t(?:ab)?$/i.test(op)
       const match = /^(?:\+)?([\d/]+)/.exec(op)
       let level

@@ -312,6 +312,25 @@ f
 ##% FILTER escapeSomething
 ```
 
+### INDENT {#ja/macro-indent}
+
+出力にインデントを設定します。
+
+```
+##% INDENT < - | reset | +N(t(ab)?)? >
+```
+_Nは１０進数の整数_
+
+INDENT マクロは以下の種類の命令を受け付けます。
+
+ - `-`: 直近のインデントレベルを取り消します。
+ - `reset`: すべてのインデントレベルを削除します。
+ - `+N`: インデントレベルを追加します。
+    - `##% INDENT +4` これは空白文字4個分のインデントを設定します。
+    - `##% INDENT +1tab` これは1つのタブ文字(`'\t'`)をインデントに追加します。
+
+[Try it](#){.demo}{data-demo=indent}
+
 
 ### INCLUDE {#ja/macro-include}
 
