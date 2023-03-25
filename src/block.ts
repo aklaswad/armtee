@@ -60,7 +60,7 @@ export abstract class ArmteeBlock implements IArmteeBlock {
       case 'comment' :
         return new ArmteeCommentBlock(txt, src)
       default :
-        throw new ATUnexpectedError(type)
+        throw new ATUnexpectedError(type as never)
     }
   }
 }

@@ -1,12 +1,12 @@
-import fs from 'node:fs'
-import path from 'node:path'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 import {setUpPrinter} from './printer.js'
-import util from 'node:util'
+import * as util from 'node:util'
 
 // XXX: How to avoid run on browser
 // XXX: And give typedef for them...?
 let readFileAsync: (...args: any) => Promise<any>
-if ('undefined' !== typeof util && Object.hasOwn(util, 'promisify')) {
+if ('undefined' !== typeof util && util.hasOwnProperty && util.hasOwnProperty('promisify')) {
   readFileAsync = util.promisify(fs.readFile)
 }
 else {

@@ -1,4 +1,4 @@
-import { ArmteeBlockMetaInfo } from "./types"
+import { ArmteeBlockMetaInfo } from "./types.js"
 
 function describeMetaInfo (meta: ArmteeBlockMetaInfo) {
   return `From template ${

@@ -5,7 +5,7 @@ export default defineConfig({
   build: {
     minify: false,
     rollupOptions: {
-      external: [/node:.*/],
+      external: [/node:.*/, /yargs*/],
     },
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
@@ -19,7 +19,7 @@ export default defineConfig({
     globals: true,
     coverage: {
       provider: 'c8',
-      reporter: ['json']
+      reporter: ['text', 'html']
     },
   }
 })
