@@ -143,6 +143,18 @@
     //!   // foo
     //! )}}
 
+- name: Change Tag
+  data:
+    name: foo
+    value: bar
+  tmpl: |-
+    <% data.name %>
+    //% TAG {{ }}
+    {{ data.value }}
+  expected: |-
+    foo
+    bar
+
 - name: Include hello
   tmpfile: true
   data:
