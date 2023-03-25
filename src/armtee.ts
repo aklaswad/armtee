@@ -262,6 +262,28 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
     }
   })
 
+  armtee.addMacro('INDENT', {
+    compile: async (armtee, args) => {
+      const op = args[0]
+      let script
+      const $c = armtee.runtimeSymbols.printer + '.context'
+      if ( op === '-' ) {
+        return `${$c}.indents.pop(); ${$c}.indent = [${$c}.indentBase, ...${$c}.indents].join("")`
+      }
+      const isTab = /t(?:ab)?$/i.test(op)
+      const match = /^(?:\+)([\d/]+)/.exec(op)
+      let level
+      if ( match ) {
+        level = parseInt(match[1])
+      }
+      else {
+        level = isTab ? 1 : 2
+      }
+      const indent = ( isTab ? '\\t' : ' ').repeat(level)
+      return `${$c}.indents.push('${indent}'); ${$c}.indent = [${$c}.indentBase, ...${$c}.indents].join("")`
+    }
+  })
+
   armtee.addMacro('INCLUDE', {
     compile: async (armtee, args, block) => {
       if ( armtee.__depth > 10 ) {

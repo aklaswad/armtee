@@ -194,3 +194,43 @@
   tmpl: |-
     //% INCLUDE each1.tmpl data
 
+- name: Indent space
+  data:
+    name: foo
+  tmpl: |-
+    bar
+    //% INDENT +2
+    <% data.name %>
+    //% INDENT -
+    bar
+  expected: |-
+    bar
+      foo
+    bar
+- name: Indent 4 space
+  data:
+    name: foo
+  tmpl: |-
+    bar
+    //% INDENT +4
+    <% data.name %>
+    //% INDENT -
+    bar
+  expected: |-
+    bar
+        foo
+    bar
+
+- name: Indent with tab
+  data:
+    name: foo
+  tmpl: |-
+    bar
+    //% INDENT t
+    <% data.name %>
+    //% INDENT -
+    bar
+  expected: |-
+    bar
+    	foo
+    bar

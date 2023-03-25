@@ -17,7 +17,10 @@ export type ArmteeTranspileOptions = {
 
 export type ArmteePrinterContext = {
   tagFilter: ArmteeFilter,
-  lineFilter: ArmteeFilter
+  lineFilter: ArmteeFilter,
+  indentBase: string,
+  indents: string[],
+  indent: string
 }
 
 export interface IArmteePrinter extends Function {
@@ -49,7 +52,7 @@ export interface IArmteeTranspiler {
   addMacro: (armtee:string, macro:IArmteeMacro) => IArmteeTranspiler
   addFilter: (armtee:string, filter:ArmteeFilter) => IArmteeTranspiler
   signature: ArmteeLineSignature
-  filemode: ArmteeTemplateMode
+  fileMode: ArmteeTemplateMode
   runtimeSymbols: Record<string, string | string[]>
   executable: Function | undefined
   rawScript: string
