@@ -1,4 +1,4 @@
-import fs from 'node:fs'
+import * as fs from 'node:fs'
 
 import {
   ArmteeBlockMetaInfo,
@@ -128,6 +128,7 @@ export class ArmteeRunner extends ArmteeTranspiler {
             }
           }
           else {
+            /* c8 ignore next 4 */
             const ae = new ATError("Panic at finding cause of compile error : Error was unexpected" + orig)
             ae.name = "PanicAtCompileErrorHandling"
             throw ae
@@ -135,6 +136,7 @@ export class ArmteeRunner extends ArmteeTranspiler {
         }
       }
       if ( ! raiser ) {
+        /* c8 ignore next 4 */
         const ae = new ATError("Panic at finding cause of compile error : No error position found:" + orig)
         ae.name = "PanicAtCompileErrorHandling"
         throw ae
@@ -152,6 +154,7 @@ export class ArmteeRunner extends ArmteeTranspiler {
         }
         catch(e) {
           if ( !(e instanceof Error) ) {
+            /* c8 ignore next 4 */
             const ae = new ATError( "Armtee: Panic at finding cause of compile error : Not expected:" + orig )
             ae.name = "PanicAtCompileErrorHandling"
             throw ae
