@@ -271,7 +271,7 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
         return `${$c}.indents.pop(); ${$c}.indent = [${$c}.indentBase, ...${$c}.indents].join("")`
       }
       const isTab = /t(?:ab)?$/i.test(op)
-      const match = /^(?:\+)([\d/]+)/.exec(op)
+      const match = /^(?:\+)?([\d/]+)/.exec(op)
       let level
       if ( match ) {
         level = parseInt(match[1])

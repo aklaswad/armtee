@@ -62,7 +62,7 @@ export function setUpPrinter (buf: string[], trace: any[], filters: {[name: stri
       lineFilter: printer.context.lineFilter,
       indentBase: printer.context.indent,
       indents: [],
-      indent: ''
+      indent: printer.context.indent
     }
     printer.contextStack.push(printer.context)
     printer.context = newContext
