@@ -72,7 +72,7 @@ template`
     fs.writeFileSync(tmplPath, tmpl, 'utf-8')
     cp.execFileSync('bin/cli.js', [
       'build',
-      '--outfile',
+      '--outFile',
       modulePath,
       '--type',
       'module',

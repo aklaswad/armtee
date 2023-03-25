@@ -30,7 +30,7 @@
     "build:cli": "npx tsc src/cli.ts --outDir dist/ --module node16",
     "try": "node test.js",
     "test": "npx vitest run --globals --reporter verbose",
-    "test:coverage": "vitest run --coverage.enabled --coverage.reporter='json'",
+    "test:ci": "vitest run --globals --reporter verbose --coverage.enabled --coverage.reporter='json'",
     "site-dev": "vite -c vite.config.site.js",
     "site-build": "node site/build.js && npm run build && vite build -c vite.config.site.js"
   },

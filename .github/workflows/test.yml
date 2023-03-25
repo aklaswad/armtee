@@ -12,7 +12,7 @@ jobs:
     - run: npm ci
     - run: npm run build
     - run: npm run build:cli
-    - run: npm run test:coverage-ci
+    - run: npm run test:ci
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       with:
