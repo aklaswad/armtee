@@ -9,7 +9,13 @@ export function setUpPrinter (buf: string[], trace: any[], filters: {[name: stri
   const symBackTick = Symbol('`')
   const symDollarCurlyBrace = Symbol('${')
   const symBackSlash = Symbol('bs')
-  const context = {tagFilter: filters.none, lineFilter: filters.none }
+  const context: ArmteePrinterContext = {
+    tagFilter: filters.none,
+    lineFilter: filters.none,
+    indentBase: '',
+    indents: [],
+    indent: ''
+  }
 
   const printer = function (
     literals: TemplateStringsArray,
@@ -35,7 +41,7 @@ export function setUpPrinter (buf: string[], trace: any[], filters: {[name: stri
         }
       })
     )
-    buf.push(printer.context.lineFilter(raw))
+    buf.push(printer.context.indent + printer.context.lineFilter(raw))
   }
   printer.$ = function (symbol: string) {
     switch (symbol) {
@@ -51,7 +57,13 @@ export function setUpPrinter (buf: string[], trace: any[], filters: {[name: stri
   printer.contextStack = contextStack
   printer.context = context
   printer.pushToContextStack = function printerPush () {
-    const newContext = Object.assign({}, printer.context)
+    const newContext: ArmteePrinterContext = {
+      tagFilter: printer.context.tagFilter,
+      lineFilter: printer.context.lineFilter,
+      indentBase: printer.context.indent,
+      indents: [],
+      indent: ''
+    }
     printer.contextStack.push(printer.context)
     printer.context = newContext
   }
