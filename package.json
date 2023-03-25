@@ -28,6 +28,7 @@
   "scripts": {
     "build": "vite build",
     "build:cli": "npx tsc src/cli.ts --outDir dist/ --module node16",
+    "coverage": "vitest run --coverage",
     "try": "node test.js",
     "test": "npx vitest run --globals --reporter verbose",
     "test:ci": "vitest run --globals --reporter verbose --coverage.enabled --coverage.reporter='json'",
