@@ -8,6 +8,8 @@ import * as util from 'node:util'
 let readFileAsync: (...args: any) => Promise<any>
 if ('undefined' !== typeof util && util.hasOwnProperty && util.hasOwnProperty('promisify')) {
   readFileAsync = util.promisify(fs.readFile)
+
+  /* c8 ignore next 4 */
 }
 else {
   readFileAsync = () => new Promise((r) => r(''))
