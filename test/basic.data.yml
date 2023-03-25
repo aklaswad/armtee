@@ -221,6 +221,28 @@
         foo
     bar
 
+- name: Multiple indents
+  data:
+    name: foo
+  tmpl: |-
+    bar
+    //% INDENT +4
+    <% data.name %>
+    //% INDENT +4
+    <% data.name %>
+    bar
+    //% INDENT -
+    fizz
+    //% INDENT -
+    buzz
+  expected: |-
+    bar
+        foo
+            foo
+            bar
+        fizz
+    buzz
+
 - name: Indent with tab
   data:
     name: foo
@@ -234,3 +256,23 @@
     bar
     	foo
     bar
+- name: Indent inside included template will automatically fixed
+  data: 1
+  debug: 10
+  tmpfile: true
+  tmpl: |-
+    foo
+    //% INDENT 4
+    bar
+    //% INCLUDE indent.tmpl
+    fizz
+    //% INDENT -
+    buzz
+  expected: |-
+    foo
+        bar
+        inc0
+            inc1
+                inc2
+        fizz
+    buzz
