@@ -33,6 +33,8 @@ import {
 
 import { ArmteeLineParser, Sigs, modeFromText } from './line-parser.js'
 
+import { moduleRunner, scriptRunner } from './executor.js'
+
 /**
  * Class represents parsed template
  */
@@ -180,13 +182,13 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
       case 'module':
         executor = [
           setUpPrinter.toString(),
-          moduleRunner
+          moduleRunnerString
         ].join('\n')
         break
       case 'script':
         executor = [
           setUpPrinter.toString(),
-          scriptRunner
+          scriptRunnerString
         ].join('\n')
         break
     }
@@ -324,35 +326,11 @@ function setUpDefaultFilters(armtee:IArmteeTranspiler) {
   armtee.addFilter( 'none', str => str )
 }
 
-const moduleRunner = `
-export async function render (data) {
-  const buf = []
-  const trace = []
-  const printer = setUpPrinter(buf,trace,filters)
-  await _render(data, printer)
-  return buf.join('\\n')
+const moduleRunnerString = `${moduleRunner.toString()}
+export const render = moduleRunner`
+
+const scriptRunnerString = `${
+  scriptRunner.toString()
 }
-`
-
-const scriptRunner = `
-process.stdin.setEncoding("utf8");
-
-var lines = [];
-var reader = require("readline").createInterface({
-  input: process.stdin,
-});
-
-reader.on("line", (line) => {
-  lines.push(line);
-});
-
-reader.on("close", async () => {
-  const input = lines.join('\\n')
-  const data = JSON.parse(input)
-  const buf = []
-  const trace = []
-  const printer = setUpPrinter(buf,trace,filters)
-  await _render(data, printer)
-  console.log( buf.join('\\n') )
-});
+scriptRunner()
 `
