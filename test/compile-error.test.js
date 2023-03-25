@@ -17,6 +17,14 @@ describe('ArmteeTranspiler', () => {
     }).rejects.toThrow(/Tag is not valid JavaScript/i)
   })
 
+  test('throw error if tag is empty', async () => {
+    expect(async () => {
+      return await ArmteeRunner.render(
+        'abc\n<% %>\nghi',
+        'def')
+    }).rejects.toThrow(/Failed to convert template/i)
+  })
+
   test('can throw if unmatched tag delimiter', async () => {
     expect(async () => {
       return await ArmteeRunner.render(

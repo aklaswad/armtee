@@ -1,3 +1,14 @@
+- name: Ignore Comment
+  data:
+    name: test
+  tmpl: |-
+    a
+    //- b
+    c
+  expected: |-
+    a
+    c
+
 - name: Render Value
   data:
     name: test
@@ -154,6 +165,17 @@
   expected: |-
     foo
     bar
+
+- name: Change Root
+  data:
+    name: foo
+    value: bar
+  tmpl: |-
+    //% ROOT item
+    <% item.name %>:<% item.value %>
+  expected: |-
+    foo:bar
+
 
 - name: Include hello
   tmpfile: true

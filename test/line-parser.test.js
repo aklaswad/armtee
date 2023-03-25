@@ -1,6 +1,7 @@
 import { expect } from 'vitest'
 import { ArmteeLineParser, modeFromText } from '../src/line-parser'
 
+
 const hashyTemplateBase = `
 ##% macro1
 ##% macro2
