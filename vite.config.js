@@ -17,6 +17,9 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    deps: {
+      inline: ['vitest-mock-process'],
+    },
     coverage: {
       provider: 'c8',
       reporter: ['text', 'html']
