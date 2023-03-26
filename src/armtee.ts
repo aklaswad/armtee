@@ -256,16 +256,6 @@ function setUpDefaultMacros(armtee:IArmteeTranspiler) {
     }
   })
 
-  armtee.addMacro('FILTERALL', {
-    compile: async (armtee, args) => {
-      const [ filterName ] = args
-      if ( ! armtee.__filters[filterName] ) {
-        throw 'Unknown filter ' + filterName
-      }
-      return [`${armtee.runtimeSymbols.printer}.context.lineFilter = ${armtee.runtimeSymbols.printer}.filters.${filterName}`]
-    }
-  })
-
   armtee.addMacro('INDENT', {
     compile: async (armtee, args) => {
       const op = args[0]
