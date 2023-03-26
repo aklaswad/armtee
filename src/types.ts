@@ -24,7 +24,6 @@ export type ArmteePrinterContext = {
 }
 
 export interface IArmteePrinter extends Function {
-  trace: Function
   filters: Record<string, ArmteeFilter>
   context: ArmteePrinterContext
   contextStack: ArmteePrinterContext[]

@@ -70,9 +70,6 @@ export class ArmteeScriptBlock extends ArmteeBlock {
 
   async compile (armtee:IArmteeTranspiler, txt:string) {
     const ret = []
-    if ( armtee.debug ) {
-      //ret.push( '_trace(' + JSON.stringify(this) + ')' )
-    }
     ret.push(this.txt)
     return ret.join('\n')
   }
@@ -179,9 +176,6 @@ ${ script }
 -------------
 ${ e instanceof Error ? e.toString() : e }
 -------------`, 'WrongTemplateLine')
-    }
-    if ( armtee.debug ) {
-      ret.push( armtee.runtimeSymbols.printer + '._trace(' + JSON.stringify(this) + ')' )
     }
     ret.push( armtee.runtimeSymbols.printer + script )
     return ret.join('\n')
