@@ -310,3 +310,23 @@
                 inc2
         fizz
     buzz
+- name: Indent can reset
+  data:
+  - 1
+  - 2
+  - 3
+  debug: 10
+  tmpl: |-
+    foo
+    //! for ( let i of data ) {
+    //% INDENT +2
+    <% i %>
+    //! }
+    //% INDENT reset
+    bar
+  expected: |-
+    foo
+      1
+        2
+          3
+    bar
