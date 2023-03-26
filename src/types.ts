@@ -8,6 +8,7 @@ export type ArmteeTranspileOptions = {
   filters?: Record<string, ArmteeFilter>
   macros?: Record<string, IArmteeMacro>
   includeFilters?: boolean
+  debug: number
   __depth?: number
   __inject?: IArmteeBlock
   __injectLine?: number

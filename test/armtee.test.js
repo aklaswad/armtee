@@ -58,6 +58,35 @@ describe('armtee convert', () => {
   })
 })
 
+describe('armtee constructor', () => {
+  it('can add custom macro', async () => {
+    const armtee = ArmteeTranspiler.fromText(
+      '//% foo bar',
+      {
+        macros: {
+          foo: {
+            precompile: (armtee, args, block) => {
+              expect(block.type()).toBe('macro')
+              expect(args.length).toBe(1)
+              expect(args[0]).toBe('bar')
+              armtee.__foo = 42
+            },
+            compile: async (_armtee, args) => {
+              expect(args.length).toBe(1)
+              expect(args[0]).toBe('bar')
+              return '//foo'
+            }
+          }
+        }
+      }
+    )
+    // compiled by macro foo
+    const compiled = await armtee.translate()
+    expect(armtee.__foo).toBe(42)
+    expect(compiled).toMatch(/\/\/foo/)
+  })
+})
+
 describe('armtee wrap', () => {
   it('can build function text', () => {
     const armtee = ArmteeTranspiler.fromText('')
@@ -82,6 +111,5 @@ describe('armtee wrap', () => {
     expect(armtee.wrap('', {__buildType: 'script', includeFilters: true}))
       .toMatch('bar bar')
   })
-
 })
 

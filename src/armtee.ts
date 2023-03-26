@@ -76,7 +76,7 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
     const blocks = parser.parse(txt, meta || {}, signature, fileMode)
     this.offset = 0
     this.__depth = 0
-    this.debug = 0
+    this.debug = options.debug || 0
     this.blocks = blocks
     this.signature = signature
     this.fileMode = fileMode
@@ -157,7 +157,6 @@ export class ArmteeTranspiler implements IArmteeTranspiler {
   }
 
   wrap (txt: string, options: ArmteeTranspileOptions ) {
-    let filterInjection = ''
     const headerLines = []
     if ( options.__buildType === 'script' ) {
       headerLines.push('#!/usr/bin/env node')
@@ -222,7 +221,7 @@ ${executor}
   }
 
   addMacro( command:string, macro:IArmteeMacro ) {
-    this.__macros[command] = macro
+    this.__macros[command.toUpperCase()] = macro
     return this
   }
 

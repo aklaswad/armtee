@@ -77,10 +77,11 @@ export class ArmteeRunner extends ArmteeTranspiler {
     //}
 
     const js = this.wrap( await this.translate(options), { ...options, __buildType: 'function' } )
-    if ( this.debug > 1 ) {
-      console.error( 'DEBUG: armtee generated render script')
-      console.error( '------------------------------------------')
-      console.error( js )
+    if ( this.debug > 0 ) {
+      console.error( `DEBUG: armtee generated render script
+------------------------------------------
+${js}
+`)
     }
 
     try {
