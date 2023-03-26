@@ -440,6 +440,29 @@ const rendered = Armtee.renderFile(filename, data)
  - `$ npx armtee render --help`
  - `$ npx armtee convert --help`
 
+### ビルド結果のモジュール{#ja/about-module-output}
+
+`armtee build --type module` コマンドを使ってESMを出力できます。
+出力したモジュールは以下のように再利用できます。
+
+```
+import * as foo from `./your-output.js`
+console.log(foo.render(data))
+```
+
+### ビルド結果のスクリプト{#ja/about-script-output}
+
+`armtee build --type script` コマンドを使って実行可能なスクリプトを出力できます。
+出力したスクリプトは以下のように再利用できます。
+
+```
+$ armtee build --type script foo.tmpl > foo.cjs
+$ ./foo.cjs --help
+$ ./foo.cjs data.json
+$ cat data.json | foo.cjs
+```
+
+
 # おまけ {#ja/appendix}
 
 

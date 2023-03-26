@@ -442,6 +442,26 @@ For details, please refer to the following help commands.
  - `$ npx armtee render --help`
  - `$ npx armtee convert --help`
 
+### Module output{#en/about-module-output}
+
+You can use ESM which printed by command `armtee build --type module` as like this;
+
+```
+import * as foo from `./your-output.js`
+console.log(foo.render(data))
+```
+
+### Script output{$en/about-script-output}
+
+You can use script which printed by command `armtee build --type script` as like below
+
+```
+$ armtee build --type script foo.tmpl > foo.cjs
+$ ./foo.cjs --help
+$ ./foo.cjs data.json
+$ cat data.json | foo.cjs
+```
+
 &nbsp;
 
 &nbsp;
