@@ -58,3 +58,30 @@ describe('armtee convert', () => {
   })
 })
 
+describe('armtee wrap', () => {
+  it('can build function text', () => {
+    const armtee = ArmteeTranspiler.fromText('')
+    expect(armtee.wrap('', {__buildType: 'function'}))
+      .toMatch(/function/)
+  })
+  it('can build module text', () => {
+    const armtee = ArmteeTranspiler.fromText('')
+    expect(armtee.wrap('', {__buildType: 'module'}))
+      .toMatch(/export/)
+  })
+
+  it('can build function text', () => {
+    const armtee = ArmteeTranspiler.fromText('')
+    expect(armtee.wrap('', {__buildType: 'script'}))
+      .toMatch('#!/usr/bin')
+  })
+  it('can include filter definitions', () => {
+    const armtee = ArmteeTranspiler.fromText('', {filters: {
+      foo: (s) => s + ' bar bar'
+    }})
+    expect(armtee.wrap('', {__buildType: 'script', includeFilters: true}))
+      .toMatch('bar bar')
+  })
+
+})
+
