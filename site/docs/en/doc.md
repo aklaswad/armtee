@@ -446,7 +446,7 @@ For details, please refer to the following help commands.
 
 You can use ESM which printed by command `armtee build --type module` as like this;
 
-```
+```javascript
 import * as foo from `./your-output.js`
 console.log(foo.render(data))
 ```
@@ -455,7 +455,7 @@ console.log(foo.render(data))
 
 You can use script which printed by command `armtee build --type script` as like below
 
-```
+```shell
 $ armtee build --type script foo.tmpl > foo.cjs
 $ ./foo.cjs --help
 $ ./foo.cjs data.json

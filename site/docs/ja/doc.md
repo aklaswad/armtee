@@ -108,8 +108,8 @@ armteeのテンプレートは、行(または複数行のブロック)単位で
 各行を`##! `のような、__空白を含めた4文字__ ではじめることでarmteeにそれぞれの行が何かを伝えます。
 この４文字を __行修飾子__ と呼びましょう。
 
-すべての行に__行修飾子__を付ける必要はありません。
-テンプレート行、またはスクリプト行は__行修飾子__を省略できます。（もしくは、省略しなければなりません。）どちらの行を省略するかは、これから説明するファイルのモードによって選ぶことができます。
+すべての行に __行修飾子__ を付ける必要はありません。
+テンプレート行、またはスクリプト行は __行修飾子__ を省略できます。（もしくは、省略しなければなりません。）どちらの行を省略するかは、これから説明するファイルのモードによって選ぶことができます。
 
 ### 2種類のスタイルと２種類のモード {#ja/2-styles-x-2-modes}
 
@@ -301,7 +301,7 @@ I came from <! data.country !>
 ```
 
 [試す](#){.demo}{data-demo=tag-change}
-f
+
 デフォルトは`<%` `%>`です。
 
 ### FILTER {#ja/macro-filter}
@@ -445,7 +445,7 @@ const rendered = Armtee.renderFile(filename, data)
 `armtee build --type module` コマンドを使ってESMを出力できます。
 出力したモジュールは以下のように再利用できます。
 
-```
+```javascript
 import * as foo from `./your-output.js`
 console.log(foo.render(data))
 ```
@@ -455,7 +455,7 @@ console.log(foo.render(data))
 `armtee build --type script` コマンドを使って実行可能なスクリプトを出力できます。
 出力したスクリプトは以下のように再利用できます。
 
-```
+```shell
 $ armtee build --type script foo.tmpl > foo.cjs
 $ ./foo.cjs --help
 $ ./foo.cjs data.json

@@ -298,16 +298,19 @@ a.editor-toggle:hover, a.editor-toggle:focus {
 .offtopic, .author-note {
   border: 1px solid #303440;
   color: #aaa;
-  padding: 2rem;
+  padding: 1.2rem;
   font-style: italic;
+  font-size: 0.97rem;
 }
 
 .offtopic::before {
-  content: '(offtopic): '
+  content: '📝 (Off Topic): ';
+  display: block;
 }
 
 .author-note::before {
-  content: '(Author Note:) '
+  content: '📝 (Author Note): ';
+  display: block;
 }
 
 .warning {
@@ -315,6 +318,10 @@ a.editor-toggle:hover, a.editor-toggle:focus {
   color: #c89e33;
   padding: 0.6rem;
   font-weight: bold;
+}
+
+.warning::before {
+  content: "⚠️ "
 }
 
 #doc-ending {
