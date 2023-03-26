@@ -5,7 +5,7 @@ import {
   IArmteeBlock
 } from './types.js'
 
-export function setUpPrinter (buf: string[], trace: any[], filters: {[name: string]: ArmteeFilter}) {
+export function setUpPrinter (buf: string[], filters: {[name: string]: ArmteeFilter}) {
   const symBackTick = Symbol('`')
   const symDollarCurlyBrace = Symbol('${')
   const symBackSlash = Symbol('bs')
@@ -51,7 +51,6 @@ export function setUpPrinter (buf: string[], trace: any[], filters: {[name: stri
     }
     throw "Invalid Symbol;"
   }
-  printer.trace = function (block: IArmteeBlock) { trace.push(block) }
   printer.filters = filters
   const contextStack :ArmteePrinterContext[] = []
   printer.contextStack = contextStack

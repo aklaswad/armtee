@@ -190,40 +190,29 @@ ERROR: ${orig}
     }
   }
 
-  parseJSError (e:any, trace: any[]) {
-    if (this.debug > 0 ) {
-      const errorBlock = trace[ trace.length - 1 ]
-      return `Armtee render error: Got JS runtime error around file ${ errorBlock.src.file } line ${ errorBlock.src.line }:
--------------
-${ errorBlock.txt }
--------------
-ERROR: ${ e instanceof Error ? e.toString() : e}
--------------`
+  parseJSError (e:any) {
+    if ( !(e instanceof Error) ) {
+      return e
     }
-    else {
-      if ( !(e instanceof Error) ) {
-        return e
-      }
-      if ( e.stack ) {
-        let matches
-        if ( matches = e.stack.match(/(\d+):(\d+)\)?\n/m) ) {
-          let pos
-          try {
-            pos = this.resolvePos( parseInt(matches[1]), parseInt(matches[2]) )
-          }
-          catch(_e) {
-            return `Armtee render error: Got JS runtime error "${e}"`
-          }
-          if ( pos ) {
-            return `Armtee render error: Got JS runtime error "${e}" at file ${pos.file} line ${pos.line}`
-          }
-          else {
-            return `Armtee render error: Got JS runtime error "${e}"`
-          }
+    if ( e.stack ) {
+      let matches
+      if ( matches = e.stack.match(/(\d+):(\d+)\)?\n/m) ) {
+        let pos
+        try {
+          pos = this.resolvePos( parseInt(matches[1]), parseInt(matches[2]) )
+        }
+        catch(_e) {
+          return `Armtee render error: Got JS runtime error "${e}"`
+        }
+        if ( pos ) {
+          return `Armtee render error: Got JS runtime error "${e}" at file ${pos.file} line ${pos.line}`
+        }
+        else {
+          return `Armtee render error: Got JS runtime error "${e}"`
         }
       }
-      return e.toString()
     }
+    return e.toString()
   }
 
   async render (data:any, options:ArmteeTranspileOptions={}) {
@@ -235,13 +224,12 @@ ERROR: ${ e instanceof Error ? e.toString() : e}
       throw ae
     }
     const buf: string[] = []
-    const trace: any[] = []
-    const printer = setUpPrinter(buf, trace, this.__filters)
+    const printer = setUpPrinter(buf, this.__filters)
     try {
       await js(data,printer)
     }
     catch (e) {
-      throw this.parseJSError(e, trace)
+      throw this.parseJSError(e)
     }
     return buf.join('\n')
   }

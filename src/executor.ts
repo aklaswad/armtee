@@ -22,15 +22,14 @@ function _render(data:any, printer:IArmteePrinter) {
 export function setTestRenderer ( fn: (data:any, printer:IArmteePrinter) => void) {
   __render = fn
 }
+
 /* c8 ignore next 1 */
 export const filters: Record <string, ArmteeFilter> = {none: s => s}
 
 export async function moduleRunner (data:any) {
   const buf:string[] = []
-  const trace:any[] = []
   const printer = setUpPrinter(
     buf,
-    trace,
     filters
   )
   await _render(data, printer)
@@ -94,8 +93,7 @@ EXAMPLE:
     return
   }
   const buf:string[] = []
-  const trace:any[] = []
-  const printer = setUpPrinter(buf,trace,filters)
+  const printer = setUpPrinter(buf,filters)
   await _render(data, printer)
   process.stdout.write( buf.join('\n') + '\n' )
 }
