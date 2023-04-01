@@ -43,7 +43,7 @@ export function setUpPrinter (buf: string[], filters: {[name: string]: ArmteeFil
     )
     buf.push(printer.context.indent + printer.context.lineFilter(raw))
   }
-  printer.$ = function (symbol: string) {
+  printer.$ = function (symbol: string) : symbol {
     switch (symbol) {
       case '`': return symBackTick;
       case '${': return symDollarCurlyBrace;
