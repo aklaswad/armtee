@@ -6,7 +6,9 @@ TOCEND
 
 ## Install {#en/install}
 
-N/A
+```bash
+npm i armtee
+```
 
 ## Writing template {#en/writing-template}
 

@@ -40,7 +40,8 @@
     "test": "npx vitest run --globals --reporter verbose",
     "test:ci": "vitest run --globals --reporter verbose --coverage.enabled --coverage.reporter='json'",
     "site-dev": "vite -c vite.config.site.js",
-    "site-build": "npm run build && node site/build.js && vite build -c vite.config.site.js"
+    "site-build": "npm run build && node site/build.js && vite build -c vite.config.site.js",
+    "publish": "npm run build && npm publish"
   },
   "author": "Akira Sawada",
   "license": "MIT",

@@ -6,13 +6,9 @@ Line oriented text template tool
 
 
 ## Install
-_Not yet shipped. Try from this repository..._
 
-```
-$ git clone git@github.com:aklaswad/armtee.git
-$ cd armtee
-$ npm i .
-$ npx armtee --help
+```bash
+npm i armtee
 ```
 
 ## Synopsis

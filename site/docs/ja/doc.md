@@ -6,7 +6,9 @@ TOCEND
 
 ## インストール {#ja/install}
 
-まだです
+```
+npm i armtee
+```
 
 ## テンプレートを書いてみる {#ja/writing-template}
 
