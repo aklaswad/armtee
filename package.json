@@ -1,7 +1,7 @@
 {
   "name": "armtee",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Line oriented micro templating tool",
   "keywords": [
     "micro",
@@ -27,9 +27,9 @@
     }
   },
   "files": [
-    "dist/",
-    "src/",
-    "types/"
+    "dist",
+    "src",
+    "types"
   ],
   "scripts": {
     "build": "rm -rf ./public && vite build",
