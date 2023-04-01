@@ -4,8 +4,12 @@
   "version": "0.0.1",
   "description": "Line oriented micro templating tool",
   "keywords": [
+    "micro",
     "template",
-    "micro template"
+    "engine",
+    "template engine",
+    "micro templating",
+    "embedded template engine"
   ],
   "homepage": "https://aklaswad.github.io/armtee/",
   "bugs": "https://github.com/aklaswad/armtee/issues",
